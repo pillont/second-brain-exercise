@@ -10,5 +10,7 @@ class GreetingService:
 
         greeting = Greeting(id=1, message="Hello from API!")
 
-        logger.info(f"Returning greeting: id={greeting.id}, message={greeting.message}")
+        logger.info(
+            "Returning greeting: id=%s, message=%s", greeting.id, greeting.message
+        )
         return greeting

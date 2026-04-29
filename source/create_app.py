@@ -1,7 +1,7 @@
 import logging
 from flask import Flask
 from flask_smorest import Api  # type: ignore[import-untyped]
-from source.config import Config
+from source.config.config import Config
 from source.container import setup_container, Container
 from source.controllers.greeting_controller import greeting_blp
 from source.controllers.utils.error_handlers import register_error_handlers
@@ -21,8 +21,9 @@ def create_app(config_obj: Config) -> FlaskApp:
     app = FlaskApp(__name__)
     app.config.from_object(config_obj)
     logger.info(
-        f"Configuration loaded: DEBUG={app.config['DEBUG']},"
-        f" TESTING={app.config['TESTING']}"
+        "Configuration loaded: DEBUG=%s, TESTING=%s",
+        app.config["DEBUG"],
+        app.config["TESTING"],
     )
 
     logger.info("Initializing dependency injection container...")

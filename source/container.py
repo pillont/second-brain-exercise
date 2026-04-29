@@ -13,7 +13,7 @@ def setup_container() -> Container:
     logger.info("Setting up dependency injection container...")
 
     container = Container()
-    container.wire(
+    container.wire(  # pylint: disable=no-member
         modules=[
             "source.controllers.greeting_controller",
         ]

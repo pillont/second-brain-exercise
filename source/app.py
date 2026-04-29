@@ -1,6 +1,6 @@
 import logging
 from source.create_app import create_app
-from source.config import get_config
+from source.config.config import get_config
 
 logger = logging.getLogger(__name__)
 

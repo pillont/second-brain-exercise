@@ -5,7 +5,11 @@
       "Bash(python -m pytest source/tests/ -v --tb=short)",
       "Bash(.venv/bin/python -m flake8 source/)",
       "Bash(.venv/bin/python -m mypy source/)",
-      "Bash(.venv/bin/python -m pytest source/tests/unit/ -v)"
+      "Bash(.venv/bin/python -m pytest source/tests/unit/ -v)",
+      "Bash(.venv/bin/python -m mypy source/ --explicit-package-bases)",
+      "Bash(.venv/bin/python -m flake8 source/ --count --show-source --statistics)",
+      "Bash(.venv/bin/python -m pylint source/ --init-hook='import sys; sys.path.insert\\(0, \".\"\\)' --extension-pkg-allow-list=dependency_injector --disable=C0111,C0103,R0903,W0621,R0801 --exit-zero)",
+      "Bash(.venv/bin/python -m pytest source/tests/unit/ -v --tb=short)"
     ]
   }
 }

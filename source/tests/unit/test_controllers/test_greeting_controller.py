@@ -1,7 +1,8 @@
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
 from source.create_app import create_app
-from source.config import TestingConfig
+from source.config.config import TestingConfig
 
 
 @pytest.fixture
