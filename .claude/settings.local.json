@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m mypy source/)",
+      "Bash(python -m pytest source/tests/ -v --tb=short)",
+      "Bash(.venv/bin/python -m flake8 source/)",
+      "Bash(.venv/bin/python -m mypy source/)",
+      "Bash(.venv/bin/python -m pytest source/tests/unit/ -v)"
+    ]
+  }
+}
