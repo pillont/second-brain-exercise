@@ -1,4 +1,4 @@
-from typing import Generator, Iterable
+from typing import Iterable
 
 from flask_smorest import Blueprint
 from dependency_injector.wiring import inject, Provide
