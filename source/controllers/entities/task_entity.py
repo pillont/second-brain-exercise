@@ -7,6 +7,7 @@ from source.controllers.entities.link import LinkEntity, LinksEntity
 class TaskLinks(LinksEntity):
     tasks: LinkEntity
     update: LinkEntity
+    delete: LinkEntity
 
 
 class TaskDataEntity(TypedDict):

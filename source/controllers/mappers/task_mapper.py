@@ -1,5 +1,3 @@
-from typing import cast
-
 from source.models.task import Task, TaskData, TaskUpdateData
 from source.controllers.entities.task_entity import (
     TaskDataEntity,
@@ -7,7 +5,7 @@ from source.controllers.entities.task_entity import (
     TaskLinks,
     TaskUpdateDataEntity,
 )
-from source.controllers.entities.link import HttpMethod
+from source.controllers.entities.link import HttpMethod, LinkEntity
 
 
 def to_task_data(entity: TaskDataEntity) -> TaskData:
@@ -28,16 +26,11 @@ def to_task_update_data(entity: TaskUpdateDataEntity) -> TaskUpdateData:
 
 
 def _build_links(task: Task) -> TaskLinks:
-    return cast(
-        TaskLinks,
-        {
-            "self_link": {"href": f"/tasks/{task.id}"},
-            "tasks": {"href": "/tasks/"},
-            "update": {
-                "href": f"/tasks/{task.id}",
-                "type": HttpMethod.PUT,
-            },
-        },
+    return TaskLinks(
+        self_link=LinkEntity(href=f"/tasks/{task.id}"),
+        tasks=LinkEntity(href="/tasks/"),
+        update=LinkEntity(href=f"/tasks/{task.id}", type=HttpMethod.PUT),
+        delete=LinkEntity(href=f"/tasks/{task.id}", type=HttpMethod.DELETE),
     )
 
 

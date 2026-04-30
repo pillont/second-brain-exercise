@@ -38,6 +38,7 @@ def test_task_schema_dump_has_correct_keys() -> None:
             self_link=LinkEntity(href="/tasks/1"),
             tasks=LinkEntity(href="/tasks/"),
             update=LinkEntity(href="/tasks/1", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/tasks/1", type=HttpMethod.DELETE),
         ),
     )
 
@@ -63,6 +64,7 @@ def test_task_schema_dump_links_structure() -> None:
             self_link=LinkEntity(href="/tasks/1"),
             tasks=LinkEntity(href="/tasks/"),
             update=LinkEntity(href="/tasks/1", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/tasks/1", type=HttpMethod.DELETE),
         ),
     )
 
@@ -83,6 +85,7 @@ def test_task_schema_dump_links_includes_tasks() -> None:
             self_link=LinkEntity(href="/tasks/1"),
             tasks=LinkEntity(href="/tasks/"),
             update=LinkEntity(href="/tasks/1", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/tasks/1", type=HttpMethod.DELETE),
         ),
     )
 
@@ -103,6 +106,7 @@ def test_task_schema_with_many_true_dumps_list() -> None:
             self_link=LinkEntity(href="/tasks/1"),
             tasks=LinkEntity(href="/tasks/"),
             update=LinkEntity(href="/tasks/1", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/tasks/1", type=HttpMethod.DELETE),
         ),
     )
     entity2 = TaskEntity(
@@ -115,6 +119,7 @@ def test_task_schema_with_many_true_dumps_list() -> None:
             self_link=LinkEntity(href="/tasks/2"),
             tasks=LinkEntity(href="/tasks/"),
             update=LinkEntity(href="/tasks/2", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/tasks/2", type=HttpMethod.DELETE),
         ),
     )
 
@@ -147,6 +152,7 @@ def test_task_schema_with_many_true_includes_links_per_entity() -> None:
             self_link=LinkEntity(href="/tasks/1"),
             tasks=LinkEntity(href="/tasks/"),
             update=LinkEntity(href="/tasks/1", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/tasks/1", type=HttpMethod.DELETE),
         ),
     )
     entity2 = TaskEntity(
@@ -159,6 +165,7 @@ def test_task_schema_with_many_true_includes_links_per_entity() -> None:
             self_link=LinkEntity(href="/tasks/2"),
             tasks=LinkEntity(href="/tasks/"),
             update=LinkEntity(href="/tasks/2", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/tasks/2", type=HttpMethod.DELETE),
         ),
     )
 

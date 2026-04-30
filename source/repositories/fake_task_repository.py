@@ -3,6 +3,7 @@ from typing import Iterable, List
 from source.models.not_found_error import NotFoundError
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
 from source.repositories.create_task_repository import CreateTaskRepository
+from source.repositories.delete_task_repository import DeleteTaskRepository
 from source.repositories.get_all_tasks_repository import GetAllTasksRepository
 from source.repositories.get_task_repository import GetTaskRepository
 from source.repositories.update_task_repository import UpdateTaskRepository
@@ -13,6 +14,7 @@ class FakeTaskRepository(
     GetAllTasksRepository,
     GetTaskRepository,
     UpdateTaskRepository,
+    DeleteTaskRepository,
 ):
     def __init__(self) -> None:
         self._tasks: List[Task] = []
@@ -39,6 +41,10 @@ class FakeTaskRepository(
         task.description = task_update_data.description
         task.due_date = task_update_data.due_date
         task.status = task_update_data.status
+
+    def delete_task(self, id: int) -> None:
+        value = self._find_by_id(id)
+        self._tasks.remove(value)
 
     def _to_task(self, task_data: TaskData) -> Task:
         return Task(

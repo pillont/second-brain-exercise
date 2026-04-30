@@ -20,7 +20,8 @@
       "Bash(.venv/bin/python -m black source/)",
       "Bash(.venv/bin/python -m pylint source/ --disable=C0111)",
       "Bash(.venv/bin/python -m pytest source/tests/unit/test_services/test_get_task_service.py source/tests/unit/test_repositories/test_fake_task_repository.py source/tests/integration/test_tasks_controller.py -v)",
-      "Bash(.venv/bin/python -m flake8 source/tests/integration/test_tasks_controller.py)"
+      "Bash(.venv/bin/python -m flake8 source/tests/integration/test_tasks_controller.py)",
+      "Bash(.venv/bin/python -m pytest source/tests/ -q)"
     ]
   }
 }

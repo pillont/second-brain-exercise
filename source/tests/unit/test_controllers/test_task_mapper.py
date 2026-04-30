@@ -88,6 +88,21 @@ def test_to_task_entity_sets_update_link() -> None:
     assert result["links"]["update"]["type"] == HttpMethod.PUT
 
 
+def test_to_task_entity_sets_delete_link() -> None:
+    task = Task(
+        id=42,
+        title="Buy milk",
+        description="At the store",
+        due_date=date(2026, 5, 1),
+        status=TaskStatus.INCOMPLETE,
+    )
+
+    result = to_task_entity(task)
+
+    assert result["links"]["delete"]["href"] == "/tasks/42"
+    assert result["links"]["delete"]["type"] == HttpMethod.DELETE
+
+
 def test_to_task_update_data_maps_all_fields() -> None:
     entity = TaskUpdateDataEntity(
         title="Buy eggs",
