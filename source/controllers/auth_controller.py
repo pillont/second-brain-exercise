@@ -40,6 +40,7 @@ def register(
         user = register_user_service.register_user(user_data)
     except UserAlreadyExistsError:
         abort(409)
+
     return to_user_entity(user)
 
 
@@ -53,10 +54,12 @@ def login(
     login_user_service: LoginUserService = Provide[Container.login_user_service],
 ) -> TokenEntity:
     try:
-        token = login_user_service.login(
+        user = login_user_service.login(
             auth_data_entity["username"],
             auth_data_entity["password"],
         )
+    
+        return to_token_entity(user)
     except InvalidCredentialsError:
         abort(401)
-    return to_token_entity(token)
+

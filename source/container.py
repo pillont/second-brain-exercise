@@ -1,7 +1,7 @@
 import pkgutil
 import logging
 import source.controllers
-from typing import List
+from typing import List, cast
 from dependency_injector import containers
 from dependency_injector.providers import Configuration, Singleton
 from source.config.app_config import AppConfig
@@ -33,14 +33,14 @@ class Container(containers.DeclarativeContainer):
     login_user_service = Singleton(
         LoginUserService,
         repository=user_repository,
-        config=config,
+        config=config.provided,
     )
 
 
 def setup_container(app_config: AppConfig) -> Container:
     logger.info("Setting up dependency injection container...")
     container = Container()
-    container.config.from_object(app_config)
+    container.config.from_dict(cast(dict, app_config))
     _wire_controllers_by_container(container)
     logger.info("Dependency injection container wired successfully")
     return container

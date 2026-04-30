@@ -1,3 +1,5 @@
+from flask_jwt_extended import create_access_token
+
 from source.controllers.entities.auth_entity import (
     AuthDataEntity,
     TokenEntity,
@@ -31,5 +33,6 @@ def _build_token_links() -> TokenLinksEntity:
     )
 
 
-def to_token_entity(token: str) -> TokenEntity:
+def to_token_entity(user:User) -> TokenEntity:
+    token = create_access_token(str(user.id))
     return TokenEntity(token=token, links=_build_token_links())

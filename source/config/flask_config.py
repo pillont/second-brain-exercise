@@ -1,4 +1,8 @@
+from datetime import timedelta
 import os
+from typing import Any
+
+from source.config.app_config import AppConfig
 
 
 class FlaskConfig:
@@ -11,7 +15,17 @@ class FlaskConfig:
     OPENAPI_URL_PREFIX = "/"
     OPENAPI_SWAGGER_UI_PATH = "/swagger-ui"
     OPENAPI_SWAGGER_UI_URL = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
+    OPENAPI_SECURITY_SCHEMES = {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT"
+        }
+    }
+    OPENAPI_SECURITY = [{"BearerAuth": []}]
 
+    JWT_ACCESS_TOKEN_EXPIRES: timedelta
+    JWT_SECRET_KEY: str
 
 class DevelopmentFlaskConfig(FlaskConfig):
     DEBUG = True
@@ -33,5 +47,13 @@ _flask_configs = {
 }
 
 
-def get_flask_config(config_name: str = "development") -> FlaskConfig:
-    return _flask_configs.get(config_name, DevelopmentFlaskConfig())
+def get_flask_config(app_config: AppConfig, config_name: str = "development") -> FlaskConfig:
+    config = _flask_configs.get(config_name, DevelopmentFlaskConfig())
+
+    apply_jwt_config(config, app_config)
+
+    return config
+
+def apply_jwt_config(config:FlaskConfig, app_config:AppConfig )-> None:
+    config.JWT_SECRET_KEY = app_config["JWT_SECRET_KEY"]
+    config.JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)

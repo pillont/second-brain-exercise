@@ -1,5 +1,6 @@
 from typing import Iterable
 
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_smorest import Blueprint
 from dependency_injector.wiring import inject, Provide
 from source.container import Container
@@ -26,6 +27,7 @@ tasks_blp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
 
 @tasks_blp.route("/", methods=["POST"])
+@jwt_required()
 @tasks_blp.arguments(TaskDataSchema)
 @tasks_blp.response(201, TaskSchema)
 @inject
@@ -38,6 +40,7 @@ def create_task(
 
 
 @tasks_blp.route("/", methods=["GET"])
+@jwt_required()
 @tasks_blp.response(200, TaskSchema(many=True))
 @inject
 def get_all_tasks(
@@ -50,6 +53,7 @@ def get_all_tasks(
 
 
 @tasks_blp.route("/<int:id>", methods=["GET"])
+@jwt_required()
 @tasks_blp.response(404)
 @tasks_blp.response(200, TaskSchema)
 @inject
@@ -62,6 +66,7 @@ def get_task(
 
 
 @tasks_blp.route("/<int:id>", methods=["PUT"])
+@jwt_required()
 @tasks_blp.arguments(TaskUpdateDataSchema)
 @tasks_blp.response(404)
 @tasks_blp.response(204)
@@ -75,6 +80,7 @@ def update_task(
 
 
 @tasks_blp.route("/<int:id>", methods=["DELETE"])
+@jwt_required()
 @tasks_blp.response(404)
 @tasks_blp.response(204)
 @inject

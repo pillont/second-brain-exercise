@@ -19,21 +19,14 @@ class LoginUserService:
         self._repository: Final = repository
         self._config: Final = config
 
-    def login(self, username: str, password: str) -> str:
+    def login(self, username: str, password: str) -> User:
         user = self._get_user(username)
         self._validate_password_or_throw(user, password)
-        return self._encode_token(user)
+        return user
 
     def _validate_password_or_throw(self, user: User, password: str) -> None:
         if not check_password_hash(user.hashed_password, password):
             raise InvalidCredentialsError()
-
-    def _encode_token(self, user: User) -> str:
-        return jwt.encode(
-            {"sub": user.id, "username": user.username},
-            self._config.JWT_SECRET_KEY,
-            algorithm="HS256",
-        )
 
     def _get_user(self, username: str) -> User:
         try:

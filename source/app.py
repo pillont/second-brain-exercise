@@ -15,7 +15,8 @@ def _init_logger() -> Logger:
 
 if __name__ == "__main__":
     logger = _init_logger()
-    app = create_app(get_flask_config(), get_app_config())
+    app_config = get_app_config()
+    app = create_app(get_flask_config(app_config), app_config)
 
     logger.info("Starting Flask server...")
     app.run(host="127.0.0.1", port=5001, debug=True)

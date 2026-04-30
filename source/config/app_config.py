@@ -1,33 +1,42 @@
 import os
 import logging
+from typing import TypedDict
 
 
-class AppConfig:
-    LOG_LEVEL: int = logging.INFO
-    JWT_SECRET_KEY: str = os.environ.get(
-        "JWT_SECRET_KEY", "dev-jwt-secret-change-in-production"
-    )
+class AppConfig(TypedDict):
+    LOG_LEVEL: int
+    JWT_SECRET_KEY: str
 
 
-class DevelopmentAppConfig(AppConfig):
-    LOG_LEVEL = logging.DEBUG
-
-
-class TestingAppConfig(AppConfig):
-    LOG_LEVEL = logging.WARNING
-
-
-class ProductionAppConfig(AppConfig):
-    pass
-
-
-_app_configs = {
-    "development": DevelopmentAppConfig(),
-    "testing": TestingAppConfig(),
-    "production": ProductionAppConfig(),
-    "default": DevelopmentAppConfig(),
-}
-
+JWT_SECRET_KEY: str = os.environ.get(
+    "JWT_SECRET_KEY", "dev-jwt-secret-change-in-production"
+)
 
 def get_app_config(config_name: str = "development") -> AppConfig:
-    return _app_configs.get(config_name, DevelopmentAppConfig())
+    match config_name:
+        case "development":
+            return {
+                "LOG_LEVEL": logging.DEBUG,
+                "JWT_SECRET_KEY": JWT_SECRET_KEY 
+            }
+        
+        case "testing":
+            return {
+                "LOG_LEVEL": logging.WARNING,
+                "JWT_SECRET_KEY": JWT_SECRET_KEY 
+            }
+         
+        case "production":
+            return {
+                "LOG_LEVEL": logging.INFO,
+                "JWT_SECRET_KEY": JWT_SECRET_KEY 
+            }
+         
+        case "default":
+            return {
+                "LOG_LEVEL": logging.INFO,
+                "JWT_SECRET_KEY": JWT_SECRET_KEY 
+            }
+        
+        case _:
+            raise NotImplementedError()
