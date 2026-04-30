@@ -1,4 +1,4 @@
-Flask==3.0.0
+Flask==3.0.2
 Werkzeug==3.0.1
 dependency-injector==4.41.0
 flask-smorest==0.47.0
