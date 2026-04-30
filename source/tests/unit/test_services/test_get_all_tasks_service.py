@@ -1,6 +1,7 @@
 from datetime import date
-from typing import Generator, List
+from typing import List
 from unittest.mock import MagicMock
+from types import GeneratorType
 from source.models.task import Task, TaskStatus
 from source.services.get_all_tasks_service import GetAllTasksService
 
@@ -40,7 +41,7 @@ def test_get_all_tasks_returns_generator() -> None:
 
     result = service.get_all_tasks()
 
-    assert isinstance(result, Generator)
+    assert isinstance(result, GeneratorType)
 
 
 def test_get_all_tasks_returns_empty_when_no_tasks() -> None:
