@@ -38,12 +38,12 @@ def test_to_task_entity_maps_fields() -> None:
 
     result = to_task_entity(task)
 
-    assert isinstance(result, TaskEntity)
-    assert result.id == 1
-    assert result.title == "Buy milk"
-    assert result.description == "At the store"
-    assert result.due_date == date(2026, 5, 1)
-    assert result.status == TaskStatus.INCOMPLETE
+    assert isinstance(result, dict)
+    assert result["id"] == 1
+    assert result["title"] == "Buy milk"
+    assert result["description"] == "At the store"
+    assert result["due_date"] == date(2026, 5, 1)
+    assert result["status"] == TaskStatus.INCOMPLETE
 
 
 def test_to_task_entity_sets_self_link() -> None:
@@ -57,7 +57,7 @@ def test_to_task_entity_sets_self_link() -> None:
 
     result = to_task_entity(task)
 
-    assert result.links.self_link.href == "/tasks/42"
+    assert result["links"]["self_link"]["href"] == "/tasks/42"
 
 
 def test_to_task_entity_sets_tasks_link() -> None:
@@ -71,8 +71,8 @@ def test_to_task_entity_sets_tasks_link() -> None:
 
     result = to_task_entity(task)
 
-    assert isinstance(result.links, TaskLinks)
-    assert result.links.tasks.href == "/tasks/"
+    assert isinstance(result["links"], dict)
+    assert result["links"]["tasks"]["href"] == "/tasks/"
 
 
 def test_to_task_entity_sets_update_link() -> None:
@@ -86,8 +86,8 @@ def test_to_task_entity_sets_update_link() -> None:
 
     result = to_task_entity(task)
 
-    assert result.links.update.href == "/tasks/42"
-    assert result.links.update.type == HttpMethod.PUT
+    assert result["links"]["update"]["href"] == "/tasks/42"
+    assert result["links"]["update"]["type"] == HttpMethod.PUT
 
 
 def test_to_task_update_data_maps_all_fields() -> None:

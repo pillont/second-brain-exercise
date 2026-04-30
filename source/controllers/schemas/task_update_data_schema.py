@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from marshmallow import fields, post_load
 
 from source.controllers.entities.task_entity import TaskUpdateDataEntity
@@ -9,4 +11,9 @@ class TaskUpdateDataSchema(TaskDataSchema):
 
     @post_load
     def make_entity(self, data: dict, **kwargs: object) -> TaskUpdateDataEntity:
-        return TaskUpdateDataEntity(**data)
+        return TaskUpdateDataEntity(
+            title=data["title"],
+            description=data["description"], 
+            due_date=data["due_date"],
+            status=data["status"],
+        )
