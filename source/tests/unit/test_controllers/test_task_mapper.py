@@ -2,8 +2,6 @@ from datetime import date
 from source.controllers.entities.link import HttpMethod
 from source.controllers.entities.task_entity import (
     TaskDataEntity,
-    TaskEntity,
-    TaskLinks,
     TaskUpdateDataEntity,
 )
 from source.controllers.mappers.task_mapper import (
