@@ -330,9 +330,7 @@ def test_put_task_service_error_returns_500(app) -> None:
     with app.test_client() as client:
         created = client.post("/tasks/", json=VALID_BODY).get_json()
         with app.container.update_task_service.override(mock_service):
-            response = client.put(
-                f"/tasks/{created['id']}", json=VALID_UPDATE_BODY
-            )
+            response = client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
         assert response.status_code == 500
         data = response.get_json()
         assert "error" in data
