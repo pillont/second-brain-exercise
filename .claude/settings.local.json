@@ -24,7 +24,12 @@
       "Bash(.venv/bin/python -m pytest source/tests/ -q)",
       "Bash(/Users/thibautpillon/dev/python_env/.venv/bin/python -m pip install PyJWT)",
       "Bash(.venv/bin/python -m pytest source/tests/ -v)",
-      "Bash(.venv/bin/python -m flake8 source/container.py)"
+      "Bash(.venv/bin/python -m flake8 source/container.py)",
+      "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py::test_post_task_returns_201 -q)",
+      "Bash(.venv/bin/python -m pytest source/tests/integration/ -v)",
+      "Bash(.venv/bin/python -m pytest source/tests/integration/ -q)",
+      "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py -q)",
+      "Bash(/Users/thibautpillon/dev/python_env/.venv/bin/python -m pytest source/tests/integration/test_auth_controller.py -v)"
     ]
   }
 }

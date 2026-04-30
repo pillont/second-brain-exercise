@@ -23,7 +23,7 @@ def get_app_config(config_name: str = "development") -> AppConfig:
         case "testing":
             return {
                 "LOG_LEVEL": logging.WARNING,
-                "JWT_SECRET_KEY": JWT_SECRET_KEY 
+                "JWT_SECRET_KEY":"test-jwt-secret",
             }
          
         case "production":

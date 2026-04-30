@@ -8,6 +8,12 @@ class UserData:
 
 
 @dataclass
+class HashedUserData:
+    username: str
+    hashed_password: str
+
+
+@dataclass
 class User:
     id: int
     username: str
