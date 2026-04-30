@@ -220,12 +220,12 @@ def test_database():
 
 ## References
 
-- [pytest official documentation](./references/pytest-guide.md)
+- [pytest official documentation](./python-unit-testing-references/pytest-guide.md)
 - [unittest standard library docs](https://docs.python.org/3/library/unittest.html)
-- [Mock objects documentation](./references/mocking.md)
-- [Test coverage best practices](./references/test-coverage.md)
+- [Mock objects documentation](./python-unit-testing-references/mocking.md)
+- [Test coverage best practices](./python-unit-testing-references/test-coverage.md)
 
 ## Tools Configuration
 
-See [pytest.ini config](./scripts/pytest.ini) for pytest setup.
+See [pytest.ini config](./python-unit-testing-scripts/pytest.ini) for pytest setup.
 

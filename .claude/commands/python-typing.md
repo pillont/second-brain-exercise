@@ -154,10 +154,10 @@ def process_readable(reader: Readable) -> None:
 ## References
 
 - [Official Python typing module](https://docs.python.org/3/library/typing.html)
-- [MyPy documentation](./references/mypy-guide.md)
-- [Type hints examples](./references/typing-examples.md)
-- [Managing Optional types](./references/optional-types.md)
+- [MyPy documentation](./python-typing-references/mypy-guide.md)
+- [Type hints examples](./python-typing-references/typing-examples.md)
+- [Managing Optional types](./python-typing-references/optional-types.md)
 
 ## Tools Configuration
 
-See [mypy.ini config](./scripts/mypy.ini) for MyPy setup.
+See [mypy.ini config](./python-typing-scripts/mypy.ini) for MyPy setup.

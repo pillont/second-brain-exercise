@@ -338,11 +338,11 @@ except ValueError as e:
 
 ## References
 
-- [Clean Code by Robert C. Martin](./references/clean-code-book.md)
-- [SOLID Principles explained](./references/solid-explained.md)
-- [Python design patterns](./references/design-patterns.md)
-- [Code smells and refactoring](./references/code-smells.md)
-- [Anti-patterns to avoid](./references/antipatterns.md)
+- [Clean Code by Robert C. Martin](./python-clean-code-solid-references/clean-code-book.md)
+- [SOLID Principles explained](./python-clean-code-solid-references/solid-explained.md)
+- [Python design patterns](./python-clean-code-solid-references/design-patterns.md)
+- [Code smells and refactoring](./python-clean-code-solid-references/code-smells.md)
+- [Anti-patterns to avoid](./python-clean-code-solid-references/antipatterns.md)
 
 ## Tools & Linters
 
@@ -354,4 +354,4 @@ except ValueError as e:
   ```bash
   python -m radon cc source/lib -a
   ```
-- **mypy**: Static type checking (see [python-typing skill](../python-typing/))
+- **mypy**: Static type checking (see [python-typing skill](./python-typing.md))

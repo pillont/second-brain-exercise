@@ -312,11 +312,11 @@ def mock_external_service():
 
 ## References
 
-- [pytest integration testing guide](./references/integration-guide.md)
-- [Mock/patch for external services](./references/mocking-external-services.md)
-- [Database testing patterns](./references/database-testing.md)
-- [Async testing with pytest-asyncio](./references/async-testing.md)
+- [pytest integration testing guide](./python-integration-testing-references/integration-guide.md)
+- [Mock/patch for external services](./python-integration-testing-references/mocking-external-services.md)
+- [Database testing patterns](./python-integration-testing-references/database-testing.md)
+- [Async testing with pytest-asyncio](./python-integration-testing-references/async-testing.md)
 
 ## Tools Configuration
 
-See [pytest.ini config](../python-unit-testing/scripts/pytest.ini) for pytest setup (shared with unit tests).
+See [pytest.ini config](./python-unit-testing-scripts/pytest.ini) for pytest setup (shared with unit tests).

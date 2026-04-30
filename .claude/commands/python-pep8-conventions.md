@@ -52,7 +52,7 @@ argument-hint: "Optional: file path or module name to lint"
 
 ## Procedure
 
-1. **Check current style** using [flake8 config](./scripts/.flake8)
+1. **Check current style** using [flake8 config](./python-pep8-conventions-scripts/.flake8)
    ```bash
    python -m flake8 source/
    ```
@@ -76,15 +76,15 @@ argument-hint: "Optional: file path or module name to lint"
 
 5. **Document** in code:
    - Always include module and function docstrings
-   - Use type hints (see [python-typing skill](../python-typing/))
+   - Use type hints (see [python-typing skill](./python-typing.md))
 
 ## References
 
 - [PEP 8 Official](https://pep8.org/)
 - [Official Python Enhancement Proposal 8](https://www.python.org/dev/peps/pep-0008/)
-- [Flake8 Configuration](./references/flake8-config.md)
-- [Auto-formatting with Black](./references/black-formatter.md)
+- [Flake8 Configuration](./python-pep8-conventions-references/flake8-config.md)
+- [Auto-formatting with Black](./python-pep8-conventions-references/black-formatter.md)
 
 ## Tools Configuration
 
-See [.flake8 config](./scripts/.flake8) and [pyproject.toml](./scripts/pyproject.toml) for linter setup.
+See [.flake8 config](./python-pep8-conventions-scripts/.flake8) and [pyproject.toml](./python-pep8-conventions-scripts/pyproject.toml) for linter setup.

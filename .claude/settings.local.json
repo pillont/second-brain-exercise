@@ -8,8 +8,13 @@
       "Bash(.venv/bin/python -m pytest source/tests/unit/ -v)",
       "Bash(.venv/bin/python -m mypy source/ --explicit-package-bases)",
       "Bash(.venv/bin/python -m flake8 source/ --count --show-source --statistics)",
-      "Bash(.venv/bin/python -m pylint source/ --init-hook='import sys; sys.path.insert\\(0, \".\"\\)' --extension-pkg-allow-list=dependency_injector --disable=C0111,C0103,R0903,W0621,R0801 --exit-zero)",
-      "Bash(.venv/bin/python -m pytest source/tests/unit/ -v --tb=short)"
+      "Bash(.venv/bin/python -m pytest source/tests/unit/ -v --tb=short)",
+      "Bash(.venv/bin/python -m flake8 source/controllers/entities/ source/controllers/schemas/link_schema.py source/controllers/schemas/greeting_schema.py source/controllers/greeting_controller.py)",
+      "Bash(.venv/bin/python source/app.py)",
+      "Bash(curl -s http://127.0.0.1:5001/hello)",
+      "Bash(python3 -m json.tool)",
+      "Bash(.venv/bin/python -m source.app)",
+      "Bash(pkill -f \"source.app\")"
     ]
   }
 }
