@@ -1,7 +1,11 @@
 from dataclasses import dataclass
 from datetime import date
 from source.models.task import TaskStatus
-from source.controllers.entities.link import Links
+from source.controllers.entities.link import Link, Links
+
+@dataclass
+class TaskLinks(Links):
+    tasks: Link
 
 
 @dataclass
@@ -18,4 +22,4 @@ class TaskEntity:
     description: str
     due_date: date
     status: TaskStatus
-    links: Links
+    links: TaskLinks

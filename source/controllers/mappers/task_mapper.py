@@ -1,5 +1,5 @@
 from source.models.task import Task, TaskData
-from source.controllers.entities.task_entity import TaskDataEntity, TaskEntity
+from source.controllers.entities.task_entity import TaskDataEntity, TaskEntity, TaskLinks
 from source.controllers.entities.link import Link, Links
 
 
@@ -11,8 +11,11 @@ def to_task_data(entity: TaskDataEntity) -> TaskData:
     )
 
 
-def _build_links(task: Task) -> Links:
-    return Links(self_link=Link(href=f"/tasks/{task.id}"))
+def _build_links(task: Task) -> TaskLinks:
+    return TaskLinks(
+        self_link=Link(href=f"/tasks/{task.id}"),
+        tasks= Link(href="/tasks/")
+    )
 
 
 def to_task_entity(task: Task) -> TaskEntity:

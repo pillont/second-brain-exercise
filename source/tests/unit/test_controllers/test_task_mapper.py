@@ -1,6 +1,6 @@
 from datetime import date
 from source.models.task import Task, TaskData, TaskStatus
-from source.controllers.entities.task_entity import TaskDataEntity, TaskEntity
+from source.controllers.entities.task_entity import TaskDataEntity, TaskEntity, TaskLinks
 from source.controllers.mappers.task_mapper import to_task_data, to_task_entity
 
 
@@ -48,3 +48,18 @@ def test_to_task_entity_sets_self_link() -> None:
     result = to_task_entity(task)
 
     assert result.links.self_link.href == "/tasks/42"
+
+
+def test_to_task_entity_sets_tasks_link() -> None:
+    task = Task(
+        id=42,
+        title="Buy milk",
+        description="At the store",
+        due_date=date(2026, 5, 1),
+        status=TaskStatus.INCOMPLETE,
+    )
+
+    result = to_task_entity(task)
+
+    assert isinstance(result.links, TaskLinks)
+    assert result.links.tasks.href == "/tasks/"
