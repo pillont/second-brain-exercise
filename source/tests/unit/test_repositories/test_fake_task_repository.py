@@ -65,7 +65,7 @@ def test_create_stores_task_data() -> None:
 def test_get_all_returns_empty_initially() -> None:
     repo = FakeTaskRepository()
 
-    result = list(repo.get_all())
+    result = list(repo.get_all().elements)
 
     assert result == []
 
@@ -77,7 +77,7 @@ def test_get_all_returns_created_task() -> None:
     )
     created = repo.create(task_data)
 
-    result = list(repo.get_all())
+    result = list(repo.get_all().elements)
 
     assert len(result) == 1
     assert result[0] is created
@@ -94,7 +94,7 @@ def test_get_all_returns_multiple_tasks_in_order() -> None:
     created_1 = repo.create(task_data_1)
     created_2 = repo.create(task_data_2)
 
-    result = list(repo.get_all())
+    result = list(repo.get_all().elements)
 
     assert len(result) == 2
     assert result[0] is created_1
@@ -108,10 +108,11 @@ def test_get_all_returns_iterable() -> None:
     )
     repo.create(task_data)
 
-    result = repo.get_all()
+    result = repo.get_all().elements
 
     assert hasattr(result, "__iter__")
     assert hasattr(result, "__next__")
+
 
 def test_get_all_returns_all_values_by_default() -> None:
     repo = FakeTaskRepository()
@@ -119,13 +120,70 @@ def test_get_all_returns_all_values_by_default() -> None:
     for i in range(10):
         repo.create(
             TaskData(
-                title=f"element1{i}", description="At the store", due_date=date(2026, 5, 1),
+                title=f"element1{i}",
+                description="At the store",
+                due_date=date(2026, 5, 1),
             )
         )
 
-    result = [t for t in repo.get_all()]
+    result = [t for t in repo.get_all().elements]
 
-    assert len(result)== 10
+    assert len(result) == 10
+
+
+def test_get_all_returns_has_next_false_if_returns_all_values_by_default() -> None:
+    repo = FakeTaskRepository()
+
+    for i in range(10):
+        repo.create(
+            TaskData(
+                title=f"element1{i}",
+                description="At the store",
+                due_date=date(2026, 5, 1),
+            )
+        )
+
+    result = repo.get_all()
+    assert not result.has_next
+
+
+def test_get_all_returns_has_next_false_if_returns_all_values() -> None:
+    repo = FakeTaskRepository()
+
+    for i in range(10):
+        repo.create(
+            TaskData(
+                title=f"element1{i}",
+                description="At the store",
+                due_date=date(2026, 5, 1),
+            )
+        )
+
+    result = repo.get_all(page_size=10)
+    assert not result.has_next
+
+    result = repo.get_all(cursor=6, page_size=4)
+    assert not result.has_next
+
+
+def test_get_all_returns_has_next_true_if_not_returns_all_values() -> None:
+    repo = FakeTaskRepository()
+
+    for i in range(10):
+        repo.create(
+            TaskData(
+                title=f"element1{i}",
+                description="At the store",
+                due_date=date(2026, 5, 1),
+            )
+        )
+
+    result = repo.get_all(page_size=8)
+    assert result.has_next
+
+    result = repo.get_all(cursor=2, page_size=2)
+    assert result.has_next
+
 
 def test_get_all_returns_firsts_elements_if_element_size_is_defined() -> None:
     repo = FakeTaskRepository()
@@ -133,17 +191,20 @@ def test_get_all_returns_firsts_elements_if_element_size_is_defined() -> None:
     for i in range(10):
         repo.create(
             TaskData(
-                title=f"element1{i}", description="At the store", due_date=date(2026, 5, 1),
+                title=f"element1{i}",
+                description="At the store",
+                due_date=date(2026, 5, 1),
             )
         )
 
-    result = [t for t in repo.get_all(page_size=4)]
+    result = [t for t in repo.get_all(page_size=4).elements]
 
-    assert len(result)== 4
+    assert len(result) == 4
     assert result[0].id == 1
     assert result[1].id == 2
     assert result[2].id == 3
     assert result[3].id == 4
+
 
 def test_get_all_returns_firsts_elements_if_page_size_and_cursor_is_defined() -> None:
     repo = FakeTaskRepository()
@@ -151,13 +212,15 @@ def test_get_all_returns_firsts_elements_if_page_size_and_cursor_is_defined() ->
     for i in range(10):
         repo.create(
             TaskData(
-                title=f"element1{i}", description="At the store", due_date=date(2026, 5, 1),
+                title=f"element1{i}",
+                description="At the store",
+                due_date=date(2026, 5, 1),
             )
         )
 
-    result = [t for t in repo.get_all(page_size=4, cursor=4)]
+    result = [t for t in repo.get_all(page_size=4, cursor=4).elements]
 
-    assert len(result)== 4
+    assert len(result) == 4
     assert result[0].id == 5
     assert result[1].id == 6
     assert result[2].id == 7
@@ -170,19 +233,22 @@ def test_get_all_returns_firsts_elements_if_cursor_is_defined() -> None:
     for i in range(10):
         repo.create(
             TaskData(
-                title=f"element1{i}", description="At the store", due_date=date(2026, 5, 1),
+                title=f"element1{i}",
+                description="At the store",
+                due_date=date(2026, 5, 1),
             )
         )
 
-    result = [t for t in repo.get_all(cursor=4)]
+    result = [t for t in repo.get_all(cursor=4).elements]
 
-    assert len(result)== 6
+    assert len(result) == 6
     assert result[0].id == 5
     assert result[1].id == 6
     assert result[2].id == 7
     assert result[3].id == 8
     assert result[4].id == 9
     assert result[5].id == 10
+
 
 def test_get_all_does_not_modify_internal_state() -> None:
     repo = FakeTaskRepository()
@@ -191,8 +257,8 @@ def test_get_all_does_not_modify_internal_state() -> None:
     )
     repo.create(task_data)
 
-    list(repo.get_all())
-    result = list(repo.get_all())
+    list(repo.get_all().elements)
+    result = list(repo.get_all().elements)
 
     assert len(result) == 1
 

@@ -1,22 +1,26 @@
-from typing import Iterable
-
 from flask_jwt_extended import jwt_required
 from flask_smorest import Blueprint
 from dependency_injector.wiring import inject, Provide
 from source.container import Container
+from source.controllers.entities.list_argument_entity import ListArgumentEntity
+from source.controllers.entities.list_entity import ListEntity
 from source.controllers.entities.task_entity import (
     TaskDataEntity,
     TaskEntity,
     TaskUpdateDataEntity,
 )
+from source.controllers.mappers.list_entity_mapper import map_to_list_entity
 from source.controllers.mappers.task_mapper import (
+    map_to_filtered_tasks_list,
     to_task_data,
     to_task_entity,
     to_task_update_data,
 )
+from source.controllers.schemas.list_argument_schema import ListArgumentSchema
 from source.controllers.schemas.task_data_schema import TaskDataSchema
-from source.controllers.schemas.task_schema import TaskSchema
+from source.controllers.schemas.task_schema import TasksListSchema, TaskSchema
 from source.controllers.schemas.task_update_data_schema import TaskUpdateDataSchema
+from source.models.filtered_list import FilteredList
 from source.services.create_task_service import CreateTaskService
 from source.services.delete_task_service import DeleteTaskService
 from source.services.get_all_tasks_service import GetAllTasksService
@@ -41,16 +45,21 @@ def create_task(
 
 @tasks_blp.route("/", methods=["GET"])
 @jwt_required()
-@tasks_blp.response(200, TaskSchema(many=True))
+@tasks_blp.arguments(ListArgumentSchema, location="query")
+@tasks_blp.response(200, TasksListSchema(many=True))
 @inject
 def get_all_tasks(
+    args: ListArgumentEntity,
     get_all_tasks_service: GetAllTasksService = Provide[
         Container.get_all_tasks_service
     ],
-) -> Iterable[TaskEntity]:
-    all_tasks = get_all_tasks_service.get_all_tasks()
-    return (to_task_entity(task) for task in all_tasks)
+) -> ListEntity[TaskEntity]:
+    all_tasks = get_all_tasks_service.get_all_tasks(
+        args.get("cursor", None), 
+        args.get("page_size", None)
+    )
 
+    return map_to_filtered_tasks_list(all_tasks)
 
 @tasks_blp.route("/<int:id>", methods=["GET"])
 @jwt_required()
