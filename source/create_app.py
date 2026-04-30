@@ -1,40 +1,70 @@
+import importlib
 import logging
+import pkgutil
+from typing import Iterator
+
 from flask import Flask
-from flask_smorest import Api  # type: ignore[import-untyped]
+from flask_smorest import Api, Blueprint
+
+import source.controllers
 from source.config.config import Config
 from source.container import setup_container, Container
-from source.controllers.greeting_controller import greeting_blp
 from source.controllers.utils.error_handlers import register_error_handlers
+from source.controllers.utils.request_logger import register_request_logger
+
+logger = logging.getLogger(__name__)
 
 
 class FlaskApp(Flask):
     container: Container
 
 
-def create_app(config_obj: Config) -> FlaskApp:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
-    logger = logging.getLogger(__name__)
-
+def _init_app(config_obj: Config) -> FlaskApp:
     app = FlaskApp(__name__)
     app.config.from_object(config_obj)
+    app.container = setup_container()
+    return app
+
+
+def _register_module_blueprints(api: Api, module: object) -> None:
+    for attr_name in dir(module):
+        attr = getattr(module, attr_name)
+        if isinstance(attr, Blueprint):
+            api.register_blueprint(attr)
+
+
+def _iter_controller_modules() -> Iterator[pkgutil.ModuleInfo]:
+    return pkgutil.walk_packages(
+        path=source.controllers.__path__,
+        prefix="source.controllers.",
+    )
+
+
+def _register_blueprints(app: FlaskApp) -> None:
+    api = Api(app)
+    for info in _iter_controller_modules():
+        module = importlib.import_module(info.name)
+        _register_module_blueprints(api, module)
+
+
+def _register_utils(app: FlaskApp) -> None:
+    register_error_handlers(app)
+    register_request_logger(app)
+
+
+def create_app(config_obj: Config) -> FlaskApp:
+
+    app = _init_app(config_obj)
     logger.info(
         "Configuration loaded: DEBUG=%s, TESTING=%s",
         app.config["DEBUG"],
         app.config["TESTING"],
     )
 
-    logger.info("Initializing dependency injection container...")
-    app.container = setup_container()
-
     logger.info("Registering blueprints...")
-    api = Api(app)
-    api.register_blueprint(greeting_blp)
-
+    _register_blueprints(app)
     logger.info("Blueprints registered successfully")
 
-    register_error_handlers(app)
+    _register_utils(app)
 
     return app
