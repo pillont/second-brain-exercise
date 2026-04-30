@@ -34,7 +34,7 @@ class FakeTaskRepository(
         task = self._find_by_id(id)
         self.update_task(task, task_update_data)
 
-    def update_task(self, task: Task, task_update_data: TaskUpdateData)-> None:
+    def update_task(self, task: Task, task_update_data: TaskUpdateData) -> None:
         task.title = task_update_data.title
         task.description = task_update_data.description
         task.due_date = task_update_data.due_date
