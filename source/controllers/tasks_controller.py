@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import Generator, Iterable
 
 from flask_smorest import Blueprint
 from dependency_injector.wiring import inject, Provide
@@ -28,6 +28,6 @@ def create_task(
 @inject
 def get_tasks(
     get_all_tasks_service=Provide[Container.get_all_tasks_service],
-) -> Generator[TaskEntity]:
+) -> Iterable[TaskEntity]:
     all_tasks = get_all_tasks_service.get_all_tasks()
     return (to_task_entity(task) for task in all_tasks)
