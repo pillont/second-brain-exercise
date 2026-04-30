@@ -17,6 +17,7 @@ from source.controllers.schemas.task_data_schema import TaskDataSchema
 from source.controllers.schemas.task_schema import TaskSchema
 from source.controllers.schemas.task_update_data_schema import TaskUpdateDataSchema
 from source.services.create_task_service import CreateTaskService
+from source.services.delete_task_service import DeleteTaskService
 from source.services.get_all_tasks_service import GetAllTasksService
 from source.services.get_task_service import GetTaskService
 from source.services.update_task_service import UpdateTaskService
@@ -71,3 +72,15 @@ def update_task(
     update_task_service: UpdateTaskService = Provide[Container.update_task_service],
 ) -> None:
     update_task_service.update_task(id, to_task_update_data(task_update_data_entity))
+
+
+@tasks_blp.route("/<int:id>", methods=["DELETE"])
+@tasks_blp.response(404)
+@tasks_blp.response(204)
+@inject
+def delete_task(
+    id: int,
+    delete_task_service: DeleteTaskService = Provide[Container.delete_task_service],
+) -> None:
+    delete_task_service.delete_task(id)
+
