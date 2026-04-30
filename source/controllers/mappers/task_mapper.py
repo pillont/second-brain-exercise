@@ -7,7 +7,7 @@ from source.controllers.entities.task_entity import (
     TaskLinks,
     TaskUpdateDataEntity,
 )
-from source.controllers.entities.link import HttpMethod, LinkEntity
+from source.controllers.entities.link import HttpMethod
 
 
 def to_task_data(entity: TaskDataEntity) -> TaskData:

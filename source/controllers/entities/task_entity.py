@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import date
 from typing import TypedDict
 from source.models.task import TaskStatus

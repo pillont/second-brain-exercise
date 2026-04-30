@@ -2,10 +2,8 @@ from datetime import date
 
 from source.controllers.entities.link import HttpMethod, LinkEntity
 from source.controllers.entities.task_entity import (
-    TaskDataEntity,
     TaskEntity,
     TaskLinks,
-    TaskUpdateDataEntity,
 )
 from source.controllers.schemas.task_data_schema import TaskDataSchema
 from source.controllers.schemas.task_schema import TaskSchema
@@ -23,9 +21,9 @@ def test_task_data_schema_load_returns_entity() -> None:
 
     result = schema.load(data)
 
-    assert isinstance(result, TaskDataEntity)
-    assert result.title == "Buy milk"
-    assert result.due_date == date(2026, 5, 1)
+    assert isinstance(result, dict)
+    assert result["title"] == "Buy milk"
+    assert result["due_date"] == date(2026, 5, 1)
 
 
 def test_task_schema_dump_has_correct_keys() -> None:
@@ -181,10 +179,10 @@ def test_task_update_data_schema_loads_valid_data() -> None:
 
     result = schema.load(data)
 
-    assert isinstance(result, TaskUpdateDataEntity)
-    assert result.title == "Buy milk"
-    assert result.due_date == date(2026, 5, 1)
-    assert result.status == "Complete"
+    assert isinstance(result, dict)
+    assert result["title"] == "Buy milk"
+    assert result["due_date"] == date(2026, 5, 1)
+    assert result["status"] == "Complete"
 
 
 def test_task_update_data_schema_missing_status_raises_error() -> None:

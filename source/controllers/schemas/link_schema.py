@@ -3,7 +3,6 @@ from typing import Any
 from marshmallow import Schema, fields, post_dump
 
 from source.controllers.entities.link import LinkEntity
-from source.controllers.entities.task_entity import TaskEntity
 
 
 class LinkSchema(Schema):
