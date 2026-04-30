@@ -1,5 +1,5 @@
 from datetime import date
-from source.models.task import Task, TaskData, TaskStatus
+from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
 from source.repositories.fake_task_repository import FakeTaskRepository
 
 
@@ -128,7 +128,6 @@ def test_get_all_does_not_modify_internal_state() -> None:
 
 
 def test_get_task_returns_task_by_id() -> None:
-    from source.models.not_found_error import NotFoundError
     repo = FakeTaskRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
@@ -142,8 +141,12 @@ def test_get_task_returns_task_by_id() -> None:
 
 def test_get_task_returns_correct_task_among_multiple() -> None:
     repo = FakeTaskRepository()
-    repo.create(TaskData(title="Buy milk", description="At the store", due_date=date(2026, 5, 1)))
-    created_2 = repo.create(TaskData(title="Buy eggs", description="At the market", due_date=date(2026, 5, 2)))
+    repo.create(TaskData(
+        title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
+    ))
+    created_2 = repo.create(TaskData(
+        title="Buy eggs", description="At the market", due_date=date(2026, 5, 2)
+    ))
 
     result = repo.get_task(created_2.id)
 
@@ -171,6 +174,44 @@ def test_get_task_raises_not_found_error_after_all_tasks_consumed() -> None:
 
     try:
         repo.get_task(999)
+        assert False, "Expected NotFoundError to be raised"
+    except NotFoundError:
+        pass
+
+
+def test_update_task_updates_fields() -> None:
+    repo = FakeTaskRepository()
+    created = repo.create(TaskData(
+        title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
+    ))
+    update_data = TaskUpdateData(
+        title="Buy eggs",
+        description="At the market",
+        due_date=date(2026, 6, 1),
+        status=TaskStatus.COMPLETE,
+    )
+
+    repo.update(created.id, update_data)
+
+    updated = repo.get_task(created.id)
+    assert updated.title == "Buy eggs"
+    assert updated.description == "At the market"
+    assert updated.due_date == date(2026, 6, 1)
+    assert updated.status == TaskStatus.COMPLETE
+
+
+def test_update_task_raises_not_found_error_for_unknown_id() -> None:
+    from source.models.not_found_error import NotFoundError
+    repo = FakeTaskRepository()
+    update_data = TaskUpdateData(
+        title="Buy eggs",
+        description="At the market",
+        due_date=date(2026, 6, 1),
+        status=TaskStatus.COMPLETE,
+    )
+
+    try:
+        repo.update(99, update_data)
         assert False, "Expected NotFoundError to be raised"
     except NotFoundError:
         pass

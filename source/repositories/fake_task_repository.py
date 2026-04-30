@@ -1,14 +1,18 @@
 from typing import Iterable, List
-from source.models.task import Task, TaskData, TaskStatus
+
+from source.models.not_found_error import NotFoundError
+from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
 from source.repositories.create_task_repository import CreateTaskRepository
 from source.repositories.get_all_tasks_repository import GetAllTasksRepository
 from source.repositories.get_task_repository import GetTaskRepository
-from source.models.not_found_error import NotFoundError
+from source.repositories.update_task_repository import UpdateTaskRepository
+
 
 class FakeTaskRepository(
-    CreateTaskRepository, 
-    GetAllTasksRepository, 
-    GetTaskRepository
+    CreateTaskRepository,
+    GetAllTasksRepository,
+    GetTaskRepository,
+    UpdateTaskRepository,
 ):
     def __init__(self) -> None:
         self._tasks: List[Task] = []
@@ -23,6 +27,16 @@ class FakeTaskRepository(
     def get_all(self) -> Iterable[Task]:
         return (t for t in self._tasks)
 
+    def get_task(self, id: int) -> Task:
+        return self._find_by_id(id)
+
+    def update(self, id: int, task_update_data: TaskUpdateData) -> None:
+        task = self._find_by_id(id)
+        task.title = task_update_data.title
+        task.description = task_update_data.description
+        task.due_date = task_update_data.due_date
+        task.status = task_update_data.status
+
     def _to_task(self, task_data: TaskData) -> Task:
         return Task(
             id=self._next_id,
@@ -32,13 +46,8 @@ class FakeTaskRepository(
             status=TaskStatus.INCOMPLETE,
         )
 
-    def get_task(self, id: int) -> Task:
+    def _find_by_id(self, id: int) -> Task:
         try:
-            return next(
-                task
-                for task
-                in self._tasks
-                if task.id == id
-            )
+            return next(task for task in self._tasks if task.id == id)
         except StopIteration:
             raise NotFoundError()

@@ -14,9 +14,9 @@ def register_error_handlers(app: Flask) -> None:
     ) -> tuple[Response, int] | Response:
         if isinstance(e, NotFoundError):
             return make_response({}, 404)
-        
+
         if isinstance(e, HTTPException):
             return make_response(e.get_response(), e.code or 500)
-        
+
         logger.error("Unexpected error: %s", str(e), exc_info=True)
         return jsonify({"error": "Internal server error"}), 500

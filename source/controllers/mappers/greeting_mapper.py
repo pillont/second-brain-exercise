@@ -1,10 +1,10 @@
 from source.models.greeting import Greeting
 from source.controllers.entities.greeting_entity import GreetingEntity
-from source.controllers.entities.link import Link, Links
+from source.controllers.entities.link import LinkEntity, LinksEntity
 
 
-def _build_links() -> Links:
-    return Links(self_link=Link(href="/hello"))
+def _build_links() -> LinksEntity:
+    return LinksEntity(self_link=LinkEntity(href="/hello"))
 
 
 def to_greeting_entity(greeting: Greeting) -> GreetingEntity:

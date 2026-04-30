@@ -1,22 +1,23 @@
 from dataclasses import dataclass
 from datetime import date
+from typing import TypedDict
 from source.models.task import TaskStatus
-from source.controllers.entities.link import Link, Links
-
-@dataclass
-class TaskLinks(Links):
-    tasks: Link
+from source.controllers.entities.link import LinkEntity, LinksEntity
 
 
-@dataclass
-class TaskDataEntity:
+class TaskLinks(LinksEntity):
+    tasks: LinkEntity
+    update: LinkEntity
+
+class TaskDataEntity(TypedDict):
     title: str
     description: str
     due_date: date
 
+class TaskUpdateDataEntity(TaskDataEntity):
+    status: TaskStatus
 
-@dataclass
-class TaskEntity:
+class TaskEntity(TypedDict):
     id: int
     title: str
     description: str

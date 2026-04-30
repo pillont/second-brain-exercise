@@ -16,6 +16,11 @@ class TaskData:
 
 
 @dataclass
+class TaskUpdateData(TaskData):
+    status: TaskStatus
+
+
+@dataclass
 class Task:
     id: int
     title: str

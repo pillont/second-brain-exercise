@@ -1,12 +1,18 @@
 from dataclasses import dataclass
-from typing import Optional
+from enum import StrEnum
+from typing import NotRequired, TypedDict
 
 
-@dataclass
-class Link:
+class HttpMethod(StrEnum):
+    GET = "GET"
+    POST = "POST"
+    PUT = "PUT"
+    DELETE = "DELETE"
+
+class LinkEntity(TypedDict):
     href: str
-    type: Optional[str]=None
+    type: NotRequired[HttpMethod]
 
-@dataclass
-class Links:
-    self_link: Link
+
+class LinksEntity(TypedDict):
+    self_link: LinkEntity
