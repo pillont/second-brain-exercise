@@ -5,6 +5,6 @@ T = TypeVar("T")
 
 
 @dataclass
-class   ListEntity(Generic[T]):
+class ListEntity(Generic[T]):
     elements: Iterable[T]
     has_next: bool

@@ -29,7 +29,8 @@
       "Bash(.venv/bin/python -m pytest source/tests/integration/ -v)",
       "Bash(.venv/bin/python -m pytest source/tests/integration/ -q)",
       "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py -q)",
-      "Bash(/Users/thibautpillon/dev/python_env/.venv/bin/python -m pytest source/tests/integration/test_auth_controller.py -v)"
+      "Bash(/Users/thibautpillon/dev/python_env/.venv/bin/python -m pytest source/tests/integration/test_auth_controller.py -v)",
+      "Bash(/Users/thibautpillon/dev/python_env/.venv/bin/python -m pytest source/tests/ -v)"
     ]
   }
 }

@@ -1,3 +1,4 @@
+from source.controllers.entities.list_entity import ListEntity
 from source.controllers.mappers.list_entity_mapper import map_to_list_entity
 from source.models.filtered_list import FilteredList
 from source.models.task import Task, TaskData, TaskUpdateData
@@ -39,7 +40,7 @@ def to_task_entity(task: Task) -> TaskEntity:
     )
 
 
-def map_to_filtered_tasks_list(all_tasks):
+def map_to_filtered_tasks_list(all_tasks: FilteredList[Task]) -> ListEntity[TaskEntity]:
     return map_to_list_entity(
         FilteredList(
             (to_task_entity(t) for t in all_tasks.elements), has_next=all_tasks.has_next

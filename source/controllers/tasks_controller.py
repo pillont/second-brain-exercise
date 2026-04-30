@@ -46,7 +46,7 @@ def create_task(
 @tasks_blp.route("/", methods=["GET"])
 @jwt_required()
 @tasks_blp.arguments(ListArgumentSchema, location="query")
-@tasks_blp.response(200, TasksListSchema(many=True))
+@tasks_blp.response(200, TasksListSchema)
 @inject
 def get_all_tasks(
     args: ListArgumentEntity,

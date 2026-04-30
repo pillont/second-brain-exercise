@@ -19,4 +19,4 @@ class TaskSchema(Schema):
 
 class TasksListSchema(Schema):
     elements = fields.List(fields.Nested(TaskSchema))
-    hasNext = fields.Bool(required=True)
+    has_next = fields.Bool(required=True)
