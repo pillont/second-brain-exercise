@@ -334,3 +334,74 @@ def test_put_task_service_error_returns_500(app) -> None:
         assert response.status_code == 500
         data = response.get_json()
         assert "error" in data
+
+
+def test_delete_task_returns_204(client) -> None:
+    created = client.post("/tasks/", json=VALID_BODY).get_json()
+
+    response = client.delete(f"/tasks/{created['id']}")
+
+    assert response.status_code == 204
+
+
+def test_delete_task_removes_task_from_list(client) -> None:
+    created = client.post("/tasks/", json=VALID_BODY).get_json()
+
+    client.delete(f"/tasks/{created['id']}")
+    data = client.get("/tasks/").get_json()
+
+    assert len(data) == 0
+
+
+def test_delete_task_makes_task_not_found(client) -> None:
+    created = client.post("/tasks/", json=VALID_BODY).get_json()
+
+    client.delete(f"/tasks/{created['id']}")
+    response = client.get(f"/tasks/{created['id']}")
+
+    assert response.status_code == 404
+
+
+def test_delete_task_returns_404_when_not_found(client) -> None:
+    response = client.delete("/tasks/999")
+
+    assert response.status_code == 404
+
+
+def test_delete_task_service_error_returns_500(app) -> None:
+    mock_service = MagicMock()
+    mock_service.delete_task.side_effect = RuntimeError("Service failure")
+    with app.test_client() as client:
+        created = client.post("/tasks/", json=VALID_BODY).get_json()
+        with app.container.delete_task_service.override(mock_service):
+            response = client.delete(f"/tasks/{created['id']}")
+        assert response.status_code == 500
+        data = response.get_json()
+        assert "error" in data
+
+
+def test_post_task_response_has_delete_link(client) -> None:
+    response = client.post("/tasks/", json=VALID_BODY)
+    data = response.get_json()
+
+    assert "delete" in data["_links"]
+    assert "href" in data["_links"]["delete"]
+
+
+def test_get_task_returns_delete_link(client) -> None:
+    created = client.post("/tasks/", json=VALID_BODY).get_json()
+
+    response = client.get(f"/tasks/{created['id']}")
+    data = response.get_json()
+
+    assert data["_links"]["delete"]["href"] == f"/tasks/{created['id']}"
+    assert data["_links"]["delete"]["type"] == "DELETE"
+
+
+def test_get_tasks_each_task_has_delete_link(client) -> None:
+    client.post("/tasks/", json=VALID_BODY)
+
+    response = client.get("/tasks/")
+    data = response.get_json()
+
+    assert "delete" in data[0]["_links"]

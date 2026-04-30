@@ -14,7 +14,7 @@ class FakeTaskRepository(
     GetAllTasksRepository,
     GetTaskRepository,
     UpdateTaskRepository,
-    DeleteTaskRepository
+    DeleteTaskRepository,
 ):
     def __init__(self) -> None:
         self._tasks: List[Task] = []

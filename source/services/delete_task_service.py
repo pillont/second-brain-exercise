@@ -1,6 +1,5 @@
 from typing import Final
 
-from source.models.task import TaskUpdateData
 from source.repositories.delete_task_repository import DeleteTaskRepository
 
 

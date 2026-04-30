@@ -5,6 +5,7 @@ from source.controllers.schemas.link_schema import LinkSchema, LinksSchema
 class TaskLinksSchema(LinksSchema):
     tasks = fields.Nested(LinkSchema, required=True)
     update = fields.Nested(LinkSchema, required=True)
+    delete = fields.Nested(LinkSchema, required=True)
 
 
 class TaskSchema(Schema):

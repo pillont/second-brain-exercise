@@ -31,6 +31,7 @@ class Container(containers.DeclarativeContainer):
         DeleteTaskService, repository=task_repository
     )
 
+
 def setup_container() -> Container:
     logger.info("Setting up dependency injection container...")
     container = Container()

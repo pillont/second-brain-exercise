@@ -83,4 +83,3 @@ def delete_task(
     delete_task_service: DeleteTaskService = Provide[Container.delete_task_service],
 ) -> None:
     delete_task_service.delete_task(id)
-

@@ -231,12 +231,25 @@ def get_resource(
 - Log at entry point
 - Register the blueprint via `api.register_blueprint()` in `source/__init__.py` and wire its module in `source/container.py`
 
-**Files**: 
-- `greeting_controller.py` - Example endpoint demonstrating the architecture
-- `tasks_controller.py` - Task CRUD endpoints (future)
-- `users_controller.py` - User authentication endpoints (future)
-- `schemas/greeting_schema.py` - One schema file per resource (naming: `<resource>_schema.py`)
-- `__init__.py` - Blueprint registration
+**Implemented endpoints**:
+
+| Method | Path | Status code | Description |
+|---|---|---|---|
+| `GET` | `/hello` | 200 | Greeting example |
+| `POST` | `/tasks/` | 201 | Create a task |
+| `GET` | `/tasks/` | 200 | List all tasks |
+| `GET` | `/tasks/{id}` | 200 / 404 | Get a task by id |
+| `PUT` | `/tasks/{id}` | 204 / 404 | Update a task |
+| `DELETE` | `/tasks/{id}` | 204 / 404 | Delete a task |
+
+**Files**:
+- `greeting_controller.py` - GET /hello
+- `tasks_controller.py` - Full task CRUD (POST, GET list, GET by id, PUT, DELETE)
+- `schemas/` - One schema file per resource (`<resource>_schema.py`)
+- `entities/` - Output DTOs + HATEOAS link types
+- `mappers/` - Mapping from domain models to entities
+- `utils/error_handlers.py` - Global exception handler → HTTP 500
+- `utils/request_logger.py` - Before-request logger
 
 **Dependencies**: Services
 
@@ -284,9 +297,12 @@ class Container(containers.DeclarativeContainer):
 ```
 
 **Files**:
-- `greeting_service.py` - Example service
-- `task_service.py` - Task creation, updates, filtering logic (future)
-- `user_service.py` - User authentication, password hashing, JWT creation (future)
+- `greeting_service.py` - GreetingService
+- `create_task_service.py` - CreateTaskService
+- `get_all_tasks_service.py` - GetAllTasksService
+- `get_task_service.py` - GetTaskService
+- `update_task_service.py` - UpdateTaskService
+- `delete_task_service.py` - DeleteTaskService
 
 **Dependencies**: Repositories, Models, Utils
 
@@ -303,11 +319,13 @@ class Container(containers.DeclarativeContainer):
 - Provide reusable query patterns (filtering, sorting, pagination)
 - Return model instances (never raw database rows)
 
-**Files**:
-- `task_repository.py` - Task CRUD operations
-- `user_repository.py` - User CRUD operations
-- `base_repository.py` - Common repository patterns (optional)
-- `__init__.py` - Repository initialization
+**Files** (ISP — one ABC per operation):
+- `create_task_repository.py` - CreateTaskRepository ABC
+- `get_all_tasks_repository.py` - GetAllTasksRepository ABC
+- `get_task_repository.py` - GetTaskRepository ABC
+- `update_task_repository.py` - UpdateTaskRepository ABC
+- `delete_task_repository.py` - DeleteTaskRepository ABC
+- `fake_task_repository.py` - In-memory implementation of all ABCs (used in tests and dev)
 
 **Dependencies**: Models, Config
 
@@ -324,9 +342,9 @@ class Container(containers.DeclarativeContainer):
 - Provide type hints for IDE support
 
 **Files**:
-- `task.py` - Task model with ID, title, description, due_date, status
-- `user.py` - User model with ID, email, password_hash, created_at
-- `__init__.py` - Model exports
+- `task.py` - TaskStatus (StrEnum), TaskData, TaskUpdateData, Task
+- `greeting.py` - Greeting
+- `not_found_error.py` - NotFoundError (raised by repositories, caught by global error handler → 404)
 
 > **Note**: Schemas live in `source/controllers/schemas/`, not here. See the Controllers section.
 
@@ -400,26 +418,45 @@ tests/
 
 ---
 
-## Data Flow Example: Creating a Task
+## Data Flow Examples
 
+**POST /tasks — create a task**:
 ```
-1. HTTP Request: POST /tasks
+1. HTTP POST /tasks/ with JSON body
    ↓
-2. [Controller] tasks_controller.task_create()
-   - Receives JSON body with title, description, due_date
-   - Calls TaskService.create_task()
+2. [Controller] create_task()
+   - flask-smorest deserializes body via TaskDataSchema → TaskDataEntity
+   - Calls to_task_data() mapper → TaskData domain object
+   - Calls CreateTaskService.create_task(task_data)
    ↓
-3. [Service] task_service.create_task()
-   - Validates business rules (title not empty, due_date in future)
-   - Calls TaskRepository.create()
-   - Returns created Task model
+3. [Service] CreateTaskService.create_task()
+   - Delegates to CreateTaskRepository.create(task_data)
+   - Returns Task model
    ↓
-4. [Repository] task_repository.create()
-   - Executes INSERT query into database
-   - Returns Task model with generated ID
+4. [Repository] FakeTaskRepository.create()
+   - Assigns auto-incremented id, sets status=INCOMPLETE
+   - Returns Task
    ↓
-5. [Controller] Serializes Task to JSON
-   - Returns HTTP 201 with created task
+5. [Controller] calls to_task_entity(task) → TaskEntity with _links
+   - flask-smorest serializes via TaskSchema → JSON
+   - Returns HTTP 201
+```
+
+**DELETE /tasks/{id} — delete a task**:
+```
+1. HTTP DELETE /tasks/42
+   ↓
+2. [Controller] delete_task(id=42)
+   - Calls DeleteTaskService.delete_task(42)
+   ↓
+3. [Service] DeleteTaskService.delete_task()
+   - Delegates to DeleteTaskRepository.delete_task(42)
+   ↓
+4. [Repository] FakeTaskRepository.delete_task()
+   - Finds task by id (raises NotFoundError if missing → 404)
+   - Removes task from in-memory list
+   ↓
+5. [Controller] Returns HTTP 204 (no body)
 ```
 
 ---
@@ -492,45 +529,54 @@ def test_create_task_validates_title():
 
 ```
 source/
+├── app.py
+├── create_app.py
+├── container.py
 ├── config/
-│   ├── __init__.py
-│   ├── settings.py
-│   ├── development.py
-│   └── production.py
+│   └── config.py
 ├── models/
-│   ├── __init__.py
 │   ├── task.py
-│   └── user.py
+│   ├── greeting.py
+│   └── not_found_error.py
 ├── repositories/
-│   ├── __init__.py
-│   ├── base_repository.py
-│   ├── task_repository.py
-│   └── user_repository.py
+│   ├── create_task_repository.py
+│   ├── get_all_tasks_repository.py
+│   ├── get_task_repository.py
+│   ├── update_task_repository.py
+│   ├── delete_task_repository.py
+│   └── fake_task_repository.py
 ├── services/
-│   ├── __init__.py
-│   ├── task_service.py
-│   └── user_service.py
+│   ├── greeting_service.py
+│   ├── create_task_service.py
+│   ├── get_all_tasks_service.py
+│   ├── get_task_service.py
+│   ├── update_task_service.py
+│   └── delete_task_service.py
 ├── controllers/
-│   ├── __init__.py
+│   ├── greeting_controller.py
 │   ├── tasks_controller.py
-│   ├── users_controller.py
-│   └── schemas/              ← one file per schema
-│       ├── __init__.py
-│       └── greeting_schema.py
-├── utils/
-│   ├── __init__.py
-│   ├── error_handlers.py
-│   ├── auth_utils.py
-│   ├── validators.py
-│   └── decorators.py
-├── tests/
-│   ├── __init__.py
-│   └── unit/
-│       ├── test_models/
-│       ├── test_services/
-│       ├── test_controllers/
-│       ├── test_repositories/
-│       └── test_utils/
-├── __init__.py
-└── app.py (Flask app factory entry point)
+│   ├── schemas/
+│   │   ├── link_schema.py
+│   │   ├── task_data_schema.py
+│   │   ├── task_update_data_schema.py
+│   │   └── task_schema.py
+│   ├── entities/
+│   │   ├── link.py
+│   │   ├── greeting_entity.py
+│   │   └── task_entity.py
+│   ├── mappers/
+│   │   ├── greeting_mapper.py
+│   │   └── task_mapper.py
+│   └── utils/
+│       ├── error_handlers.py
+│       └── request_logger.py
+└── tests/
+    ├── unit/
+    │   ├── test_models/
+    │   ├── test_services/
+    │   ├── test_controllers/
+    │   ├── test_repositories/
+    │   └── test_utils/
+    └── integration/
+        └── test_tasks_controller.py
 ```

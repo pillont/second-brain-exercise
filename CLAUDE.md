@@ -18,40 +18,57 @@ source/
 │   └── config.py            (Config classes + get_config())
 ├── models/
 │   ├── __init__.py
-│   └── task.py              (TaskStatus enum, TaskData, Task)
+│   ├── task.py              (TaskStatus enum, TaskData, TaskUpdateData, Task)
+│   ├── greeting.py          (Greeting)
+│   └── not_found_error.py   (NotFoundError — raised by repositories when id not found)
 ├── repositories/
 │   ├── __init__.py
-│   ├── create_task_repository.py  (CreateTaskRepository ABC)
-│   └── fake_task_repository.py    (in-memory implementation)
+│   ├── create_task_repository.py   (CreateTaskRepository ABC)
+│   ├── get_all_tasks_repository.py (GetAllTasksRepository ABC)
+│   ├── get_task_repository.py      (GetTaskRepository ABC)
+│   ├── update_task_repository.py   (UpdateTaskRepository ABC)
+│   ├── delete_task_repository.py   (DeleteTaskRepository ABC)
+│   └── fake_task_repository.py     (in-memory implementation of all ABCs)
 ├── services/
 │   ├── __init__.py
-│   └── task_service.py      (CreateTaskService)
+│   ├── greeting_service.py         (GreetingService)
+│   ├── create_task_service.py      (CreateTaskService)
+│   ├── get_all_tasks_service.py    (GetAllTasksService)
+│   ├── get_task_service.py         (GetTaskService)
+│   ├── update_task_service.py      (UpdateTaskService)
+│   └── delete_task_service.py      (DeleteTaskService)
 ├── controllers/
 │   ├── __init__.py
-│   ├── tasks_controller.py
+│   ├── greeting_controller.py
+│   ├── tasks_controller.py  (POST, GET list, GET /{id}, PUT /{id}, DELETE /{id})
 │   ├── schemas/              ← one file per schema
 │   │   ├── __init__.py
-│   │   ├── link_schema.py   (LinkSchema, LinksSchema — HATEOAS)
-│   │   ├── task_data_schema.py
-│   │   └── task_schema.py
+│   │   ├── link_schema.py            (LinkSchema, LinksSchema — HATEOAS)
+│   │   ├── task_data_schema.py       (TaskDataSchema — POST body)
+│   │   ├── task_update_data_schema.py (TaskUpdateDataSchema — PUT body)
+│   │   └── task_schema.py            (TaskSchema — response)
 │   ├── entities/             ← one file per controller output DTO
 │   │   ├── __init__.py
-│   │   ├── link.py          (Link, Links — HATEOAS dataclasses)
-│   │   └── task_entity.py   (TaskDataEntity, TaskEntity)
+│   │   ├── link.py           (HttpMethod enum, LinkEntity, LinksEntity)
+│   │   ├── greeting_entity.py
+│   │   └── task_entity.py    (TaskDataEntity, TaskUpdateDataEntity, TaskLinks, TaskEntity)
 │   ├── mappers/              ← one file per resource
 │   │   ├── __init__.py
-│   │   └── task_mapper.py   (to_task_data, to_task_entity)
+│   │   ├── greeting_mapper.py
+│   │   └── task_mapper.py    (to_task_data, to_task_update_data, to_task_entity)
 │   └── utils/
 │       ├── error_handlers.py (centralized Flask error handler)
 │       └── request_logger.py (before_request logger)
 └── tests/
     ├── __init__.py
-    └── unit/
-        ├── test_models/
-        ├── test_services/
-        ├── test_controllers/
-        ├── test_repositories/
-        └── test_utils/
+    ├── unit/
+    │   ├── test_models/
+    │   ├── test_services/
+    │   ├── test_controllers/
+    │   ├── test_repositories/
+    │   └── test_utils/
+    └── integration/
+        └── test_tasks_controller.py
 ```
 
 
@@ -242,27 +259,35 @@ Marshmallow `data_key` is used to map Python attribute names to the JSON keys re
 
 **entities/link.py** (shared, do not duplicate):
 ```python
-from dataclasses import dataclass
+from enum import StrEnum
+from typing import NotRequired, TypedDict
 
-@dataclass
-class Link:
+class HttpMethod(StrEnum):
+    GET = "GET"
+    POST = "POST"
+    PUT = "PUT"
+    DELETE = "DELETE"
+
+class LinkEntity(TypedDict):
     href: str
+    type: NotRequired[HttpMethod]
 
-@dataclass
-class Links:
-    self_link: Link
+class LinksEntity(TypedDict):
+    self_link: LinkEntity
 ```
 
 **entities/greeting_entity.py**:
 ```python
-from dataclasses import dataclass
-from source.controllers.entities.link import Links
+from typing import TypedDict
+from source.controllers.entities.link import LinksEntity
 
-@dataclass
-class GreetingEntity:
+class GreetingLinks(LinksEntity):
+    pass
+
+class GreetingEntity(TypedDict):
     id: int
     message: str
-    links: Links
+    links: GreetingLinks
 ```
 
 **schemas/link_schema.py** (shared, do not duplicate):
@@ -271,6 +296,7 @@ from marshmallow import Schema, fields
 
 class LinkSchema(Schema):
     href = fields.Str(required=True)
+    type = fields.Str(load_default=None)
 
 class LinksSchema(Schema):
     self_link = fields.Nested(LinkSchema, data_key="self", required=True)
@@ -281,24 +307,26 @@ class LinksSchema(Schema):
 from marshmallow import Schema, fields
 from source.controllers.schemas.link_schema import LinksSchema
 
+class GreetingLinksSchema(LinksSchema):
+    pass
+
 class GreetingSchema(Schema):
     id = fields.Int(required=True)
     message = fields.Str(required=True)
-    links = fields.Nested(LinksSchema, data_key="_links", required=True)
+    links = fields.Nested(GreetingLinksSchema, data_key="_links", required=True)
 ```
 
 **mappers/greeting_mapper.py** — builds links and maps to entity:
 ```python
-from source.controllers.entities.link import Link, Links
-from source.controllers.entities.greeting_entity import GreetingEntity
+from source.controllers.entities.link import LinkEntity
+from source.controllers.entities.greeting_entity import GreetingEntity, GreetingLinks
 from source.models.greeting import Greeting
 
-def _build_links() -> Links:
-    return Links(self_link=Link(href="/hello"))
+def _build_links() -> GreetingLinks:
+    return GreetingLinks(self_link=LinkEntity(href="/hello"))
 
 def to_greeting_entity(greeting: Greeting) -> GreetingEntity:
-    links = _build_links()
-    return GreetingEntity(id=greeting.id, message=greeting.message, links=links)
+    return GreetingEntity(id=greeting.id, message=greeting.message, links=_build_links())
 ```
 
 **greeting_controller.py** — orchestrates only, no mapping logic:
@@ -310,14 +338,45 @@ def get_greeting(greeting_service=Provide[Container.greeting_service]) -> Greeti
     return to_greeting_entity(greeting_service.get_greeting())
 ```
 
+### TypedDict constructor pattern — never use `cast()`
+
+Entities and links are `TypedDict`. Always use the constructor with keyword arguments — mypy resolves types at construction, making `cast()` unnecessary:
+
+```python
+return TaskLinks(
+    self_link=LinkEntity(href=f"/tasks/{task.id}"),
+    tasks=LinkEntity(href="/tasks/"),
+    update=LinkEntity(href=f"/tasks/{task.id}", type=HttpMethod.PUT),
+    delete=LinkEntity(href=f"/tasks/{task.id}", type=HttpMethod.DELETE),
+)
+```
+
+Never use the dict literal + `cast()` pattern — it bypasses type checking:
+
+```python
+return cast(TaskLinks, {"self_link": {"href": "..."}})
+```
+
+### Task links reference
+
+`TaskLinks` (in `task_entity.py`) currently exposes these links in every task response:
+
+| Key | Method | href | Purpose |
+|---|---|---|---|
+| `self` | — | `/tasks/{id}` | The task itself |
+| `tasks` | — | `/tasks/` | The task collection |
+| `update` | `PUT` | `/tasks/{id}` | Update the task |
+| `delete` | `DELETE` | `/tasks/{id}` | Delete the task |
+
 ### Rules
 
 - **Never add `links` to a domain model** — models stay pure.
 - **Never build links in a service or controller** — link building belongs in the mapper.
 - **Never write mapping logic inline in a controller** — delegate to `<resource>_mapper.py`.
-- **Reuse `link.py` and `link_schema.py`** — do not create new `Link`/`Links` classes per resource.
+- **Reuse `link.py` and `link_schema.py`** — do not create new `LinkEntity`/`LinksEntity` classes per resource.
 - **One entity file per resource** — naming: `<resource>_entity.py` → `class <Resource>Entity`.
 - **One mapper file per resource** — naming: `<resource>_mapper.py`.
+- **Never use `cast()`** — use the TypedDict constructor with kwargs instead.
 
 ---
 
@@ -383,9 +442,16 @@ def _wire_controllers_by_container(container: Container) -> None:
 ```
 
 ISP applies to repositories and services — one class per operation:
-- `CreateTaskRepository(ABC)` in `create_task_repository.py`
-- `CreateTaskService` in `task_service.py`
-- When adding `GET /tasks`, create `GetTasksRepository` separately
+
+| Endpoint | Repository ABC | Service |
+|---|---|---|
+| `POST /tasks` | `CreateTaskRepository` | `CreateTaskService` |
+| `GET /tasks` | `GetAllTasksRepository` | `GetAllTasksService` |
+| `GET /tasks/{id}` | `GetTaskRepository` | `GetTaskService` |
+| `PUT /tasks/{id}` | `UpdateTaskRepository` | `UpdateTaskService` |
+| `DELETE /tasks/{id}` | `DeleteTaskRepository` | `DeleteTaskService` |
+
+When adding a new operation, always create a new ABC in `repositories/` and a new service in `services/` — never extend an existing one.
 
 Never disable pylint rules inline (`# pylint: disable=...`) — fix the root cause or configure the tool.
 
