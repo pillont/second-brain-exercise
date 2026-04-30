@@ -1,4 +1,4 @@
-from typing import Generator, List
+from typing import Iterable, List
 from source.models.task import Task, TaskData, TaskStatus
 from source.repositories.create_task_repository import CreateTaskRepository
 from source.repositories.get_all_tasks_repository import GetAllTasksRepository
@@ -15,7 +15,7 @@ class FakeTaskRepository(CreateTaskRepository, GetAllTasksRepository):
         self._next_id += 1
         return task
 
-    def get_all(self) -> Generator[Task]:
+    def get_all(self) -> Iterable[Task]:
         return (t for t in self._tasks)
 
     def _to_task(self, task_data: TaskData) -> Task:

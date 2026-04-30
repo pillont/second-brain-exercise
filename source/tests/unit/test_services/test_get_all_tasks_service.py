@@ -1,7 +1,6 @@
 from datetime import date
-from typing import List
+from typing import Iterable, List
 from unittest.mock import MagicMock
-from types import GeneratorType
 from source.models.task import Task, TaskStatus
 from source.services.get_all_tasks_service import GetAllTasksService
 
@@ -25,7 +24,7 @@ def test_get_all_tasks_calls_repository() -> None:
     mock_repo.get_all.assert_called_once()
 
 
-def test_get_all_tasks_returns_generator() -> None:
+def test_get_all_tasks_returns_iterable() -> None:
     mock_repo = MagicMock()
     mock_repo.get_all.return_value = (
         Task(
@@ -41,7 +40,7 @@ def test_get_all_tasks_returns_generator() -> None:
 
     result = service.get_all_tasks()
 
-    assert isinstance(result, GeneratorType)
+    assert isinstance(result, Iterable)
 
 
 def test_get_all_tasks_returns_empty_when_no_tasks() -> None:

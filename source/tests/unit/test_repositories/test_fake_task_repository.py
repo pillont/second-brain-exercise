@@ -101,7 +101,7 @@ def test_get_all_returns_multiple_tasks_in_order() -> None:
     assert result[1] is created_2
 
 
-def test_get_all_returns_generator() -> None:
+def test_get_all_returns_iterable() -> None:
     repo = FakeTaskRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
