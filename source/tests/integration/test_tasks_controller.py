@@ -1,13 +1,14 @@
 from unittest.mock import MagicMock
 
 import pytest
+from source.config.flask_config import TestingFlaskConfig
+from source.config.app_config import TestingAppConfig
 from source.create_app import create_app
-from source.config.config import TestingConfig
 
 
 @pytest.fixture
 def app():
-    application = create_app(TestingConfig())
+    application = create_app(TestingFlaskConfig(), TestingAppConfig())
     application.config["TESTING"] = True
     return application
 
