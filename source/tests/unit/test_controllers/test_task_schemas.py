@@ -189,6 +189,7 @@ def test_task_update_data_schema_loads_valid_data() -> None:
 
 def test_task_update_data_schema_missing_status_raises_error() -> None:
     from marshmallow import ValidationError
+
     schema = TaskUpdateDataSchema()
     data = {
         "title": "Buy milk",

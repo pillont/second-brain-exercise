@@ -9,13 +9,16 @@ class TaskLinks(LinksEntity):
     tasks: LinkEntity
     update: LinkEntity
 
+
 class TaskDataEntity(TypedDict):
     title: str
     description: str
     due_date: date
 
+
 class TaskUpdateDataEntity(TaskDataEntity):
     status: TaskStatus
+
 
 class TaskEntity(TypedDict):
     id: int

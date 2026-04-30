@@ -22,9 +22,7 @@ class Container(containers.DeclarativeContainer):
     get_all_tasks_service = providers.Singleton(
         GetAllTasksService, repository=task_repository
     )
-    get_task_service = providers.Singleton(
-        GetTaskService, repository=task_repository
-    )
+    get_task_service = providers.Singleton(GetTaskService, repository=task_repository)
     update_task_service = providers.Singleton(
         UpdateTaskService, repository=task_repository
     )

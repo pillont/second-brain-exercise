@@ -9,6 +9,7 @@ class HttpMethod(StrEnum):
     PUT = "PUT"
     DELETE = "DELETE"
 
+
 class LinkEntity(TypedDict):
     href: str
     type: NotRequired[HttpMethod]

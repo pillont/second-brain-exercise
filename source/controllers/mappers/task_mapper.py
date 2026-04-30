@@ -37,8 +37,8 @@ def _build_links(task: Task) -> TaskLinks:
                 "href": f"/tasks/{task.id}",
                 "type": HttpMethod.PUT,
             },
-        }
-    )   
+        },
+    )
 
 
 def to_task_entity(task: Task) -> TaskEntity:
