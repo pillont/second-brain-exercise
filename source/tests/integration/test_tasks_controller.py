@@ -1,19 +1,38 @@
 from unittest.mock import MagicMock
 
 import pytest
+from source.config.flask_config import TestingFlaskConfig
+from source.config.app_config import get_app_config
 from source.create_app import create_app
-from source.config.config import TestingConfig
 
 
 @pytest.fixture
 def app():
-    application = create_app(TestingConfig())
+    application = create_app(TestingFlaskConfig(), get_app_config("testing"))
     application.config["TESTING"] = True
     return application
 
 
+USER_CREDENTIALS = {"username": "taskuser", "password": "taskpass"}
+
+
 @pytest.fixture
-def client(app):
+def token(app):
+    with app.test_client() as c:
+        c.post("/auth/register", json=USER_CREDENTIALS)
+        resp = c.post("/auth/login", json=USER_CREDENTIALS)
+        return resp.get_json()["token"]
+
+
+@pytest.fixture
+def client(app, token):
+    c = app.test_client()
+    c.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
+    return c
+
+
+@pytest.fixture
+def unauthenticated_client(app):
     return app.test_client()
 
 
@@ -55,10 +74,11 @@ def test_post_task_missing_title_returns_422(client) -> None:
     assert response.status_code == 422
 
 
-def test_post_task_service_error_returns_500(app) -> None:
+def test_post_task_service_error_returns_500(app, token) -> None:
     mock_service = MagicMock()
     mock_service.create_task.side_effect = RuntimeError("Service failure")
     with app.test_client() as client:
+        client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
         with app.container.create_task_service.override(mock_service):
             response = client.post("/tasks/", json=VALID_BODY)
         assert response.status_code == 500
@@ -142,10 +162,11 @@ def test_get_tasks_returns_json_content_type(client) -> None:
     assert response.content_type == "application/json"
 
 
-def test_get_tasks_service_error_returns_500(app) -> None:
+def test_get_tasks_service_error_returns_500(app, token) -> None:
     mock_service = MagicMock()
     mock_service.get_all_tasks.side_effect = RuntimeError("Service failure")
     with app.test_client() as client:
+        client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
         with app.container.get_all_tasks_service.override(mock_service):
             response = client.get("/tasks/")
         assert response.status_code == 500
@@ -209,10 +230,11 @@ def test_get_task_returns_404_when_not_found(client) -> None:
     assert response.status_code == 404
 
 
-def test_get_task_service_error_returns_500(app) -> None:
+def test_get_task_service_error_returns_500(app, token) -> None:
     mock_service = MagicMock()
     mock_service.get_task.side_effect = RuntimeError("Service failure")
     with app.test_client() as client:
+        client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
         with app.container.get_task_service.override(mock_service):
             response = client.get("/tasks/1")
         assert response.status_code == 500
@@ -324,10 +346,11 @@ def test_put_task_missing_title_returns_422(client) -> None:
     assert response.status_code == 422
 
 
-def test_put_task_service_error_returns_500(app) -> None:
+def test_put_task_service_error_returns_500(app, token) -> None:
     mock_service = MagicMock()
     mock_service.update_task.side_effect = RuntimeError("Service failure")
     with app.test_client() as client:
+        client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
         created = client.post("/tasks/", json=VALID_BODY).get_json()
         with app.container.update_task_service.override(mock_service):
             response = client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
@@ -368,10 +391,11 @@ def test_delete_task_returns_404_when_not_found(client) -> None:
     assert response.status_code == 404
 
 
-def test_delete_task_service_error_returns_500(app) -> None:
+def test_delete_task_service_error_returns_500(app, token) -> None:
     mock_service = MagicMock()
     mock_service.delete_task.side_effect = RuntimeError("Service failure")
     with app.test_client() as client:
+        client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
         created = client.post("/tasks/", json=VALID_BODY).get_json()
         with app.container.delete_task_service.override(mock_service):
             response = client.delete(f"/tasks/{created['id']}")
@@ -405,3 +429,33 @@ def test_get_tasks_each_task_has_delete_link(client) -> None:
     data = response.get_json()
 
     assert "delete" in data[0]["_links"]
+
+
+def test_post_task_without_auth_returns_401(unauthenticated_client) -> None:
+    response = unauthenticated_client.post("/tasks/", json=VALID_BODY)
+
+    assert response.status_code == 401
+
+
+def test_get_tasks_without_auth_returns_401(unauthenticated_client) -> None:
+    response = unauthenticated_client.get("/tasks/")
+
+    assert response.status_code == 401
+
+
+def test_get_task_without_auth_returns_401(unauthenticated_client) -> None:
+    response = unauthenticated_client.get("/tasks/1")
+
+    assert response.status_code == 401
+
+
+def test_put_task_without_auth_returns_401(unauthenticated_client) -> None:
+    response = unauthenticated_client.put("/tasks/1", json=VALID_UPDATE_BODY)
+
+    assert response.status_code == 401
+
+
+def test_delete_task_without_auth_returns_401(unauthenticated_client) -> None:
+    response = unauthenticated_client.delete("/tasks/1")
+
+    assert response.status_code == 401

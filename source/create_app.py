@@ -4,10 +4,12 @@ import pkgutil
 from typing import Iterator
 
 from flask import Flask
+from flask_jwt_extended import JWTManager
 from flask_smorest import Api, Blueprint
 
 import source.controllers
-from source.config.config import Config
+from source.config.app_config import AppConfig
+from source.config.flask_config import FlaskConfig
 from source.container import setup_container, Container
 from source.controllers.utils.error_handlers import register_error_handlers
 from source.controllers.utils.request_logger import register_request_logger
@@ -19,10 +21,17 @@ class FlaskApp(Flask):
     container: Container
 
 
-def _init_app(config_obj: Config) -> FlaskApp:
+jwt = JWTManager()
+
+
+def _init_app(flask_config: FlaskConfig, app_config: AppConfig) -> FlaskApp:
     app = FlaskApp(__name__)
-    app.config.from_object(config_obj)
-    app.container = setup_container()
+    app.config.from_object(flask_config)
+
+    app.container = setup_container(app_config)
+
+    jwt.init_app(app)
+
     return app
 
 
@@ -52,9 +61,9 @@ def _register_utils(app: FlaskApp) -> None:
     register_request_logger(app)
 
 
-def create_app(config_obj: Config) -> FlaskApp:
+def create_app(flask_config: FlaskConfig, app_config: AppConfig) -> FlaskApp:
 
-    app = _init_app(config_obj)
+    app = _init_app(flask_config, app_config)
     logger.info(
         "Configuration loaded: DEBUG=%s, TESTING=%s",
         app.config["DEBUG"],

@@ -3,12 +3,13 @@ import logging
 import pytest
 from werkzeug.exceptions import NotFound
 from source.create_app import create_app
-from source.config.config import TestingConfig
+from source.config.app_config import get_app_config
+from source.config.flask_config import TestingFlaskConfig
 
 
 @pytest.fixture
 def app():
-    application = create_app(TestingConfig())
+    application = create_app(TestingFlaskConfig(), get_app_config("testing"))
     application.config["TESTING"] = True
     return application
 

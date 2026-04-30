@@ -11,24 +11,31 @@ you can find the project description in [this file](./readme.md)
 ```
 source/
 ├── app.py                   (entry point — init logger, run server)
-├── create_app.py            (Flask app factory)
+├── create_app.py            (Flask app factory — also owns the jwt = JWTManager() singleton)
 ├── container.py             (dependency injection container)
 ├── config/
 │   ├── __init__.py          ← empty, package marker only
-│   └── config.py            (Config classes + get_config())
+│   ├── app_config.py        (AppConfig TypedDict, get_app_config())
+│   └── flask_config.py      (FlaskConfig + subclasses, API_SPEC_OPTIONS for Swagger JWT)
 ├── models/
 │   ├── __init__.py
 │   ├── task.py              (TaskStatus enum, TaskData, TaskUpdateData, Task)
 │   ├── greeting.py          (Greeting)
-│   └── not_found_error.py   (NotFoundError — raised by repositories when id not found)
+│   ├── user.py              (UserData dataclass, User dataclass)
+│   ├── not_found_error.py   (NotFoundError — raised by repositories when id not found)
+│   ├── invalid_credentials_error.py  (InvalidCredentialsError — bad username or password)
+│   └── user_already_exists_error.py  (UserAlreadyExistsError — duplicate username on register)
 ├── repositories/
 │   ├── __init__.py
-│   ├── create_task_repository.py   (CreateTaskRepository ABC)
-│   ├── get_all_tasks_repository.py (GetAllTasksRepository ABC)
-│   ├── get_task_repository.py      (GetTaskRepository ABC)
-│   ├── update_task_repository.py   (UpdateTaskRepository ABC)
-│   ├── delete_task_repository.py   (DeleteTaskRepository ABC)
-│   └── fake_task_repository.py     (in-memory implementation of all ABCs)
+│   ├── create_task_repository.py        (CreateTaskRepository ABC)
+│   ├── get_all_tasks_repository.py      (GetAllTasksRepository ABC)
+│   ├── get_task_repository.py           (GetTaskRepository ABC)
+│   ├── update_task_repository.py        (UpdateTaskRepository ABC)
+│   ├── delete_task_repository.py        (DeleteTaskRepository ABC)
+│   ├── fake_task_repository.py          (in-memory implementation of all task ABCs)
+│   ├── register_user_repository.py      (RegisterUserRepository ABC)
+│   ├── get_user_by_username_repository.py (GetUserByUsernameRepository ABC)
+│   └── fake_user_repository.py          (in-memory implementation of all user ABCs)
 ├── services/
 │   ├── __init__.py
 │   ├── greeting_service.py         (GreetingService)
@@ -36,29 +43,38 @@ source/
 │   ├── get_all_tasks_service.py    (GetAllTasksService)
 │   ├── get_task_service.py         (GetTaskService)
 │   ├── update_task_service.py      (UpdateTaskService)
-│   └── delete_task_service.py      (DeleteTaskService)
+│   ├── delete_task_service.py      (DeleteTaskService)
+│   ├── register_user_service.py    (RegisterUserService — hashes password, delegates to repo)
+│   └── login_user_service.py       (LoginUserService — verifies password, raises InvalidCredentialsError)
 ├── controllers/
 │   ├── __init__.py
 │   ├── greeting_controller.py
-│   ├── tasks_controller.py  (POST, GET list, GET /{id}, PUT /{id}, DELETE /{id})
+│   ├── tasks_controller.py  (POST, GET list, GET /{id}, PUT /{id}, DELETE /{id} — all @jwt_required)
+│   ├── auth_controller.py   (POST /auth/register, POST /auth/login)
 │   ├── schemas/              ← one file per schema
 │   │   ├── __init__.py
-│   │   ├── link_schema.py            (LinkSchema, LinksSchema — HATEOAS)
-│   │   ├── task_data_schema.py       (TaskDataSchema — POST body)
+│   │   ├── link_schema.py             (LinkSchema, LinksSchema — HATEOAS)
+│   │   ├── task_data_schema.py        (TaskDataSchema — POST body)
 │   │   ├── task_update_data_schema.py (TaskUpdateDataSchema — PUT body)
-│   │   └── task_schema.py            (TaskSchema — response)
+│   │   ├── task_schema.py             (TaskSchema — response)
+│   │   ├── auth_data_schema.py        (AuthDataSchema — login/register body)
+│   │   ├── user_schema.py             (UserSchema — register response)
+│   │   └── token_schema.py            (TokenSchema — login response)
 │   ├── entities/             ← one file per controller output DTO
 │   │   ├── __init__.py
 │   │   ├── link.py           (HttpMethod enum, LinkEntity, LinksEntity)
 │   │   ├── greeting_entity.py
-│   │   └── task_entity.py    (TaskDataEntity, TaskUpdateDataEntity, TaskLinks, TaskEntity)
+│   │   ├── task_entity.py    (TaskDataEntity, TaskUpdateDataEntity, TaskLinks, TaskEntity)
+│   │   └── auth_entity.py    (AuthDataEntity, UserLinksEntity, UserEntity, TokenLinksEntity, TokenEntity)
 │   ├── mappers/              ← one file per resource
 │   │   ├── __init__.py
 │   │   ├── greeting_mapper.py
-│   │   └── task_mapper.py    (to_task_data, to_task_update_data, to_task_entity)
+│   │   ├── task_mapper.py    (to_task_data, to_task_update_data, to_task_entity)
+│   │   └── auth_mapper.py    (to_auth_data, to_user_entity, to_token_entity — calls create_access_token)
 │   └── utils/
 │       ├── error_handlers.py (centralized Flask error handler)
-│       └── request_logger.py (before_request logger)
+│       ├── request_logger.py (before_request logger)
+│       └── jwt_errors.py     (JWT-specific error callbacks: expired → 401, invalid → 422)
 └── tests/
     ├── __init__.py
     ├── unit/
@@ -68,7 +84,9 @@ source/
     │   ├── test_repositories/
     │   └── test_utils/
     └── integration/
-        └── test_tasks_controller.py
+        ├── test_greeting_controller.py
+        ├── test_tasks_controller.py
+        └── test_auth_controller.py
 ```
 
 
@@ -91,6 +109,8 @@ source/
 - radon (complexity measurement)
 - marshmallow (schema-based serialization)
 - flask-smorest (annotation-based response serialization + OpenAPI)
+- flask-jwt-extended (JWT creation and `@jwt_required` protection)
+- werkzeug (password hashing via `generate_password_hash` / `check_password_hash`)
 
 ### Serialization Pattern (flask-smorest + marshmallow)
 
@@ -380,6 +400,222 @@ return cast(TaskLinks, {"self_link": {"href": "..."}})
 
 ---
 
+## Authentication & JWT Convention
+
+The API uses **flask-jwt-extended** for stateless JWT authentication. Routes that require a logged-in user are decorated with `@jwt_required()`.
+
+### Initialization
+
+`jwt = JWTManager()` is declared as a module-level singleton in `create_app.py` and initialized with `jwt.init_app(app)` inside `_init_app()`. This singleton is also imported by `jwt_errors.py` to register error callbacks.
+
+```python
+from flask_jwt_extended import JWTManager
+jwt = JWTManager()
+
+def _init_app(flask_config, app_config):
+    app = FlaskApp(__name__)
+    app.config.from_object(flask_config)
+    jwt.init_app(app)
+    return app
+```
+
+### Flask config keys
+
+`FlaskConfig` (in `flask_config.py`) must declare:
+
+| Key | Value | Purpose |
+|---|---|---|
+| `JWT_SECRET_KEY` | set from `AppConfig` via `apply_jwt_config()` | signing key for tokens |
+| `JWT_ACCESS_TOKEN_EXPIRES` | `timedelta(minutes=15)` | token lifetime |
+| `API_SPEC_OPTIONS` | see below | makes the Authorize button appear in Swagger UI |
+
+The `API_SPEC_OPTIONS` dict wires the Swagger UI Authorize button — **do not use the non-existent `OPENAPI_SECURITY_SCHEMES` / `OPENAPI_SECURITY` keys**:
+
+```python
+API_SPEC_OPTIONS = {
+    "components": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+            }
+        }
+    },
+    "security": [{"BearerAuth": []}],
+}
+```
+
+### JWT error callbacks
+
+`source/controllers/utils/jwt_errors.py` registers two callbacks on the `jwt` singleton:
+
+| Callback | Trigger | HTTP status |
+|---|---|---|
+| `@jwt.expired_token_loader` | expired token | 401 |
+| `@jwt.invalid_token_loader` | malformed / missing token | 422 |
+
+These must be registered in `create_app.py` alongside the other utils — add a call to `register_error_handlers` from `jwt_errors.py` if you add new JWT callbacks.
+
+### Protecting a route
+
+Place `@jwt_required()` immediately after the route decorator and before `@blp.arguments` / `@blp.response`:
+
+```python
+@tasks_blp.route("/", methods=["POST"])
+@jwt_required()
+@tasks_blp.arguments(TaskDataSchema)
+@tasks_blp.response(201, TaskSchema)
+@inject
+def create_task(task_data_entity, create_task_service=Provide[...]) -> TaskEntity:
+    ...
+```
+
+Unauthenticated requests to a protected route receive **401**.
+
+### Auth endpoints
+
+| Endpoint | Method | Description | Success | Error |
+|---|---|---|---|---|
+| `/auth/register` | POST | Create a new user | 201 `UserEntity` | 409 duplicate username, 422 bad body |
+| `/auth/login` | POST | Authenticate and get a token | 200 `TokenEntity` | 401 wrong credentials, 422 bad body |
+
+`auth_controller.py` is the **only** controller that uses `try/except` — it catches domain errors (`UserAlreadyExistsError`, `InvalidCredentialsError`) and converts them to HTTP errors via `abort()`. All other controllers rely on the global error handler.
+
+```python
+@auth_blp.route("/register", methods=["POST"])
+@auth_blp.arguments(AuthDataSchema)
+@auth_blp.response(409)
+@auth_blp.response(201, UserSchema)
+@inject
+def register(auth_data_entity, register_user_service=Provide[...]) -> UserEntity:
+    try:
+        user = register_user_service.register_user(to_auth_data(auth_data_entity))
+    except UserAlreadyExistsError:
+        abort(409)
+    return to_user_entity(user)
+```
+
+### User model
+
+```python
+@dataclass
+class UserData:
+    username: str
+    password: str      # plain text — only used as input before hashing
+
+@dataclass
+class User:
+    id: int
+    username: str
+    hashed_password: str
+```
+
+### Password hashing
+
+Hashing is done in `RegisterUserService`, not in the repository or controller:
+
+```python
+from werkzeug.security import generate_password_hash, check_password_hash
+
+hashed = UserData(username=user_data.username, password=generate_password_hash(user_data.password))
+```
+
+Verification is done in `LoginUserService`:
+
+```python
+if not check_password_hash(user.hashed_password, password):
+    raise InvalidCredentialsError()
+```
+
+### Token creation
+
+Token creation belongs in `auth_mapper.py` — **never in the controller or service**:
+
+```python
+from flask_jwt_extended import create_access_token
+
+def to_token_entity(user: User) -> TokenEntity:
+    token = create_access_token(str(user.id))   # subject = user id as string
+    return TokenEntity(token=token, links=_build_token_links())
+```
+
+### AppConfig
+
+`AppConfig` is a `TypedDict` and requires `JWT_SECRET_KEY`:
+
+```python
+class AppConfig(TypedDict):
+    LOG_LEVEL: int
+    JWT_SECRET_KEY: str
+```
+
+In tests, always use `get_app_config("testing")` — **never create a dedicated class** (`TestingAppConfig` or equivalent):
+
+```python
+from source.config.app_config import get_app_config
+
+application = create_app(TestingFlaskConfig(), get_app_config("testing"))
+```
+
+### Integration test fixtures for JWT
+
+Protected routes require a valid token. Use these fixtures — defined once per integration test file:
+
+```python
+from source.config.app_config import get_app_config
+from source.config.flask_config import TestingFlaskConfig
+from source.create_app import create_app
+
+@pytest.fixture
+def app():
+    application = create_app(TestingFlaskConfig(), get_app_config("testing"))
+    application.config["TESTING"] = True
+    return application
+
+USER_CREDENTIALS = {"username": "taskuser", "password": "taskpass"}
+
+@pytest.fixture
+def token(app):
+    with app.test_client() as c:
+        c.post("/auth/register", json=USER_CREDENTIALS)
+        resp = c.post("/auth/login", json=USER_CREDENTIALS)
+        return resp.get_json()["token"]
+
+@pytest.fixture
+def client(app, token):
+    c = app.test_client()
+    c.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
+    return c
+```
+
+For tests that verify **unauthenticated access is rejected**, use a separate fixture:
+
+```python
+@pytest.fixture
+def unauthenticated_client(app):
+    return app.test_client()
+
+def test_get_tasks_without_auth_returns_401(unauthenticated_client) -> None:
+    response = unauthenticated_client.get("/tasks/")
+    assert response.status_code == 401
+```
+
+For service-error tests that create an inner `app.test_client()`, set `environ_base` on that client too:
+
+```python
+def test_post_task_service_error_returns_500(app, token) -> None:
+    mock_service = MagicMock()
+    mock_service.create_task.side_effect = RuntimeError("Service failure")
+    with app.test_client() as client:
+        client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {token}"
+        with app.container.create_task_service.override(mock_service):
+            response = client.post("/tasks/", json=VALID_BODY)
+        assert response.status_code == 500
+```
+
+---
+
 ## Error Handling & Request Logging Convention
 
 **Controllers must NOT wrap endpoint logic in try/except.**
@@ -450,6 +686,8 @@ ISP applies to repositories and services — one class per operation:
 | `GET /tasks/{id}` | `GetTaskRepository` | `GetTaskService` |
 | `PUT /tasks/{id}` | `UpdateTaskRepository` | `UpdateTaskService` |
 | `DELETE /tasks/{id}` | `DeleteTaskRepository` | `DeleteTaskService` |
+| `POST /auth/register` | `RegisterUserRepository` | `RegisterUserService` |
+| `POST /auth/login` | `GetUserByUsernameRepository` | `LoginUserService` |
 
 When adding a new operation, always create a new ABC in `repositories/` and a new service in `services/` — never extend an existing one.
 
