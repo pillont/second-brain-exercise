@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Generator, List, cast
+from typing import Generator, List
 from unittest.mock import MagicMock
 from source.models.task import Task, TaskStatus
 from source.services.get_all_tasks_service import GetAllTasksService
