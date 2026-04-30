@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from flask_smorest import Blueprint
 from dependency_injector.wiring import inject, Provide
 from source.container import Container
@@ -19,3 +21,13 @@ def create_task(
 ) -> TaskEntity:
     task = create_task_service.create_task(to_task_data(task_data_entity))
     return to_task_entity(task)
+
+
+@tasks_blp.route("/", methods=["GET"])
+@tasks_blp.response(200, TaskSchema(many=True))
+@inject
+def get_tasks(
+    get_all_tasks_service=Provide[Container.get_all_tasks_service],
+) -> Iterable[TaskEntity]:
+    all_tasks = get_all_tasks_service.get_all_tasks()
+    return (to_task_entity(task) for task in all_tasks)

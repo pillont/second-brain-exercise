@@ -1,7 +1,7 @@
 from datetime import date
 from unittest.mock import MagicMock
 from source.models.task import Task, TaskData, TaskStatus
-from source.services.task_service import CreateTaskService
+from source.services.create_task_service import CreateTaskService
 
 
 def test_create_task_calls_repository() -> None:
