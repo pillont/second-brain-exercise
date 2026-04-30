@@ -9,4 +9,8 @@ class TaskDataSchema(Schema):
 
     @post_load
     def make_entity(self, data: dict, **kwargs: object) -> TaskDataEntity:
-        return TaskDataEntity(**data)
+        return TaskDataEntity(
+            title=data["title"],
+            description=data["description"],
+            due_date=data["due_date"],
+        )

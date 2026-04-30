@@ -3,10 +3,12 @@ import logging
 import source.controllers
 from typing import List
 from dependency_injector import containers, providers
-from source.services.get_all_tasks_service import GetAllTasksService
-from source.services.greeting_service import GreetingService
-from source.repositories.fake_task_repository import FakeTaskRepository
 from source.services.create_task_service import CreateTaskService
+from source.services.get_all_tasks_service import GetAllTasksService
+from source.services.get_task_service import GetTaskService
+from source.services.greeting_service import GreetingService
+from source.services.update_task_service import UpdateTaskService
+from source.repositories.fake_task_repository import FakeTaskRepository
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +21,10 @@ class Container(containers.DeclarativeContainer):
     )
     get_all_tasks_service = providers.Singleton(
         GetAllTasksService, repository=task_repository
+    )
+    get_task_service = providers.Singleton(GetTaskService, repository=task_repository)
+    update_task_service = providers.Singleton(
+        UpdateTaskService, repository=task_repository
     )
 
 

@@ -18,4 +18,4 @@ def test_to_greeting_entity_sets_self_link() -> None:
 
     result = to_greeting_entity(greeting)
 
-    assert result.links.self_link.href == "/hello"
+    assert result.links["self_link"]["href"] == "/hello"
