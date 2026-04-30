@@ -1,4 +1,4 @@
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 from source.models.not_found_error import NotFoundError
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
@@ -26,7 +26,7 @@ class FakeTaskRepository(
         self._next_id += 1
         return task
 
-    def get_all(self) -> Iterable[Task]:
+    def get_all(self, cursor: Optional[int] =None, page_size: Optional[int]=None) -> Iterable[Task]:
         return (t for t in self._tasks)
 
     def get_task(self, id: int) -> Task:
