@@ -1,0 +1,42 @@
+import logging
+import pytest
+from source.create_app import create_app
+from source.config.config import TestingConfig
+
+
+@pytest.fixture
+def app():
+    application = create_app(TestingConfig())
+    application.config["TESTING"] = True
+    return application
+
+
+@pytest.fixture
+def client(app):
+    return app.test_client()
+
+
+def test_request_is_logged(client, caplog):
+    with caplog.at_level(
+        logging.INFO, logger="source.controllers.utils.request_logger"
+    ):
+        client.get("/hello")
+
+    assert any(
+        "GET" in record.message and "/hello" in record.message
+        for record in caplog.records
+    )
+
+
+def test_post_request_is_logged(client, caplog):
+    with caplog.at_level(
+        logging.INFO, logger="source.controllers.utils.request_logger"
+    ):
+        client.post(
+            "/tasks/", json={"title": "t", "description": "d", "due_date": "2026-05-01"}
+        )
+
+    assert any(
+        "POST" in record.message and "/tasks/" in record.message
+        for record in caplog.records
+    )

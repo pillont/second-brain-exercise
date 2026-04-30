@@ -10,49 +10,48 @@ you can find the project description in [this file](./readme.md)
 
 ```
 source/
-├── app.py (Flask application factory)
+├── app.py                   (entry point — init logger, run server)
+├── create_app.py            (Flask app factory)
+├── container.py             (dependency injection container)
 ├── config/
 │   ├── __init__.py          ← empty, package marker only
 │   └── config.py            (Config classes + get_config())
 ├── models/
 │   ├── __init__.py
-│   ├── task.py (Task entity model)
-│   └── user.py (User entity model)
+│   └── task.py              (TaskStatus enum, TaskData, Task)
 ├── repositories/
 │   ├── __init__.py
-│   ├── base_repository.py (common repository patterns)
-│   ├── task_repository.py (Task data access)
-│   └── user_repository.py (User data access)
+│   ├── create_task_repository.py  (CreateTaskRepository ABC)
+│   └── fake_task_repository.py    (in-memory implementation)
 ├── services/
 │   ├── __init__.py
-│   ├── task_service.py (Task business logic)
-│   └── user_service.py (User business logic & authentication)
+│   └── task_service.py      (CreateTaskService)
 ├── controllers/
 │   ├── __init__.py
-│   ├── tasks_controller.py (Task API endpoints)
-│   ├── users_controller.py (User API endpoints & auth)
+│   ├── tasks_controller.py
 │   ├── schemas/              ← one file per schema
 │   │   ├── __init__.py
-│   │   ├── link_schema.py (LinkSchema, LinksSchema — HATEOAS)
-│   │   └── greeting_schema.py (GreetingSchema)
-│   └── entities/             ← one file per controller output DTO
-│       ├── __init__.py
-│       ├── link.py (Link, Links — HATEOAS dataclasses)
-│       └── greeting_entity.py (GreetingEntity)
-├── utils/
-│   ├── __init__.py
-│   ├── error_handlers.py (centralized Flask error handler)
-│   ├── auth_utils.py (JWT & password utilities)
-│   ├── validators.py (validation helpers)
-│   └── decorators.py (Flask decorators)
+│   │   ├── link_schema.py   (LinkSchema, LinksSchema — HATEOAS)
+│   │   ├── task_data_schema.py
+│   │   └── task_schema.py
+│   ├── entities/             ← one file per controller output DTO
+│   │   ├── __init__.py
+│   │   ├── link.py          (Link, Links — HATEOAS dataclasses)
+│   │   └── task_entity.py   (TaskDataEntity, TaskEntity)
+│   ├── mappers/              ← one file per resource
+│   │   ├── __init__.py
+│   │   └── task_mapper.py   (to_task_data, to_task_entity)
+│   └── utils/
+│       ├── error_handlers.py (centralized Flask error handler)
+│       └── request_logger.py (before_request logger)
 └── tests/
     ├── __init__.py
     └── unit/
-        ├── test_models/ (model unit tests)
-        ├── test_services/ (service unit tests)
-        ├── test_controllers/ (controller unit tests)
-        ├── test_repositories/ (repository unit tests)
-        └── test_utils/ (utils unit tests)
+        ├── test_models/
+        ├── test_services/
+        ├── test_controllers/
+        ├── test_repositories/
+        └── test_utils/
 ```
 
 
@@ -81,7 +80,7 @@ source/
 Controllers **never** call `schema.dump()` manually. Instead, use the `@blp.response` decorator so flask-smorest serializes the return value automatically:
 
 ```python
-from flask_smorest import Blueprint  # type: ignore[import-untyped]
+from flask_smorest import Blueprint
 from source.models.my_model import MyModel
 from source.controllers.schemas.my_schema import MySchema
 
@@ -99,7 +98,7 @@ def get_resource(my_service=Provide[Container.my_service]) -> MyModel:
 - Blueprints must be registered via `api.register_blueprint()` (not `app.register_blueprint()`), where `api = Api(app)` in `create_app()`
 - The `Config` base class must include `API_TITLE`, `API_VERSION`, and `OPENAPI_VERSION` for flask-smorest
 - flask-smorest exposes `/openapi.json` and `/swagger-ui` automatically
-- Add `# type: ignore[import-untyped]` on `from flask_smorest import ...` lines (no type stubs available)
+- **No `# type: ignore`** — third-party packages without stubs are configured in `mypy.ini` with `ignore_missing_imports = True` per package section
 
 ## Development Standards
 
@@ -123,11 +122,14 @@ All agents developing for this project must follow these standards. Skills are a
   - Single Responsibility Principle (SRP)
   - Open/Closed Principle (OCP)
   - Liskov Substitution Principle (LSP)
-  - Interface Segregation Principle (ISP)
+  - **Interface Segregation Principle (ISP)** — one interface per operation: `CreateTaskRepository`, not `TaskRepository`. Same for services: `CreateTaskService`.
   - Dependency Inversion Principle (DIP)
   - Maximum function length: 20 lines
   - Avoid code duplication (DRY)
   - Use dependency injection for testability
+  - **Method ordering in classes**: `__init__` → public methods → private methods (`_`)
+  - **Extract sub-functions** for distinct concerns: link building, entity mapping, blueprint registration, logger init
+  - **Module-level logger**: `logger = logging.getLogger(__name__)` at the top of the file, after imports — never passed as a parameter
 
 ### Testing Standards
 - **Unit Tests** — Test individual functions/methods (see `/python-unit-testing` skill)
@@ -215,7 +217,7 @@ All API responses follow HATEOAS — each response includes a `_links` object wi
 
 **Controller entities** (`source/controllers/entities/`) are output DTOs, specific to the controller layer. They wrap the domain model data and add the `_links` field before the response is serialized.
 
-The controller is responsible for the mapping: `Model → Entity`.
+**Mappers** (`source/controllers/mappers/`) handle the conversion between domain models and controller entities. Controllers delegate all mapping to them.
 
 ### File structure
 
@@ -225,6 +227,7 @@ The controller is responsible for the mapping: `Model → Entity`.
 | `source/controllers/entities/<resource>_entity.py` | DTO for a given resource |
 | `source/controllers/schemas/link_schema.py` | `LinkSchema` and `LinksSchema` (shared by all schemas) |
 | `source/controllers/schemas/<resource>_schema.py` | Schema for the entity, includes `_links` field |
+| `source/controllers/mappers/<resource>_mapper.py` | `to_<resource>_entity()` and input mapping functions |
 
 ### `data_key` mapping convention
 
@@ -284,48 +287,107 @@ class GreetingSchema(Schema):
     links = fields.Nested(LinksSchema, data_key="_links", required=True)
 ```
 
-**greeting_controller.py** — the controller maps Model → Entity and injects the links:
+**mappers/greeting_mapper.py** — builds links and maps to entity:
+```python
+from source.controllers.entities.link import Link, Links
+from source.controllers.entities.greeting_entity import GreetingEntity
+from source.models.greeting import Greeting
+
+def _build_links() -> Links:
+    return Links(self_link=Link(href="/hello"))
+
+def to_greeting_entity(greeting: Greeting) -> GreetingEntity:
+    links = _build_links()
+    return GreetingEntity(id=greeting.id, message=greeting.message, links=links)
+```
+
+**greeting_controller.py** — orchestrates only, no mapping logic:
 ```python
 @greeting_blp.route("/hello", methods=["GET"])
 @greeting_blp.response(200, GreetingSchema)
 @inject
 def get_greeting(greeting_service=Provide[Container.greeting_service]) -> GreetingEntity:
-    greeting = greeting_service.get_greeting()
-    links = Links(self_link=Link(href="/hello"))
-    return GreetingEntity(id=greeting.id, message=greeting.message, links=links)
+    return to_greeting_entity(greeting_service.get_greeting())
 ```
 
 ### Rules
 
 - **Never add `links` to a domain model** — models stay pure.
-- **Never build links in a service** — link building is a controller concern (URLs are HTTP layer knowledge).
+- **Never build links in a service or controller** — link building belongs in the mapper.
+- **Never write mapping logic inline in a controller** — delegate to `<resource>_mapper.py`.
 - **Reuse `link.py` and `link_schema.py`** — do not create new `Link`/`Links` classes per resource.
 - **One entity file per resource** — naming: `<resource>_entity.py` → `class <Resource>Entity`.
+- **One mapper file per resource** — naming: `<resource>_mapper.py`.
 
 ---
 
-## Error Handling Convention
+## Error Handling & Request Logging Convention
 
 **Controllers must NOT wrap endpoint logic in try/except.**
 
-All unexpected exceptions are caught and logged by a single global handler registered in `source/utils/error_handlers.py`. It:
-- Logs every unhandled exception at `ERROR` level with full traceback
-- Returns `{"error": "Internal server error"}` with HTTP 500
-- Lets `HTTPException` (404, 405, etc.) pass through normally
+Two cross-cutting hooks are registered in `source/controllers/utils/` and wired in `create_app()`:
 
-The handler is registered in `create_app()` (`source/create_app.py`) and applies to every blueprint automatically.
+| File | Hook | Purpose |
+|---|---|---|
+| `error_handlers.py` | `@app.errorhandler(Exception)` | Catches all unhandled exceptions, logs at ERROR, returns HTTP 500 |
+| `request_logger.py` | `@app.before_request` | Logs `METHOD /path` for every incoming request |
+
+Because `request_logger.py` handles request logging globally, **controllers must not log the incoming request themselves**.
 
 **Correct controller pattern:**
 ```python
 @blueprint.route("/example", methods=["GET"])
 @inject
-def get_example(my_service=Provide[Container.my_service]) -> tuple[dict, int]:
-    logger.info("GET /example called")
+def get_example(my_service=Provide[Container.my_service]) -> MyEntity:
     result = my_service.do_something()
-    return schema.dump(result), 200
+    return to_my_entity(result)
 ```
 
 Services and repositories may still raise domain-specific exceptions — the global handler will catch anything that bubbles up uncaught.
+
+---
+
+## Models Convention
+
+- Use `StrEnum` (Python 3.11+) for status/type enums — guarantees `str(value) == value.value`, required for marshmallow `fields.Str()` serialization:
+
+```python
+from enum import StrEnum
+
+class TaskStatus(StrEnum):
+    INCOMPLETE = "Incomplete"
+    COMPLETE = "Complete"
+```
+
+- Never use `str, Enum` — in Python 3.11+, `str()` returns `"ClassName.MEMBER"` not the value.
+
+---
+
+## Container & Dependency Injection Convention
+
+Controllers are **auto-wired** using `pkgutil.walk_packages` — never list them manually:
+
+```python
+import pkgutil
+import source.controllers
+
+def _wire_controllers_by_container(container: Container) -> None:
+    modules = [
+        info.name
+        for info in pkgutil.walk_packages(
+            path=source.controllers.__path__,
+            prefix="source.controllers.",
+        )
+    ]
+    container.wire(modules=modules)
+```
+
+ISP applies to repositories and services — one class per operation:
+- `CreateTaskRepository(ABC)` in `create_task_repository.py`
+- `CreateTaskService` in `task_service.py`
+- When adding `GET /tasks`, create `GetTasksRepository` separately
+
+Never disable pylint rules inline (`# pylint: disable=...`) — fix the root cause or configure the tool.
 
 ---
 

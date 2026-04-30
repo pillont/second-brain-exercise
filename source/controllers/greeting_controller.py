@@ -1,9 +1,9 @@
 import logging
-from flask_smorest import Blueprint  # type: ignore[import-untyped]
+from flask_smorest import Blueprint
 from dependency_injector.wiring import inject, Provide
 from source.container import Container
 from source.controllers.entities.greeting_entity import GreetingEntity
-from source.controllers.entities.link import Link, Links
+from source.controllers.mappers.greeting_mapper import to_greeting_entity
 from source.controllers.schemas.greeting_schema import GreetingSchema
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,4 @@ greeting_blp = Blueprint("greeting", __name__, url_prefix="")
 def get_greeting(
     greeting_service=Provide[Container.greeting_service],
 ) -> GreetingEntity:
-    logger.info("GET /hello endpoint called")
-    greeting = greeting_service.get_greeting()
-    links = Links(self_link=Link(href="/hello"))
-    return GreetingEntity(id=greeting.id, message=greeting.message, links=links)
+    return to_greeting_entity(greeting_service.get_greeting())

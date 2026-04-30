@@ -34,12 +34,12 @@ class ProductionConfig(Config):
 
 
 config_by_name = {
-    "development": DevelopmentConfig,
-    "testing": TestingConfig,
-    "production": ProductionConfig,
-    "default": DevelopmentConfig,
+    "development": DevelopmentConfig(),
+    "testing": TestingConfig(),
+    "production": ProductionConfig(),
+    "default": DevelopmentConfig(),
 }
 
 
-def get_config(config_name: str = "development") -> type[Config]:
-    return config_by_name.get(config_name, DevelopmentConfig)
+def get_config(config_name: str = "development") -> Config:
+    return config_by_name.get(config_name, DevelopmentConfig())

@@ -14,7 +14,11 @@
       "Bash(curl -s http://127.0.0.1:5001/hello)",
       "Bash(python3 -m json.tool)",
       "Bash(.venv/bin/python -m source.app)",
-      "Bash(pkill -f \"source.app\")"
+      "Bash(pkill -f \"source.app\")",
+      "Bash(.venv/bin/python -m pytest source/tests/unit/ -q)",
+      "Bash(.venv/bin/python -m black --check source/)",
+      "Bash(.venv/bin/python -m black source/)",
+      "Bash(.venv/bin/python -m pylint source/ --disable=C0111)"
     ]
   }
 }
