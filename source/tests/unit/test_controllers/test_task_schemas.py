@@ -56,3 +56,64 @@ def test_task_schema_dump_links_structure() -> None:
     result = schema.dump(entity)
 
     assert result["_links"]["self"]["href"] == "/tasks/1"
+
+
+def test_task_schema_with_many_true_dumps_list() -> None:
+    schema = TaskSchema(many=True)
+    entity1 = TaskEntity(
+        id=1,
+        title="Buy milk",
+        description="At the store",
+        due_date=date(2026, 5, 1),
+        status=TaskStatus.INCOMPLETE,
+        links=Links(self_link=Link(href="/tasks/1")),
+    )
+    entity2 = TaskEntity(
+        id=2,
+        title="Buy eggs",
+        description="At the market",
+        due_date=date(2026, 5, 2),
+        status=TaskStatus.INCOMPLETE,
+        links=Links(self_link=Link(href="/tasks/2")),
+    )
+
+    result = schema.dump([entity1, entity2])
+
+    assert isinstance(result, list)
+    assert len(result) == 2
+    assert result[0]["id"] == 1
+    assert result[1]["id"] == 2
+
+
+def test_task_schema_with_many_true_dumps_empty_list() -> None:
+    schema = TaskSchema(many=True)
+
+    result = schema.dump([])
+
+    assert isinstance(result, list)
+    assert len(result) == 0
+
+
+def test_task_schema_with_many_true_includes_links_per_entity() -> None:
+    schema = TaskSchema(many=True)
+    entity1 = TaskEntity(
+        id=1,
+        title="Buy milk",
+        description="At the store",
+        due_date=date(2026, 5, 1),
+        status=TaskStatus.INCOMPLETE,
+        links=Links(self_link=Link(href="/tasks/1")),
+    )
+    entity2 = TaskEntity(
+        id=2,
+        title="Buy eggs",
+        description="At the market",
+        due_date=date(2026, 5, 2),
+        status=TaskStatus.INCOMPLETE,
+        links=Links(self_link=Link(href="/tasks/2")),
+    )
+
+    result = schema.dump([entity1, entity2])
+
+    assert result[0]["_links"]["self"]["href"] == "/tasks/1"
+    assert result[1]["_links"]["self"]["href"] == "/tasks/2"
