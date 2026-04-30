@@ -13,7 +13,7 @@ class TaskUpdateDataSchema(TaskDataSchema):
     def make_entity(self, data: dict, **kwargs: object) -> TaskUpdateDataEntity:
         return TaskUpdateDataEntity(
             title=data["title"],
-            description=data["description"], 
+            description=data["description"],
             due_date=data["due_date"],
             status=data["status"],
         )

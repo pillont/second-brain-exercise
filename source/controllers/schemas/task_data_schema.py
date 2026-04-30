@@ -11,6 +11,6 @@ class TaskDataSchema(Schema):
     def make_entity(self, data: dict, **kwargs: object) -> TaskDataEntity:
         return TaskDataEntity(
             title=data["title"],
-            description=data["description"], 
-            due_date=data["due_date"]
+            description=data["description"],
+            due_date=data["due_date"],
         )
