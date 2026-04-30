@@ -20,12 +20,14 @@ logger = logging.getLogger(__name__)
 class FlaskApp(Flask):
     container: Container
 
+
 jwt = JWTManager()
+
 
 def _init_app(flask_config: FlaskConfig, app_config: AppConfig) -> FlaskApp:
     app = FlaskApp(__name__)
     app.config.from_object(flask_config)
-    
+
     app.container = setup_container(app_config)
 
     jwt.init_app(app)

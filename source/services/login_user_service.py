@@ -1,6 +1,5 @@
 from typing import Final
 
-import jwt
 from werkzeug.security import check_password_hash
 
 from source.config.app_config import AppConfig

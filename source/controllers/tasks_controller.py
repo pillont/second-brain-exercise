@@ -1,6 +1,6 @@
 from typing import Iterable
 
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from flask_smorest import Blueprint
 from dependency_injector.wiring import inject, Provide
 from source.container import Container

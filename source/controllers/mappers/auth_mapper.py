@@ -33,6 +33,6 @@ def _build_token_links() -> TokenLinksEntity:
     )
 
 
-def to_token_entity(user:User) -> TokenEntity:
+def to_token_entity(user: User) -> TokenEntity:
     token = create_access_token(str(user.id))
     return TokenEntity(token=token, links=_build_token_links())

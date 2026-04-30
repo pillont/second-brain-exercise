@@ -58,8 +58,7 @@ def login(
             auth_data_entity["username"],
             auth_data_entity["password"],
         )
-    
+
         return to_token_entity(user)
     except InvalidCredentialsError:
         abort(401)
-

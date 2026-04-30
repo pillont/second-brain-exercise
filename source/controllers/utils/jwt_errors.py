@@ -1,9 +1,6 @@
 import logging
-from flask import Flask, Response, jsonify, make_response
+from flask import Flask
 from source.create_app import jwt
-from werkzeug.exceptions import HTTPException
-
-from source.models.not_found_error import NotFoundError
 
 logger = logging.getLogger(__name__)
 

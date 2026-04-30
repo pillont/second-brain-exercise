@@ -5,8 +5,6 @@ import pytest
 from source.config.app_config import get_app_config
 from source.config.flask_config import TestingFlaskConfig
 from source.create_app import create_app
-from source.models.invalid_credentials_error import InvalidCredentialsError
-from source.models.user_already_exists_error import UserAlreadyExistsError
 
 
 @pytest.fixture
@@ -137,7 +135,10 @@ def test_login_returns_register_link(registered_client) -> None:
 def test_login_invalid_password_returns_401(registered_client) -> None:
     response = registered_client.post(
         "/auth/login",
-        json={"username": VALID_CREDENTIALS["username"], "password": "wrong_password_invalid"},
+        json={
+            "username": VALID_CREDENTIALS["username"],
+            "password": "wrong_password_invalid",
+        },
     )
 
     assert response.status_code == 401
