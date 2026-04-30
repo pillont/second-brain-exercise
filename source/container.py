@@ -4,6 +4,7 @@ import source.controllers
 from typing import List
 from dependency_injector import containers, providers
 from source.services.create_task_service import CreateTaskService
+from source.services.delete_task_service import DeleteTaskService
 from source.services.get_all_tasks_service import GetAllTasksService
 from source.services.get_task_service import GetTaskService
 from source.services.greeting_service import GreetingService
@@ -26,7 +27,9 @@ class Container(containers.DeclarativeContainer):
     update_task_service = providers.Singleton(
         UpdateTaskService, repository=task_repository
     )
-
+    delete_task_service = providers.Singleton(
+        DeleteTaskService, repository=task_repository
+    )
 
 def setup_container() -> Container:
     logger.info("Setting up dependency injection container...")
