@@ -15,12 +15,8 @@ class FakeTaskRepository(CreateTaskRepository, GetAllTasksRepository):
         self._next_id += 1
         return task
 
-    def get_all(self) -> Generator[Task]: 
-        return (
-            t 
-            for t 
-            in self._tasks
-        )
+    def get_all(self) -> Generator[Task]:
+        return (t for t in self._tasks)
 
     def _to_task(self, task_data: TaskData) -> Task:
         return Task(

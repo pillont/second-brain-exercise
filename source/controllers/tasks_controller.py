@@ -23,7 +23,6 @@ def create_task(
     return to_task_entity(task)
 
 
-
 @tasks_blp.route("/", methods=["GET"])
 @tasks_blp.response(200, TaskSchema(many=True))
 @inject
@@ -31,9 +30,4 @@ def get_tasks(
     get_all_tasks_service=Provide[Container.get_all_tasks_service],
 ) -> Generator[TaskEntity]:
     all_tasks = get_all_tasks_service.get_all_tasks()
-    return (
-        to_task_entity(task) 
-        for task 
-        in all_tasks
-    )
-
+    return (to_task_entity(task) for task in all_tasks)
