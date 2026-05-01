@@ -39,6 +39,8 @@ source/
   - Method ordering: `__init__` → public → private (`_`)
   - Module-level logger: `logger = logging.getLogger(__name__)` after imports, never passed as parameter
 - **No `# pylint: disable`** inline — fix root cause or configure the tool
+- **`@dataclass` for pure data only** — if a class has a business method, use a regular class with explicit `__init__`
+- **`Final` on all immutable `__init__` attributes** — every `self.x = y` never reassigned, in every class
 
 ## Testing
 
@@ -105,5 +107,14 @@ See [error-handling](.claude/commands/error-handling.md).
 
 See [dependency-injection](.claude/commands/dependency-injection.md).
 
+### Coding patterns
+Inheritance for variants, update operations, `fields.Enum`, generic/resource-specific schemas & entities, filter param ordering, pure functions — see [conventions](.claude/commands/conventions.md).
+
 ### CI/CD
 Quality checks run automatically on every push/PR — see [CI/CD Workflow Guide](.claude/commands/python-pep8-conventions-references/ci-cd-workflow.md).
+
+---
+
+## Testing Conventions
+
+Filter feature checklist (model, repository, service, integration) — see [testing-conventions](.claude/commands/testing-conventions.md).
