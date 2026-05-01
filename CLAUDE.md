@@ -61,7 +61,7 @@ python -m pylint source/ --disable=C0111
 ## Conventions
 
 ### `__init__.py`
-Package markers only — must remain **empty**. Never put code, imports, or comments in `__init__.py`.
+Barrel exports + `__all__` uniquement. Les packages de tests restent vides. Aucun code d'initialisation, aucune logique.
 
 ### HATEOAS
 - All responses include a `_links` object — models stay pure, links belong in mappers only
