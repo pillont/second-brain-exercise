@@ -265,7 +265,7 @@ def test_get_tasks_each_task_has_update_link(client) -> None:
     client.post("/tasks/", json=VALID_BODY)
 
     response = client.get("/tasks/")
-    data = response.get_json()
+    data = response.get_json()["elements"]
 
     assert "update" in data[0]["_links"]
 
@@ -371,7 +371,7 @@ def test_delete_task_removes_task_from_list(client) -> None:
     created = client.post("/tasks/", json=VALID_BODY).get_json()
 
     client.delete(f"/tasks/{created['id']}")
-    data = client.get("/tasks/").get_json()
+    data = client.get("/tasks/").get_json()["elements"]
 
     assert len(data) == 0
 
@@ -426,7 +426,7 @@ def test_get_tasks_each_task_has_delete_link(client) -> None:
     client.post("/tasks/", json=VALID_BODY)
 
     response = client.get("/tasks/")
-    data = response.get_json()
+    data = response.get_json()["elements"]
 
     assert "delete" in data[0]["_links"]
 

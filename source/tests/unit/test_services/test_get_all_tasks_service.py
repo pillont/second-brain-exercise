@@ -1,6 +1,8 @@
 from datetime import date
+from itertools import chain
 from typing import Iterable, List
 from unittest.mock import MagicMock
+from source.models.filtered_list import FilteredList
 from source.models.task import Task, TaskStatus
 from source.services.get_all_tasks_service import GetAllTasksService
 
@@ -46,10 +48,10 @@ def test_get_all_tasks_returns_iterable() -> None:
 def test_get_all_tasks_returns_empty_when_no_tasks() -> None:
     mock_repo = MagicMock()
     fake_tasks: List[Task] = []
-    mock_repo.get_all.return_value = (t for t in fake_tasks)
+    mock_repo.get_all.return_value = FilteredList((t for t in fake_tasks), False)
     service = GetAllTasksService(repository=mock_repo)
 
-    result = list(service.get_all_tasks())
+    result = list(service.get_all_tasks().elements)
 
     assert result == []
 
@@ -70,10 +72,10 @@ def test_get_all_tasks_returns_multiple_tasks() -> None:
         due_date=date(2026, 5, 2),
         status=TaskStatus.INCOMPLETE,
     )
-    mock_repo.get_all.return_value = (task for task in [task1, task2])
+    mock_repo.get_all.return_value = FilteredList(chain([task1, task2]), False)
     service = GetAllTasksService(repository=mock_repo)
 
-    result = list(service.get_all_tasks())
+    result = list(service.get_all_tasks().elements)
 
     assert len(result) == 2
     assert result[0] is task1

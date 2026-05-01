@@ -9,7 +9,6 @@ from source.controllers.entities.task_entity import (
     TaskEntity,
     TaskUpdateDataEntity,
 )
-from source.controllers.mappers.list_entity_mapper import map_to_list_entity
 from source.controllers.mappers.task_mapper import (
     map_to_filtered_tasks_list,
     to_task_data,
@@ -20,7 +19,6 @@ from source.controllers.schemas.list_argument_schema import ListArgumentSchema
 from source.controllers.schemas.task_data_schema import TaskDataSchema
 from source.controllers.schemas.task_schema import TasksListSchema, TaskSchema
 from source.controllers.schemas.task_update_data_schema import TaskUpdateDataSchema
-from source.models.filtered_list import FilteredList
 from source.services.create_task_service import CreateTaskService
 from source.services.delete_task_service import DeleteTaskService
 from source.services.get_all_tasks_service import GetAllTasksService
@@ -55,11 +53,11 @@ def get_all_tasks(
     ],
 ) -> ListEntity[TaskEntity]:
     all_tasks = get_all_tasks_service.get_all_tasks(
-        args.get("cursor", None), 
-        args.get("page_size", None)
+        args.get("cursor", None), args.get("page_size", None)
     )
 
     return map_to_filtered_tasks_list(all_tasks)
+
 
 @tasks_blp.route("/<int:id>", methods=["GET"])
 @jwt_required()
