@@ -194,7 +194,7 @@ def test_task_update_data_schema_loads_valid_data() -> None:
     assert result["status"] == "Complete"
 
 
-def test_task_update_data_schema_loads_valid_data() -> None:
+def test_task_update_data_schema_loads_invalid_status() -> None:
     schema = TaskUpdateDataSchema()
     data = {
         "title": "Buy milk",
@@ -208,6 +208,7 @@ def test_task_update_data_schema_loads_valid_data() -> None:
         assert False, "Expected ValidationError to be raised"
     except ValidationError:
         pass
+
 
 def test_task_update_data_schema_missing_status_raises_error() -> None:
 
