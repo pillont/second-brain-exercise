@@ -431,6 +431,166 @@ def test_get_tasks_each_task_has_delete_link(client) -> None:
     assert "delete" in data[0]["_links"]
 
 
+def test_get_tasks_filter_by_status_complete(client) -> None:
+    client.post("/tasks/", json=VALID_BODY)
+    created = client.post(
+        "/tasks/", json={**VALID_BODY, "title": "Buy eggs"}
+    ).get_json()
+    client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
+
+    response = client.get("/tasks/?status=Complete")
+    data = response.get_json()["elements"]
+
+    assert len(data) == 1
+    assert data[0]["status"] == "Complete"
+
+
+def test_get_tasks_filter_by_status_incomplete(client) -> None:
+    client.post("/tasks/", json=VALID_BODY)
+    created = client.post(
+        "/tasks/", json={**VALID_BODY, "title": "Buy eggs"}
+    ).get_json()
+    client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
+
+    response = client.get("/tasks/?status=Incomplete")
+    data = response.get_json()["elements"]
+
+    assert len(data) == 1
+    assert data[0]["status"] == "Incomplete"
+
+
+def test_get_tasks_filter_by_due_date_from(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-01-01"})
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-12-31"})
+
+    response = client.get("/tasks/?due_date_from=2026-06-01")
+    data = response.get_json()["elements"]
+
+    assert len(data) == 1
+    assert data[0]["due_date"] == "2026-12-31"
+
+
+def test_get_tasks_filter_by_due_date_to(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-01-01"})
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-12-31"})
+
+    response = client.get("/tasks/?due_date_to=2026-06-01")
+    data = response.get_json()["elements"]
+
+    assert len(data) == 1
+    assert data[0]["due_date"] == "2026-01-01"
+
+
+def test_get_tasks_filter_by_due_date_range(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-01-01"})
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-06-15"})
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-12-31"})
+
+    response = client.get("/tasks/?due_date_from=2026-03-01&due_date_to=2026-09-01")
+    data = response.get_json()["elements"]
+
+    assert len(data) == 1
+    assert data[0]["due_date"] == "2026-06-15"
+
+
+def test_get_tasks_filter_by_title(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Buy milk"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Walk the dog"})
+
+    response = client.get("/tasks/?title=buy")
+    data = response.get_json()["elements"]
+
+    assert len(data) == 1
+    assert data[0]["title"] == "Buy milk"
+
+
+def test_get_tasks_filter_by_title_case_insensitive(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Buy Milk"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Walk the dog"})
+
+    response = client.get("/tasks/?title=BUY")
+    data = response.get_json()["elements"]
+
+    assert len(data) == 1
+
+
+def test_get_tasks_filter_by_description(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "description": "At the store"})
+    client.post("/tasks/", json={**VALID_BODY, "description": "In the park"})
+
+    response = client.get("/tasks/?description=store")
+    data = response.get_json()["elements"]
+
+    assert len(data) == 1
+    assert data[0]["description"] == "At the store"
+
+
+def test_get_tasks_filter_by_description_case_insensitive(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "description": "At the Store"})
+    client.post("/tasks/", json={**VALID_BODY, "description": "In the park"})
+
+    response = client.get("/tasks/?description=STORE")
+    data = response.get_json()["elements"]
+
+    assert len(data) == 1
+
+
+def test_get_tasks_filter_combined_status_and_title(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Buy milk"})
+    created = client.post(
+        "/tasks/", json={**VALID_BODY, "title": "Buy eggs"}
+    ).get_json()
+    client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
+
+    response = client.get("/tasks/?status=Incomplete&title=buy")
+    data = response.get_json()["elements"]
+
+    assert len(data) == 1
+    assert data[0]["title"] == "Buy milk"
+
+
+def test_get_tasks_filter_with_pagination(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Task 1"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Task 2"})
+    created = client.post("/tasks/", json={**VALID_BODY, "title": "Task 3"}).get_json()
+    client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
+
+    response = client.get("/tasks/?status=Incomplete&page_size=1")
+    data = response.get_json()
+
+    assert len(data["elements"]) == 1
+    assert data["has_next"] is True
+
+
+def test_get_tasks_filter_returns_empty_list_when_no_match(client) -> None:
+    client.post("/tasks/", json=VALID_BODY)
+
+    response = client.get("/tasks/?status=Complete")
+    data = response.get_json()
+
+    assert data["elements"] == []
+    assert data["has_next"] is False
+
+
+def test_get_tasks_filter_returns_multiple_matching_elements(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Task 1"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Task 2"})
+    created = client.post("/tasks/", json={**VALID_BODY, "title": "Task 3"}).get_json()
+    client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
+
+    response = client.get("/tasks/?status=Incomplete")
+    data = response.get_json()
+
+    assert len(data["elements"]) == 2
+    assert data["has_next"] is False
+
+
+def test_get_tasks_filter_invalid_status_returns_422(client) -> None:
+    response = client.get("/tasks/?status=Invalid")
+
+    assert response.status_code == 422
+
+
 def test_post_task_without_auth_returns_401(unauthenticated_client) -> None:
     response = unauthenticated_client.post("/tasks/", json=VALID_BODY)
 

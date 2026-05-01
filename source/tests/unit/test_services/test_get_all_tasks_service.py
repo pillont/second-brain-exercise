@@ -82,6 +82,44 @@ def test_get_all_tasks_returns_multiple_tasks() -> None:
     assert result[1] is task2
 
 
+def test_get_all_tasks_passes_filters_to_repository() -> None:
+    from source.models.task_filters import TaskFilters
+    from source.models.task import TaskStatus
+
+    mock_repo = MagicMock()
+    mock_repo.get_all.return_value = FilteredList(iter([]), False)
+    service = GetAllTasksService(repository=mock_repo)
+    filters = TaskFilters(status=TaskStatus.COMPLETE)
+
+    service.get_all_tasks(filters=filters)
+
+    mock_repo.get_all.assert_called_once_with(filters, None, None)
+
+
+def test_get_all_tasks_passes_cursor_and_page_size_to_repository() -> None:
+    mock_repo = MagicMock()
+    mock_repo.get_all.return_value = FilteredList(iter([]), False)
+    service = GetAllTasksService(repository=mock_repo)
+
+    service.get_all_tasks(cursor=5, page_size=10)
+
+    mock_repo.get_all.assert_called_once_with(None, 5, 10)
+
+
+def test_get_all_tasks_passes_all_params_to_repository() -> None:
+    from source.models.task_filters import TaskFilters
+    from source.models.task import TaskStatus
+
+    mock_repo = MagicMock()
+    mock_repo.get_all.return_value = FilteredList(iter([]), False)
+    service = GetAllTasksService(repository=mock_repo)
+    filters = TaskFilters(status=TaskStatus.INCOMPLETE)
+
+    service.get_all_tasks(filters=filters, cursor=3, page_size=5)
+
+    mock_repo.get_all.assert_called_once_with(filters, 3, 5)
+
+
 def test_get_all_tasks_propagates_repository_error() -> None:
     mock_repo = MagicMock()
     mock_repo.get_all.side_effect = RuntimeError("Database error")

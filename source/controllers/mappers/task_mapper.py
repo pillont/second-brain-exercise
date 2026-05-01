@@ -1,7 +1,11 @@
 from source.controllers.entities.list_entity import ListEntity
+from source.controllers.entities.tasks_list_argument_entity import (
+    TasksListArgumentEntity,
+)
 from source.controllers.mappers.list_entity_mapper import map_to_list_entity
 from source.models.filtered_list import FilteredList
 from source.models.task import Task, TaskData, TaskUpdateData
+from source.models.task_filters import TaskFilters
 from source.controllers.entities.task_entity import (
     TaskDataEntity,
     TaskEntity,
@@ -9,6 +13,16 @@ from source.controllers.entities.task_entity import (
     TaskUpdateDataEntity,
 )
 from source.controllers.entities.link import HttpMethod, LinkEntity
+
+
+def to_task_filters(entity: TasksListArgumentEntity) -> TaskFilters:
+    return TaskFilters(
+        status=entity.get("status"),
+        due_date_from=entity.get("due_date_from"),
+        due_date_to=entity.get("due_date_to"),
+        title=entity.get("title"),
+        description=entity.get("description"),
+    )
 
 
 def to_task_data(entity: TaskDataEntity) -> TaskData:
