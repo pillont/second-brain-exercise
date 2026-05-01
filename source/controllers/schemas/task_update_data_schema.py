@@ -2,10 +2,11 @@ from marshmallow import fields, post_load
 
 from source.controllers.entities.task_entity import TaskUpdateDataEntity
 from source.controllers.schemas.task_data_schema import TaskDataSchema
+from source.models.task import TaskStatus
 
 
 class TaskUpdateDataSchema(TaskDataSchema):
-    status = fields.Str(required=True)
+    status = fields.Enum(TaskStatus, by_value=True, required=True)
 
     @post_load
     def make_entity(self, data: dict, **kwargs: object) -> TaskUpdateDataEntity:

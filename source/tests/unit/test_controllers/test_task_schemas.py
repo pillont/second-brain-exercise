@@ -1,5 +1,7 @@
 from datetime import date
 
+from marshmallow import ValidationError
+
 from source.controllers.entities.link import HttpMethod, LinkEntity
 from source.controllers.entities.task_entity import (
     TaskEntity,
@@ -192,8 +194,22 @@ def test_task_update_data_schema_loads_valid_data() -> None:
     assert result["status"] == "Complete"
 
 
+def test_task_update_data_schema_loads_valid_data() -> None:
+    schema = TaskUpdateDataSchema()
+    data = {
+        "title": "Buy milk",
+        "description": "At the store",
+        "due_date": "2026-05-01",
+        "status": "UNKNOWN STATUS !",
+    }
+
+    try:
+        schema.load(data)
+        assert False, "Expected ValidationError to be raised"
+    except ValidationError:
+        pass
+
 def test_task_update_data_schema_missing_status_raises_error() -> None:
-    from marshmallow import ValidationError
 
     schema = TaskUpdateDataSchema()
     data = {
