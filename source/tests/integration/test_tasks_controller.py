@@ -433,7 +433,9 @@ def test_get_tasks_each_task_has_delete_link(client) -> None:
 
 def test_get_tasks_filter_by_status_complete(client) -> None:
     client.post("/tasks/", json=VALID_BODY)
-    created = client.post("/tasks/", json={**VALID_BODY, "title": "Buy eggs"}).get_json()
+    created = client.post(
+        "/tasks/", json={**VALID_BODY, "title": "Buy eggs"}
+    ).get_json()
     client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
 
     response = client.get("/tasks/?status=Complete")
@@ -445,7 +447,9 @@ def test_get_tasks_filter_by_status_complete(client) -> None:
 
 def test_get_tasks_filter_by_status_incomplete(client) -> None:
     client.post("/tasks/", json=VALID_BODY)
-    created = client.post("/tasks/", json={**VALID_BODY, "title": "Buy eggs"}).get_json()
+    created = client.post(
+        "/tasks/", json={**VALID_BODY, "title": "Buy eggs"}
+    ).get_json()
     client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
 
     response = client.get("/tasks/?status=Incomplete")
@@ -533,7 +537,9 @@ def test_get_tasks_filter_by_description_case_insensitive(client) -> None:
 
 def test_get_tasks_filter_combined_status_and_title(client) -> None:
     client.post("/tasks/", json={**VALID_BODY, "title": "Buy milk"})
-    created = client.post("/tasks/", json={**VALID_BODY, "title": "Buy eggs"}).get_json()
+    created = client.post(
+        "/tasks/", json={**VALID_BODY, "title": "Buy eggs"}
+    ).get_json()
     client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
 
     response = client.get("/tasks/?status=Incomplete&title=buy")

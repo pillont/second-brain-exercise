@@ -4,9 +4,7 @@ from typing import Final, Iterable, Optional
 from source.models.task import Task, TaskStatus
 
 
-def _filter_by_status(
-    elements: Iterable[Task], status: TaskStatus
-) -> Iterable[Task]:
+def _filter_by_status(elements: Iterable[Task], status: TaskStatus) -> Iterable[Task]:
     return (t for t in elements if t.status == status)
 
 

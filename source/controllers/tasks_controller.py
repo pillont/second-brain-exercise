@@ -2,7 +2,9 @@ from flask_jwt_extended import jwt_required
 from flask_smorest import Blueprint
 from dependency_injector.wiring import inject, Provide
 from source.container import Container
-from source.controllers.entities.tasks_list_argument_entity import TasksListArgumentEntity
+from source.controllers.entities.tasks_list_argument_entity import (
+    TasksListArgumentEntity,
+)
 from source.controllers.entities.list_entity import ListEntity
 from source.controllers.entities.task_entity import (
     TaskDataEntity,
@@ -16,7 +18,9 @@ from source.controllers.mappers.task_mapper import (
     to_task_filters,
     to_task_update_data,
 )
-from source.controllers.schemas.tasks_list_argument_schema import TasksListArgumentSchema
+from source.controllers.schemas.tasks_list_argument_schema import (
+    TasksListArgumentSchema,
+)
 from source.controllers.schemas.task_data_schema import TaskDataSchema
 from source.controllers.schemas.task_schema import TasksListSchema, TaskSchema
 from source.controllers.schemas.task_update_data_schema import TaskUpdateDataSchema

@@ -347,7 +347,9 @@ def test_update_task_updates_fields() -> None:
 def test_get_all_with_status_filter_returns_matching_tasks() -> None:
     repo = FakeTaskRepository()
     created = repo.create(
-        TaskData(title="Buy milk", description="At the store", due_date=date(2026, 5, 1))
+        TaskData(
+            title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
+        )
     )
     repo.update(
         created.id,
@@ -359,12 +361,16 @@ def test_get_all_with_status_filter_returns_matching_tasks() -> None:
         ),
     )
     repo.create(
-        TaskData(title="Buy eggs", description="At the market", due_date=date(2026, 5, 2))
+        TaskData(
+            title="Buy eggs", description="At the market", due_date=date(2026, 5, 2)
+        )
     )
 
     from source.models.task_filters import TaskFilters
 
-    result = list(repo.get_all(filters=TaskFilters(status=TaskStatus.COMPLETE)).elements)
+    result = list(
+        repo.get_all(filters=TaskFilters(status=TaskStatus.COMPLETE)).elements
+    )
 
     assert len(result) == 1
     assert result[0].status == TaskStatus.COMPLETE
@@ -373,7 +379,9 @@ def test_get_all_with_status_filter_returns_matching_tasks() -> None:
 def test_get_all_with_status_filter_excludes_non_matching_tasks() -> None:
     repo = FakeTaskRepository()
     created = repo.create(
-        TaskData(title="Buy milk", description="At the store", due_date=date(2026, 5, 1))
+        TaskData(
+            title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
+        )
     )
     repo.update(
         created.id,
@@ -385,12 +393,16 @@ def test_get_all_with_status_filter_excludes_non_matching_tasks() -> None:
         ),
     )
     repo.create(
-        TaskData(title="Buy eggs", description="At the market", due_date=date(2026, 5, 2))
+        TaskData(
+            title="Buy eggs", description="At the market", due_date=date(2026, 5, 2)
+        )
     )
 
     from source.models.task_filters import TaskFilters
 
-    result = list(repo.get_all(filters=TaskFilters(status=TaskStatus.INCOMPLETE)).elements)
+    result = list(
+        repo.get_all(filters=TaskFilters(status=TaskStatus.INCOMPLETE)).elements
+    )
 
     assert len(result) == 1
     assert result[0].status == TaskStatus.INCOMPLETE
@@ -399,7 +411,9 @@ def test_get_all_with_status_filter_excludes_non_matching_tasks() -> None:
 def test_get_all_with_due_date_from_filter() -> None:
     repo = FakeTaskRepository()
     repo.create(TaskData(title="Task 1", description="Desc", due_date=date(2026, 1, 1)))
-    repo.create(TaskData(title="Task 2", description="Desc", due_date=date(2026, 12, 31)))
+    repo.create(
+        TaskData(title="Task 2", description="Desc", due_date=date(2026, 12, 31))
+    )
 
     from source.models.task_filters import TaskFilters
 
@@ -414,7 +428,9 @@ def test_get_all_with_due_date_from_filter() -> None:
 def test_get_all_with_due_date_to_filter() -> None:
     repo = FakeTaskRepository()
     repo.create(TaskData(title="Task 1", description="Desc", due_date=date(2026, 1, 1)))
-    repo.create(TaskData(title="Task 2", description="Desc", due_date=date(2026, 12, 31)))
+    repo.create(
+        TaskData(title="Task 2", description="Desc", due_date=date(2026, 12, 31))
+    )
 
     from source.models.task_filters import TaskFilters
 
@@ -428,8 +444,12 @@ def test_get_all_with_due_date_to_filter() -> None:
 
 def test_get_all_with_title_filter_case_insensitive() -> None:
     repo = FakeTaskRepository()
-    repo.create(TaskData(title="Buy Milk", description="Desc", due_date=date(2026, 5, 1)))
-    repo.create(TaskData(title="Walk the dog", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(
+        TaskData(title="Buy Milk", description="Desc", due_date=date(2026, 5, 1))
+    )
+    repo.create(
+        TaskData(title="Walk the dog", description="Desc", due_date=date(2026, 5, 1))
+    )
 
     from source.models.task_filters import TaskFilters
 
@@ -441,8 +461,12 @@ def test_get_all_with_title_filter_case_insensitive() -> None:
 
 def test_get_all_with_description_filter_case_insensitive() -> None:
     repo = FakeTaskRepository()
-    repo.create(TaskData(title="Task 1", description="At the Store", due_date=date(2026, 5, 1)))
-    repo.create(TaskData(title="Task 2", description="In the park", due_date=date(2026, 5, 1)))
+    repo.create(
+        TaskData(title="Task 1", description="At the Store", due_date=date(2026, 5, 1))
+    )
+    repo.create(
+        TaskData(title="Task 2", description="In the park", due_date=date(2026, 5, 1))
+    )
 
     from source.models.task_filters import TaskFilters
 
@@ -454,7 +478,9 @@ def test_get_all_with_description_filter_case_insensitive() -> None:
 
 def test_get_all_with_combined_filters() -> None:
     repo = FakeTaskRepository()
-    repo.create(TaskData(title="Buy milk", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(
+        TaskData(title="Buy milk", description="Desc", due_date=date(2026, 5, 1))
+    )
     created = repo.create(
         TaskData(title="Buy eggs", description="Desc", due_date=date(2026, 5, 1))
     )
@@ -471,7 +497,9 @@ def test_get_all_with_combined_filters() -> None:
     from source.models.task_filters import TaskFilters
 
     result = list(
-        repo.get_all(filters=TaskFilters(status=TaskStatus.INCOMPLETE, title="buy")).elements
+        repo.get_all(
+            filters=TaskFilters(status=TaskStatus.INCOMPLETE, title="buy")
+        ).elements
     )
 
     assert len(result) == 1
@@ -497,7 +525,9 @@ def test_get_all_filters_applied_before_pagination() -> None:
 
     from source.models.task_filters import TaskFilters
 
-    result = repo.get_all(filters=TaskFilters(status=TaskStatus.INCOMPLETE), page_size=1)
+    result = repo.get_all(
+        filters=TaskFilters(status=TaskStatus.INCOMPLETE), page_size=1
+    )
 
     assert len(list(result.elements)) == 1
     assert result.has_next is True

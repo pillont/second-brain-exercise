@@ -1,5 +1,7 @@
 from source.controllers.entities.list_entity import ListEntity
-from source.controllers.entities.tasks_list_argument_entity import TasksListArgumentEntity
+from source.controllers.entities.tasks_list_argument_entity import (
+    TasksListArgumentEntity,
+)
 from source.controllers.mappers.list_entity_mapper import map_to_list_entity
 from source.models.filtered_list import FilteredList
 from source.models.task import Task, TaskData, TaskUpdateData
