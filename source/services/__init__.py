@@ -8,8 +8,12 @@ from source.services.login_user_service import LoginUserService
 from source.services.register_user_service import RegisterUserService
 
 __all__ = [
-    "CreateTaskService", "DeleteTaskService",
-    "GetAllTasksService", "GetTaskService", "UpdateTaskService",
+    "CreateTaskService",
+    "DeleteTaskService",
+    "GetAllTasksService",
+    "GetTaskService",
+    "UpdateTaskService",
     "GreetingService",
-    "LoginUserService", "RegisterUserService",
+    "LoginUserService",
+    "RegisterUserService",
 ]

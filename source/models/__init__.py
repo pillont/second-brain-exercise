@@ -7,9 +7,17 @@ from source.models.invalid_credentials_error import InvalidCredentialsError
 from source.models.user_already_exists_error import UserAlreadyExistsError
 
 __all__ = [
-    "Task", "TaskData", "TaskUpdateData", "TaskStatus",
-    "User", "UserData", "HashedUserData",
+    "Task",
+    "TaskData",
+    "TaskUpdateData",
+    "TaskStatus",
+    "User",
+    "UserData",
+    "HashedUserData",
     "Greeting",
-    "FilteredList", "map_to_filtered",
-    "NotFoundError", "InvalidCredentialsError", "UserAlreadyExistsError",
+    "FilteredList",
+    "map_to_filtered",
+    "NotFoundError",
+    "InvalidCredentialsError",
+    "UserAlreadyExistsError",
 ]
