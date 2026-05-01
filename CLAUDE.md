@@ -90,6 +90,12 @@ See [jwt-authentication](.claude/commands/jwt-authentication.md) and [jwt_securi
 
 See [error-handling](.claude/commands/error-handling.md).
 
+### Pure Functions & Classes
+- If a method doesn't use `self` (no state access), extract it as a **module-level private function** (`_` prefix) rather than a class method
+- The class method becomes a pure orchestrator: it passes the needed values explicitly as parameters
+- This keeps helper functions pure, independently testable, and free of implicit coupling to instance state
+- Example: `source/models/task_filters.py` — `_filter_by_status`, `_filter_by_title`, etc. are module-level; `TaskFilters.apply()` calls them by passing `self.status`, `self.title`, etc. as arguments
+
 ### Models
 - Use `StrEnum` for status/type enums — never `str, Enum` (Python 3.11+ breaks serialization)
 

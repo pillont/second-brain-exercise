@@ -2,7 +2,7 @@ from flask_jwt_extended import jwt_required
 from flask_smorest import Blueprint
 from dependency_injector.wiring import inject, Provide
 from source.container import Container
-from source.controllers.entities.list_argument_entity import ListArgumentEntity
+from source.controllers.entities.tasks_list_argument_entity import TasksListArgumentEntity
 from source.controllers.entities.list_entity import ListEntity
 from source.controllers.entities.task_entity import (
     TaskDataEntity,
@@ -13,9 +13,10 @@ from source.controllers.mappers.task_mapper import (
     map_to_filtered_tasks_list,
     to_task_data,
     to_task_entity,
+    to_task_filters,
     to_task_update_data,
 )
-from source.controllers.schemas.list_argument_schema import ListArgumentSchema
+from source.controllers.schemas.tasks_list_argument_schema import TasksListArgumentSchema
 from source.controllers.schemas.task_data_schema import TaskDataSchema
 from source.controllers.schemas.task_schema import TasksListSchema, TaskSchema
 from source.controllers.schemas.task_update_data_schema import TaskUpdateDataSchema
@@ -43,17 +44,17 @@ def create_task(
 
 @tasks_blp.route("/", methods=["GET"])
 @jwt_required()
-@tasks_blp.arguments(ListArgumentSchema, location="query")
+@tasks_blp.arguments(TasksListArgumentSchema, location="query")
 @tasks_blp.response(200, TasksListSchema)
 @inject
 def get_all_tasks(
-    args: ListArgumentEntity,
+    args: TasksListArgumentEntity,
     get_all_tasks_service: GetAllTasksService = Provide[
         Container.get_all_tasks_service
     ],
 ) -> ListEntity[TaskEntity]:
     all_tasks = get_all_tasks_service.get_all_tasks(
-        args.get("cursor", None), args.get("page_size", None)
+        to_task_filters(args), args.get("cursor", None), args.get("page_size", None)
     )
 
     return map_to_filtered_tasks_list(all_tasks)

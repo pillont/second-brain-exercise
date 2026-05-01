@@ -30,7 +30,9 @@
       "Bash(.venv/bin/python -m pytest source/tests/integration/ -q)",
       "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py -q)",
       "Bash(/Users/thibautpillon/dev/python_env/.venv/bin/python -m pytest source/tests/integration/test_auth_controller.py -v)",
-      "Bash(/Users/thibautpillon/dev/python_env/.venv/bin/python -m pytest source/tests/ -v)"
+      "Bash(/Users/thibautpillon/dev/python_env/.venv/bin/python -m pytest source/tests/ -v)",
+      "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py::test_get_tasks_filter_by_status_complete -v -s)",
+      "Bash(.venv/bin/python -c ' *)"
     ]
   }
 }
