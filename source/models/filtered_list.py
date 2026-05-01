@@ -3,6 +3,17 @@ from typing import Final, Generic, Iterable, List, Optional, Tuple, TypeVar
 
 T = TypeVar("T")
 
+class FilteredList(Generic[T]):
+    def __init__(self, sliced_elements: Iterable[T], has_next: bool) -> None:
+        self.elements: Final = sliced_elements
+        self.has_next: Final = has_next
+
+def map_to_filtered(
+    elements: Iterable[T], page_size: Optional[int]
+) -> FilteredList[T]:
+    sliced_elements, has_next = _slice_with_has_next(elements, page_size)
+    return FilteredList(sliced_elements, has_next)
+
 
 def _slice_with_has_next(
     elements: Iterable[T], page_size: Optional[int]
@@ -24,14 +35,3 @@ def _has_next(elements_with_next: List[T], page_size: int) -> bool:
     return len(elements_with_next) > page_size
 
 
-class FilteredList(Generic[T]):
-    def __init__(self, sliced_elements: Iterable[T], has_next: bool) -> None:
-        self.elements: Final = sliced_elements
-        self.has_next: Final = has_next
-
-    @staticmethod
-    def map_to_filtered(
-        elements: Iterable[T], page_size: Optional[int]
-    ) -> FilteredList[T]:
-        sliced_elements, has_next = _slice_with_has_next(elements, page_size)
-        return FilteredList(sliced_elements, has_next)

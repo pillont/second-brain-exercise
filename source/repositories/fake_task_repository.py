@@ -1,7 +1,7 @@
 from itertools import chain
 from typing import Iterable, List, Optional
 
-from source.models.filtered_list import FilteredList
+from source.models.filtered_list import FilteredList, map_to_filtered
 from source.models.not_found_error import NotFoundError
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
 from source.repositories.create_task_repository import CreateTaskRepository
@@ -37,7 +37,7 @@ class FakeTaskRepository(
         if cursor:
             elements = self._filtered_by_cursor(elements, cursor)
 
-        return FilteredList.map_to_filtered(elements, page_size)
+        return map_to_filtered(elements, page_size)
 
     def get_task(self, id: int) -> Task:
         return self._find_by_id(id)
