@@ -94,7 +94,7 @@ def test_get_tasks_returns_200(client) -> None:
 
 def test_get_tasks_returns_empty_list_initially(client) -> None:
     response = client.get("/tasks/")
-    data = response.get_json()
+    data = response.get_json()["elements"]
 
     assert isinstance(data, list)
     assert len(data) == 0
@@ -105,7 +105,7 @@ def test_get_tasks_returns_list_of_tasks(client) -> None:
     client.post("/tasks/", json={**VALID_BODY, "title": "Buy eggs"})
 
     response = client.get("/tasks/")
-    data = response.get_json()
+    data = response.get_json()["elements"]
 
     assert isinstance(data, list)
     assert len(data) == 2
@@ -115,7 +115,7 @@ def test_get_tasks_each_task_has_expected_keys(client) -> None:
     client.post("/tasks/", json=VALID_BODY)
 
     response = client.get("/tasks/")
-    data = response.get_json()
+    data = response.get_json()["elements"]
 
     assert len(data) == 1
     task = data[0]
@@ -134,7 +134,7 @@ def test_get_tasks_each_task_has_self_link(client) -> None:
     created_id = created_task["id"]
 
     response = client.get("/tasks/")
-    data = response.get_json()
+    data = response.get_json()["elements"]
 
     task_links = [task["_links"]["self"]["href"] for task in data]
     assert f"/tasks/{created_id}" in task_links
@@ -144,7 +144,7 @@ def test_get_tasks_each_task_has_tasks_link(client) -> None:
     client.post("/tasks/", json=VALID_BODY)
 
     response = client.get("/tasks/")
-    data = response.get_json()
+    data = response.get_json()["elements"]
 
     assert data[0]["_links"]["tasks"]["href"] == "/tasks/"
 
@@ -265,7 +265,7 @@ def test_get_tasks_each_task_has_update_link(client) -> None:
     client.post("/tasks/", json=VALID_BODY)
 
     response = client.get("/tasks/")
-    data = response.get_json()
+    data = response.get_json()["elements"]
 
     assert "update" in data[0]["_links"]
 
@@ -371,7 +371,7 @@ def test_delete_task_removes_task_from_list(client) -> None:
     created = client.post("/tasks/", json=VALID_BODY).get_json()
 
     client.delete(f"/tasks/{created['id']}")
-    data = client.get("/tasks/").get_json()
+    data = client.get("/tasks/").get_json()["elements"]
 
     assert len(data) == 0
 
@@ -426,7 +426,7 @@ def test_get_tasks_each_task_has_delete_link(client) -> None:
     client.post("/tasks/", json=VALID_BODY)
 
     response = client.get("/tasks/")
-    data = response.get_json()
+    data = response.get_json()["elements"]
 
     assert "delete" in data[0]["_links"]
 

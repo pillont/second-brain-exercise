@@ -15,3 +15,8 @@ class TaskSchema(Schema):
     due_date = fields.Date(required=True)
     status = fields.Str(required=True)
     links = fields.Nested(TaskLinksSchema, data_key="_links", required=True)
+
+
+class TasksListSchema(Schema):
+    elements = fields.List(fields.Nested(TaskSchema))
+    has_next = fields.Bool(required=True)

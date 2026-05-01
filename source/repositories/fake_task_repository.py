@@ -1,5 +1,7 @@
-from typing import Iterable, List
+from itertools import chain
+from typing import Iterable, List, Optional
 
+from source.models.filtered_list import FilteredList, map_to_filtered
 from source.models.not_found_error import NotFoundError
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
 from source.repositories.create_task_repository import CreateTaskRepository
@@ -26,8 +28,16 @@ class FakeTaskRepository(
         self._next_id += 1
         return task
 
-    def get_all(self) -> Iterable[Task]:
-        return (t for t in self._tasks)
+    def get_all(
+        self, cursor: Optional[int] = None, page_size: Optional[int] = None
+    ) -> FilteredList[Task]:
+
+        elements: Iterable[Task] = chain(self._tasks)
+
+        if cursor:
+            elements = self._filtered_by_cursor(elements, cursor)
+
+        return map_to_filtered(elements, page_size)
 
     def get_task(self, id: int) -> Task:
         return self._find_by_id(id)
@@ -60,3 +70,8 @@ class FakeTaskRepository(
             return next(task for task in self._tasks if task.id == id)
         except StopIteration:
             raise NotFoundError()
+
+    def _filtered_by_cursor(
+        self, elements: Iterable[Task], cursor: int
+    ) -> Iterable[Task]:
+        return (t for t in elements if not cursor or t.id > cursor)
