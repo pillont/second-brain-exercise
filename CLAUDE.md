@@ -39,6 +39,8 @@ source/
   - Method ordering: `__init__` → public → private (`_`)
   - Module-level logger: `logger = logging.getLogger(__name__)` after imports, never passed as parameter
 - **No `# pylint: disable`** inline — fix root cause or configure the tool
+- **`@dataclass` for pure data only** — if a class has a business method, use a regular class with explicit `__init__`
+- **`Final` on all immutable `__init__` attributes** — every `self.x = y` never reassigned, in every class
 
 ## Testing
 
@@ -61,7 +63,7 @@ python -m pylint source/ --disable=C0111
 ## Conventions
 
 ### `__init__.py`
-Barrel exports + `__all__` uniquement. Les packages de tests restent vides. Aucun code d'initialisation, aucune logique.
+Package markers only — must remain **empty**. Never put code, imports, or comments in `__init__.py`.
 
 ### HATEOAS
 - All responses include a `_links` object — models stay pure, links belong in mappers only
@@ -90,12 +92,6 @@ See [jwt-authentication](.claude/commands/jwt-authentication.md) and [jwt_securi
 
 See [error-handling](.claude/commands/error-handling.md).
 
-### Pure Functions & Classes
-- If a method doesn't use `self` (no state access), extract it as a **module-level private function** (`_` prefix) rather than a class method
-- The class method becomes a pure orchestrator: it passes the needed values explicitly as parameters
-- This keeps helper functions pure, independently testable, and free of implicit coupling to instance state
-- Example: `source/models/task_filters.py` — `_filter_by_status`, `_filter_by_title`, etc. are module-level; `TaskFilters.apply()` calls them by passing `self.status`, `self.title`, etc. as arguments
-
 ### Models
 - Use `StrEnum` for status/type enums — never `str, Enum` (Python 3.11+ breaks serialization)
 
@@ -105,5 +101,14 @@ See [error-handling](.claude/commands/error-handling.md).
 
 See [dependency-injection](.claude/commands/dependency-injection.md).
 
+### Coding patterns
+Inheritance for variants, update operations, `fields.Enum`, generic/resource-specific schemas & entities, filter param ordering, pure functions — see [conventions](.claude/commands/conventions.md).
+
 ### CI/CD
 Quality checks run automatically on every push/PR — see [CI/CD Workflow Guide](.claude/commands/python-pep8-conventions-references/ci-cd-workflow.md).
+
+---
+
+## Testing Conventions
+
+Filter feature checklist (model, repository, service, integration) — see [testing-conventions](.claude/commands/testing-conventions.md).
