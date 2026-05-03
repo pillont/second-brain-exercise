@@ -43,9 +43,9 @@ class TaskSort:
 
     def apply(self, elements: Iterable[Task]) -> List[Task]:
         reverse = self.direction == SortDirection.DESC
-        
+
         items = list(elements)
-       
+
         match self.field:
             case SortField.TITLE:
                 return _sort_by_title(items, reverse)
