@@ -5,6 +5,8 @@ from source.controllers.schemas.link_schema import LinkSchema, LinksSchema
 
 class TokenLinksSchema(LinksSchema):
     register = fields.Nested(LinkSchema, required=True)
+    get_all_tasks = fields.Nested(LinkSchema, required=True)
+    create_task = fields.Nested(LinkSchema, required=True)
 
 
 class TokenSchema(Schema):

@@ -10,6 +10,10 @@ from source.controllers.schemas.auth_data_schema import AuthDataSchema
 from source.controllers.schemas.token_schema import TokenLinksSchema, TokenSchema
 from source.controllers.schemas.user_schema import UserLinksSchema, UserSchema
 from source.controllers.schemas.greeting_schema import GreetingSchema
+from source.controllers.schemas.entry_point_schema import (
+    EntryPointLinksSchema,
+    EntryPointSchema,
+)
 from source.controllers.schemas.list_argument_schema import ListArgumentSchema
 
 __all__ = [
@@ -26,5 +30,7 @@ __all__ = [
     "UserLinksSchema",
     "UserSchema",
     "GreetingSchema",
+    "EntryPointLinksSchema",
+    "EntryPointSchema",
     "ListArgumentSchema",
 ]

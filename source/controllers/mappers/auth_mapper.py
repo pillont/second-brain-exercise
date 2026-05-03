@@ -30,6 +30,8 @@ def _build_token_links() -> TokenLinksEntity:
     return TokenLinksEntity(
         self_link=LinkEntity(href="/auth/login"),
         register=LinkEntity(href="/auth/register", type=HttpMethod.POST),
+        get_all_tasks=LinkEntity(href="/tasks/"),
+        create_task=LinkEntity(href="/tasks/", type=HttpMethod.POST),
     )
 
 
