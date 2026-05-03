@@ -10,6 +10,7 @@ from source.controllers.mappers.auth_mapper import (
     to_token_entity,
 )
 from source.controllers.mappers.greeting_mapper import to_greeting_entity
+from source.controllers.mappers.entry_point_mapper import to_entry_point_entity
 from source.controllers.mappers.list_entity_mapper import map_to_list_entity
 
 __all__ = [
@@ -21,5 +22,6 @@ __all__ = [
     "to_user_entity",
     "to_token_entity",
     "to_greeting_entity",
+    "to_entry_point_entity",
     "map_to_list_entity",
 ]

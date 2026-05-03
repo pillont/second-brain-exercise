@@ -13,6 +13,10 @@ from source.controllers.entities.auth_entity import (
     TokenEntity,
 )
 from source.controllers.entities.greeting_entity import GreetingEntity
+from source.controllers.entities.entry_point_entity import (
+    EntryPointLinksEntity,
+    EntryPointEntity,
+)
 from source.controllers.entities.list_argument_entity import ListArgumentEntity
 from source.controllers.entities.list_entity import ListEntity
 
@@ -30,6 +34,8 @@ __all__ = [
     "TokenLinksEntity",
     "TokenEntity",
     "GreetingEntity",
+    "EntryPointLinksEntity",
+    "EntryPointEntity",
     "ListArgumentEntity",
     "ListEntity",
 ]

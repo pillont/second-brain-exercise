@@ -20,6 +20,8 @@ class UserEntity(TypedDict):
 
 class TokenLinksEntity(LinksEntity):
     register: LinkEntity
+    get_all_tasks: LinkEntity
+    create_task: LinkEntity
 
 
 class TokenEntity(TypedDict):
