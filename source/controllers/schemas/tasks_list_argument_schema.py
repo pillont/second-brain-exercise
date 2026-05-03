@@ -2,6 +2,7 @@ from marshmallow import fields
 
 from source.controllers.schemas.list_argument_schema import ListArgumentSchema
 from source.models.task import TaskStatus
+from source.models.task_sort import SortDirection, SortField
 
 
 class TasksListArgumentSchema(ListArgumentSchema):
@@ -10,3 +11,5 @@ class TasksListArgumentSchema(ListArgumentSchema):
     due_date_to = fields.Date(required=False)
     title = fields.String(required=False)
     description = fields.String(required=False)
+    sort_by = fields.Enum(SortField, by_value=True, required=False)
+    sort_direction = fields.Enum(SortDirection, by_value=True, required=False)

@@ -5,6 +5,7 @@ from source.models.filtered_list import FilteredList, map_to_filtered
 from source.models.not_found_error import NotFoundError
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
 from source.models.task_filters import TaskFilters
+from source.models.task_sort import TaskSort
 from source.repositories.create_task_repository import CreateTaskRepository
 from source.repositories.delete_task_repository import DeleteTaskRepository
 from source.repositories.get_all_tasks_repository import GetAllTasksRepository
@@ -32,18 +33,21 @@ class FakeTaskRepository(
     def get_all(
         self,
         filters: Optional[TaskFilters] = None,
+        sort: Optional[TaskSort] = None,
         cursor: Optional[int] = None,
         page_size: Optional[int] = None,
     ) -> FilteredList[Task]:
         elements: Iterable[Task] = chain(self._tasks)
 
-        if cursor:
-            elements = self._filtered_by_cursor(elements, cursor)
-
         if filters:
             elements = filters.apply(elements)
 
-        return map_to_filtered(elements, page_size)
+        sorted_elements: List[Task] = sort.apply(elements) if sort else list(elements)
+
+        if cursor:
+            sorted_elements = self._filtered_by_cursor(sorted_elements, cursor)
+
+        return map_to_filtered(sorted_elements, page_size)
 
     def get_task(self, id: int) -> Task:
         return self._find_by_id(id)
@@ -77,7 +81,8 @@ class FakeTaskRepository(
         except StopIteration:
             raise NotFoundError()
 
-    def _filtered_by_cursor(
-        self, elements: Iterable[Task], cursor: int
-    ) -> Iterable[Task]:
-        return (t for t in elements if not cursor or t.id > cursor)
+    def _filtered_by_cursor(self, elements: List[Task], cursor: int) -> List[Task]:
+        for i, task in enumerate(elements):
+            if task.id == cursor:
+                return elements[i + 1 :]
+        return elements

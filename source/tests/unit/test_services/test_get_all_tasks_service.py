@@ -93,7 +93,7 @@ def test_get_all_tasks_passes_filters_to_repository() -> None:
 
     service.get_all_tasks(filters=filters)
 
-    mock_repo.get_all.assert_called_once_with(filters, None, None)
+    mock_repo.get_all.assert_called_once_with(filters, None, None, None)
 
 
 def test_get_all_tasks_passes_cursor_and_page_size_to_repository() -> None:
@@ -103,7 +103,7 @@ def test_get_all_tasks_passes_cursor_and_page_size_to_repository() -> None:
 
     service.get_all_tasks(cursor=5, page_size=10)
 
-    mock_repo.get_all.assert_called_once_with(None, 5, 10)
+    mock_repo.get_all.assert_called_once_with(None, None, 5, 10)
 
 
 def test_get_all_tasks_passes_all_params_to_repository() -> None:
@@ -117,7 +117,7 @@ def test_get_all_tasks_passes_all_params_to_repository() -> None:
 
     service.get_all_tasks(filters=filters, cursor=3, page_size=5)
 
-    mock_repo.get_all.assert_called_once_with(filters, 3, 5)
+    mock_repo.get_all.assert_called_once_with(filters, None, 3, 5)
 
 
 def test_get_all_tasks_propagates_repository_error() -> None:
@@ -130,3 +130,32 @@ def test_get_all_tasks_propagates_repository_error() -> None:
         assert False, "Expected RuntimeError to be raised"
     except RuntimeError as e:
         assert str(e) == "Database error"
+
+
+def test_get_all_tasks_passes_sort_to_repository() -> None:
+    from source.models.task_sort import TaskSort, SortField
+
+    mock_repo = MagicMock()
+    mock_repo.get_all.return_value = FilteredList(iter([]), False)
+    service = GetAllTasksService(repository=mock_repo)
+    sort = TaskSort(field=SortField.TITLE)
+
+    service.get_all_tasks(sort=sort)
+
+    mock_repo.get_all.assert_called_once_with(None, sort, None, None)
+
+
+def test_get_all_tasks_passes_all_params_including_sort_to_repository() -> None:
+    from source.models.task_filters import TaskFilters
+    from source.models.task_sort import TaskSort, SortField, SortDirection
+    from source.models.task import TaskStatus
+
+    mock_repo = MagicMock()
+    mock_repo.get_all.return_value = FilteredList(iter([]), False)
+    service = GetAllTasksService(repository=mock_repo)
+    filters = TaskFilters(status=TaskStatus.INCOMPLETE)
+    sort = TaskSort(field=SortField.TITLE, direction=SortDirection.DESC)
+
+    service.get_all_tasks(filters=filters, sort=sort, cursor=2, page_size=5)
+
+    mock_repo.get_all.assert_called_once_with(filters, sort, 2, 5)

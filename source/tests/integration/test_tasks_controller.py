@@ -619,3 +619,138 @@ def test_delete_task_without_auth_returns_401(unauthenticated_client) -> None:
     response = unauthenticated_client.delete("/tasks/1")
 
     assert response.status_code == 401
+
+
+def test_get_tasks_sort_by_title_asc_returns_alphabetical_order(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Cherry"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Apple"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Banana"})
+
+    response = client.get("/tasks/?sort_by=title&sort_direction=asc")
+    data = response.get_json()["elements"]
+
+    assert [t["title"] for t in data] == ["Apple", "Banana", "Cherry"]
+
+
+def test_get_tasks_sort_by_title_desc_returns_reverse_alphabetical_order(
+    client,
+) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Apple"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Cherry"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Banana"})
+
+    response = client.get("/tasks/?sort_by=title&sort_direction=desc")
+    data = response.get_json()["elements"]
+
+    assert [t["title"] for t in data] == ["Cherry", "Banana", "Apple"]
+
+
+def test_get_tasks_sort_by_due_date_asc(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-12-31"})
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-01-01"})
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-06-15"})
+
+    response = client.get("/tasks/?sort_by=due_date&sort_direction=asc")
+    data = response.get_json()["elements"]
+
+    assert [t["due_date"] for t in data] == ["2026-01-01", "2026-06-15", "2026-12-31"]
+
+
+def test_get_tasks_sort_by_due_date_desc(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-01-01"})
+    client.post("/tasks/", json={**VALID_BODY, "due_date": "2026-12-31"})
+
+    response = client.get("/tasks/?sort_by=due_date&sort_direction=desc")
+    data = response.get_json()["elements"]
+
+    assert data[0]["due_date"] == "2026-12-31"
+    assert data[1]["due_date"] == "2026-01-01"
+
+
+def test_get_tasks_sort_by_status_asc_returns_complete_first(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Task 1"})
+    created = client.post("/tasks/", json={**VALID_BODY, "title": "Task 2"}).get_json()
+    client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
+
+    response = client.get("/tasks/?sort_by=status&sort_direction=asc")
+    data = response.get_json()["elements"]
+
+    assert data[0]["status"] == "Complete"
+    assert data[1]["status"] == "Incomplete"
+
+
+def test_get_tasks_sort_direction_only_defaults_to_id_sort(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Task A"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Task B"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Task C"})
+
+    response = client.get("/tasks/?sort_direction=desc")
+    data = response.get_json()["elements"]
+
+    ids = [t["id"] for t in data]
+    assert ids == sorted(ids, reverse=True)
+
+
+def test_get_tasks_sort_with_filter(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Cherry"})
+    created = client.post("/tasks/", json={**VALID_BODY, "title": "Apple"}).get_json()
+    client.put(f"/tasks/{created['id']}", json=VALID_UPDATE_BODY)
+    client.post("/tasks/", json={**VALID_BODY, "title": "Banana"})
+
+    response = client.get("/tasks/?status=Incomplete&sort_by=title&sort_direction=asc")
+    data = response.get_json()["elements"]
+
+    assert [t["title"] for t in data] == ["Banana", "Cherry"]
+
+
+def test_get_tasks_sort_with_pagination_page1(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Cherry"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Apple"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Banana"})
+
+    response = client.get("/tasks/?sort_by=title&sort_direction=asc&page_size=2")
+    data = response.get_json()
+
+    assert [t["title"] for t in data["elements"]] == ["Apple", "Banana"]
+    assert data["has_next"] is True
+
+
+def test_get_tasks_sort_with_pagination_page2(client) -> None:
+    client.post("/tasks/", json={**VALID_BODY, "title": "Cherry"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Apple"})
+    client.post("/tasks/", json={**VALID_BODY, "title": "Banana"})
+
+    page1 = client.get(
+        "/tasks/?sort_by=title&sort_direction=asc&page_size=2"
+    ).get_json()
+    cursor = page1["elements"][-1]["id"]
+
+    response = client.get(
+        f"/tasks/?sort_by=title&sort_direction=asc&page_size=2&cursor={cursor}"
+    )
+    data = response.get_json()
+
+    assert [t["title"] for t in data["elements"]] == ["Cherry"]
+    assert data["has_next"] is False
+
+
+def test_get_tasks_sort_returns_empty_list_when_filter_matches_nothing(client) -> None:
+    client.post("/tasks/", json=VALID_BODY)
+
+    response = client.get("/tasks/?sort_by=title&status=Complete")
+    data = response.get_json()
+
+    assert data["elements"] == []
+    assert data["has_next"] is False
+
+
+def test_get_tasks_invalid_sort_by_returns_422(client) -> None:
+    response = client.get("/tasks/?sort_by=invalid_field")
+
+    assert response.status_code == 422
+
+
+def test_get_tasks_invalid_sort_direction_returns_422(client) -> None:
+    response = client.get("/tasks/?sort_direction=sideways")
+
+    assert response.status_code == 422

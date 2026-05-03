@@ -111,7 +111,6 @@ def test_get_all_returns_iterable() -> None:
     result = repo.get_all().elements
 
     assert hasattr(result, "__iter__")
-    assert hasattr(result, "__next__")
 
 
 def test_get_all_returns_all_values_by_default() -> None:
@@ -561,3 +560,216 @@ def test_update_task_raises_not_found_error_for_unknown_id() -> None:
         assert False, "Expected NotFoundError to be raised"
     except NotFoundError:
         pass
+
+
+def test_get_all_sort_by_title_asc() -> None:
+    from source.models.task_sort import SortField, SortDirection, TaskSort
+
+    repo = FakeTaskRepository()
+    repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(TaskData(title="Banana", description="Desc", due_date=date(2026, 5, 1)))
+
+    result = list(
+        repo.get_all(
+            sort=TaskSort(field=SortField.TITLE, direction=SortDirection.ASC)
+        ).elements
+    )
+
+    assert [t.title for t in result] == ["Apple", "Banana", "Cherry"]
+
+
+def test_get_all_sort_by_title_desc() -> None:
+    from source.models.task_sort import SortField, SortDirection, TaskSort
+
+    repo = FakeTaskRepository()
+    repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(TaskData(title="Banana", description="Desc", due_date=date(2026, 5, 1)))
+
+    result = list(
+        repo.get_all(
+            sort=TaskSort(field=SortField.TITLE, direction=SortDirection.DESC)
+        ).elements
+    )
+
+    assert [t.title for t in result] == ["Cherry", "Banana", "Apple"]
+
+
+def test_get_all_sort_by_due_date_asc() -> None:
+    from source.models.task_sort import SortField, SortDirection, TaskSort
+
+    repo = FakeTaskRepository()
+    repo.create(
+        TaskData(title="Task 1", description="Desc", due_date=date(2026, 12, 31))
+    )
+    repo.create(TaskData(title="Task 2", description="Desc", due_date=date(2026, 1, 1)))
+    repo.create(TaskData(title="Task 3", description="Desc", due_date=date(2026, 6, 1)))
+
+    result = list(
+        repo.get_all(
+            sort=TaskSort(field=SortField.DUE_DATE, direction=SortDirection.ASC)
+        ).elements
+    )
+
+    assert [t.due_date for t in result] == [
+        date(2026, 1, 1),
+        date(2026, 6, 1),
+        date(2026, 12, 31),
+    ]
+
+
+def test_get_all_sort_by_due_date_desc() -> None:
+    from source.models.task_sort import SortField, SortDirection, TaskSort
+
+    repo = FakeTaskRepository()
+    repo.create(TaskData(title="Task 1", description="Desc", due_date=date(2026, 1, 1)))
+    repo.create(
+        TaskData(title="Task 2", description="Desc", due_date=date(2026, 12, 31))
+    )
+
+    result = list(
+        repo.get_all(
+            sort=TaskSort(field=SortField.DUE_DATE, direction=SortDirection.DESC)
+        ).elements
+    )
+
+    assert result[0].due_date == date(2026, 12, 31)
+    assert result[1].due_date == date(2026, 1, 1)
+
+
+def test_get_all_sort_by_status_asc() -> None:
+    from source.models.task_sort import SortField, SortDirection, TaskSort
+
+    repo = FakeTaskRepository()
+    created = repo.create(
+        TaskData(title="Task 1", description="Desc", due_date=date(2026, 5, 1))
+    )
+    repo.update(
+        created.id,
+        TaskUpdateData(
+            title=created.title,
+            description=created.description,
+            due_date=created.due_date,
+            status=TaskStatus.COMPLETE,
+        ),
+    )
+    repo.create(TaskData(title="Task 2", description="Desc", due_date=date(2026, 5, 1)))
+
+    result = list(
+        repo.get_all(
+            sort=TaskSort(field=SortField.STATUS, direction=SortDirection.ASC)
+        ).elements
+    )
+
+    assert result[0].status == TaskStatus.COMPLETE
+    assert result[1].status == TaskStatus.INCOMPLETE
+
+
+def test_get_all_cursor_works_correctly_after_sort_by_title() -> None:
+    from source.models.task_sort import SortField, SortDirection, TaskSort
+
+    repo = FakeTaskRepository()
+    repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(TaskData(title="Banana", description="Desc", due_date=date(2026, 5, 1)))
+
+    sort = TaskSort(field=SortField.TITLE, direction=SortDirection.ASC)
+    page1 = list(repo.get_all(sort=sort, page_size=2).elements)
+    assert [t.title for t in page1] == ["Apple", "Banana"]
+    assert repo.get_all(sort=sort, page_size=2).has_next is True
+
+    cursor_id = page1[-1].id
+    page2 = list(repo.get_all(sort=sort, cursor=cursor_id, page_size=2).elements)
+    assert [t.title for t in page2] == ["Cherry"]
+    assert repo.get_all(sort=sort, cursor=cursor_id, page_size=2).has_next is False
+
+
+def test_get_all_cursor_not_found_returns_full_sorted_list() -> None:
+    from source.models.task_sort import SortField, SortDirection, TaskSort
+
+    repo = FakeTaskRepository()
+    repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
+
+    sort = TaskSort(field=SortField.TITLE, direction=SortDirection.ASC)
+    result = list(repo.get_all(sort=sort, cursor=999).elements)
+
+    assert [t.title for t in result] == ["Apple", "Cherry"]
+
+
+def test_get_all_filter_and_sort_combined() -> None:
+    from source.models.task_filters import TaskFilters
+    from source.models.task_sort import SortField, SortDirection, TaskSort
+
+    repo = FakeTaskRepository()
+    repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
+    created = repo.create(
+        TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1))
+    )
+    repo.update(
+        created.id,
+        TaskUpdateData(
+            title=created.title,
+            description=created.description,
+            due_date=created.due_date,
+            status=TaskStatus.COMPLETE,
+        ),
+    )
+    repo.create(TaskData(title="Banana", description="Desc", due_date=date(2026, 5, 1)))
+
+    result = list(
+        repo.get_all(
+            filters=TaskFilters(status=TaskStatus.INCOMPLETE),
+            sort=TaskSort(field=SortField.TITLE, direction=SortDirection.ASC),
+        ).elements
+    )
+
+    assert [t.title for t in result] == ["Banana", "Cherry"]
+
+
+def test_get_all_filter_sort_cursor_pagination_combined() -> None:
+    from source.models.task_filters import TaskFilters
+    from source.models.task_sort import SortField, SortDirection, TaskSort
+
+    repo = FakeTaskRepository()
+    repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
+    created = repo.create(
+        TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1))
+    )
+    repo.update(
+        created.id,
+        TaskUpdateData(
+            title=created.title,
+            description=created.description,
+            due_date=created.due_date,
+            status=TaskStatus.COMPLETE,
+        ),
+    )
+    repo.create(TaskData(title="Banana", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(TaskData(title="Date", description="Desc", due_date=date(2026, 5, 1)))
+
+    filters = TaskFilters(status=TaskStatus.INCOMPLETE)
+    sort = TaskSort(field=SortField.TITLE, direction=SortDirection.ASC)
+
+    page1 = repo.get_all(filters=filters, sort=sort, page_size=2)
+    assert [t.title for t in page1.elements] == ["Banana", "Cherry"]
+    assert page1.has_next is True
+
+    cursor_id = list(repo.get_all(filters=filters, sort=sort, page_size=2).elements)[
+        -1
+    ].id
+    page2 = repo.get_all(filters=filters, sort=sort, cursor=cursor_id, page_size=2)
+    assert [t.title for t in page2.elements] == ["Date"]
+    assert page2.has_next is False
+
+
+def test_get_all_none_sort_preserves_insertion_order() -> None:
+    repo = FakeTaskRepository()
+    repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
+    repo.create(TaskData(title="Banana", description="Desc", due_date=date(2026, 5, 1)))
+
+    result = list(repo.get_all(sort=None).elements)
+
+    assert [t.title for t in result] == ["Cherry", "Apple", "Banana"]
