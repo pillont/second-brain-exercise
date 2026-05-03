@@ -118,3 +118,66 @@ def test_to_task_update_data_maps_all_fields() -> None:
     assert result.description == "At the market"
     assert result.due_date == date(2026, 6, 1)
     assert result.status == TaskStatus.COMPLETE
+
+
+def _make_list_entity(
+    sort_by=None,
+    sort_direction=None,
+):
+    from source.controllers.entities.tasks_list_argument_entity import (
+        TasksListArgumentEntity,
+    )
+
+    return TasksListArgumentEntity(
+        cursor=None,
+        page_size=None,
+        status=None,
+        due_date_from=None,
+        due_date_to=None,
+        title=None,
+        description=None,
+        sort_by=sort_by,
+        sort_direction=sort_direction,
+    )
+
+
+def test_to_task_sort_defaults_to_id_asc_when_no_params() -> None:
+    from source.controllers.mappers.task_mapper import to_task_sort
+    from source.models.task_sort import SortField, SortDirection
+
+    result = to_task_sort(_make_list_entity())
+
+    assert result.field == SortField.ID
+    assert result.direction == SortDirection.ASC
+
+
+def test_to_task_sort_maps_sort_by_title() -> None:
+    from source.controllers.mappers.task_mapper import to_task_sort
+    from source.models.task_sort import SortField, SortDirection
+
+    result = to_task_sort(_make_list_entity(sort_by=SortField.TITLE))
+
+    assert result.field == SortField.TITLE
+    assert result.direction == SortDirection.ASC
+
+
+def test_to_task_sort_maps_sort_direction_desc() -> None:
+    from source.controllers.mappers.task_mapper import to_task_sort
+    from source.models.task_sort import SortField, SortDirection
+
+    result = to_task_sort(_make_list_entity(sort_direction=SortDirection.DESC))
+
+    assert result.field == SortField.ID
+    assert result.direction == SortDirection.DESC
+
+
+def test_to_task_sort_maps_sort_by_and_direction() -> None:
+    from source.controllers.mappers.task_mapper import to_task_sort
+    from source.models.task_sort import SortField, SortDirection
+
+    result = to_task_sort(
+        _make_list_entity(sort_by=SortField.DUE_DATE, sort_direction=SortDirection.DESC)
+    )
+
+    assert result.field == SortField.DUE_DATE
+    assert result.direction == SortDirection.DESC

@@ -16,6 +16,7 @@ from source.controllers.mappers.task_mapper import (
     to_task_data,
     to_task_entity,
     to_task_filters,
+    to_task_sort,
     to_task_update_data,
 )
 from source.controllers.schemas.tasks_list_argument_schema import (
@@ -58,7 +59,10 @@ def get_all_tasks(
     ],
 ) -> ListEntity[TaskEntity]:
     all_tasks = get_all_tasks_service.get_all_tasks(
-        to_task_filters(args), args.get("cursor", None), args.get("page_size", None)
+        to_task_filters(args),
+        to_task_sort(args),
+        args.get("cursor", None),
+        args.get("page_size", None),
     )
 
     return map_to_filtered_tasks_list(all_tasks)

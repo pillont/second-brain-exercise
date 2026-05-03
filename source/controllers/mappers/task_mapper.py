@@ -6,6 +6,7 @@ from source.controllers.mappers.list_entity_mapper import map_to_list_entity
 from source.models.filtered_list import FilteredList
 from source.models.task import Task, TaskData, TaskUpdateData
 from source.models.task_filters import TaskFilters
+from source.models.task_sort import SortDirection, SortField, TaskSort
 from source.controllers.entities.task_entity import (
     TaskDataEntity,
     TaskEntity,
@@ -22,6 +23,13 @@ def to_task_filters(entity: TasksListArgumentEntity) -> TaskFilters:
         due_date_to=entity.get("due_date_to"),
         title=entity.get("title"),
         description=entity.get("description"),
+    )
+
+
+def to_task_sort(entity: TasksListArgumentEntity) -> TaskSort:
+    return TaskSort(
+        field=entity.get("sort_by") or SortField.ID,
+        direction=entity.get("sort_direction") or SortDirection.ASC,
     )
 
 
