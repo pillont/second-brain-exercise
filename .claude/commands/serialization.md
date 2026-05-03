@@ -7,13 +7,38 @@ from flask_smorest import Blueprint
 from source.models.my_model import MyModel
 from source.controllers.schemas.my_schema import MySchema
 
-my_blp = Blueprint("my_resource", __name__, url_prefix="/my-resource")
+my_blp = Blueprint(
+    "my_resource",
+    __name__,
+    url_prefix="/my-resource",
+    description="My resource description.",
+)
 
 @my_blp.route("/", methods=["GET"])
+@my_blp.doc(summary="Get resource", description="Retrieve the resource.")
 @my_blp.response(200, MySchema)
 @inject
 def get_resource(my_service=Provide[Container.my_service]) -> MyModel:
     return my_service.do_something()
+```
+
+## Swagger documentation
+
+Every endpoint **must** have a `@blp.doc(summary=..., description=...)` decorator. Every Blueprint **must** have a `description=` parameter. Never use docstrings — `@blp.doc()` is the only accepted mechanism.
+
+**Decorator order** (top → bottom):
+1. `@blp.route(...)` — always first
+2. `@jwt_required()` — immediately after the route (if auth required)
+3. `@blp.doc(summary=..., description=...)` — before arguments/response
+4. `@blp.arguments(...)` / `@blp.response(...)` — closest to the function
+
+Use multi-line format when the decorator exceeds 88 characters:
+
+```python
+@my_blp.doc(
+    summary="List resources",
+    description="Retrieve all resources with optional filters.",
+)
 ```
 
 ## Rules
