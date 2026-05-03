@@ -12,6 +12,7 @@ root_blp = Blueprint("root", __name__, url_prefix="")
 
 
 @root_blp.route("/", methods=["GET"])
+@root_blp.doc(summary="Entry point", description="Returns the API root links.")
 @root_blp.response(200, EntryPointSchema)
 def get_entry_point() -> EntryPointEntity:
     return to_entry_point_entity()

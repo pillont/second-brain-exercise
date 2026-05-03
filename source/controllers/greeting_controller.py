@@ -12,6 +12,7 @@ greeting_blp = Blueprint("greeting", __name__, url_prefix="")
 
 
 @greeting_blp.route("/hello", methods=["GET"])
+@greeting_blp.doc(summary="Greeting", description="Returns a greeting message.")
 @greeting_blp.response(200, GreetingSchema)
 @inject
 def get_greeting(

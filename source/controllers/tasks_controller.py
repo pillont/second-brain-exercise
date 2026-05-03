@@ -31,11 +31,12 @@ from source.services.get_all_tasks_service import GetAllTasksService
 from source.services.get_task_service import GetTaskService
 from source.services.update_task_service import UpdateTaskService
 
-tasks_blp = Blueprint("tasks", __name__, url_prefix="/tasks")
+tasks_blp = Blueprint("tasks", __name__, url_prefix="/tasks", description="Task management.")
 
 
 @tasks_blp.route("/", methods=["POST"])
 @jwt_required()
+@tasks_blp.doc(summary="Create a task", description="Create a new task.")
 @tasks_blp.arguments(TaskDataSchema)
 @tasks_blp.response(201, TaskSchema)
 @inject
@@ -49,6 +50,7 @@ def create_task(
 
 @tasks_blp.route("/", methods=["GET"])
 @jwt_required()
+@tasks_blp.doc(summary="List tasks", description="Retrieve all tasks with optional filters and pagination.")
 @tasks_blp.arguments(TasksListArgumentSchema, location="query")
 @tasks_blp.response(200, TasksListSchema)
 @inject
@@ -70,6 +72,7 @@ def get_all_tasks(
 
 @tasks_blp.route("/<int:id>", methods=["GET"])
 @jwt_required()
+@tasks_blp.doc(summary="Get a task", description="Retrieve a single task by its ID.")
 @tasks_blp.response(404)
 @tasks_blp.response(200, TaskSchema)
 @inject
@@ -83,6 +86,7 @@ def get_task(
 
 @tasks_blp.route("/<int:id>", methods=["PUT"])
 @jwt_required()
+@tasks_blp.doc(summary="Update a task", description="Update an existing task by its ID.")
 @tasks_blp.arguments(TaskUpdateDataSchema)
 @tasks_blp.response(404)
 @tasks_blp.response(204)
@@ -97,6 +101,7 @@ def update_task(
 
 @tasks_blp.route("/<int:id>", methods=["DELETE"])
 @jwt_required()
+@tasks_blp.doc(summary="Delete a task", description="Delete a task by its ID.")
 @tasks_blp.response(404)
 @tasks_blp.response(204)
 @inject
