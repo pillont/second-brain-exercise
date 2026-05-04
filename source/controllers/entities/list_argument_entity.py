@@ -2,5 +2,5 @@ from typing import Optional, TypedDict
 
 
 class ListArgumentEntity(TypedDict):
-    cursor: Optional[int]
+    cursor: Optional[str]
     page_size: Optional[int]

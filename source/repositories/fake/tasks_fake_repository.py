@@ -1,17 +1,70 @@
+from datetime import date
 from itertools import chain
-from typing import Iterable, List, Optional
+from typing import Iterable, List, Optional, Union
 
 from source.models.filtered_list import FilteredList, map_to_filtered_list
 from source.models.not_found_error import NotFoundError
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
+from source.models.task_cursor import (
+    TaskCursor,
+    convert_cursor_sort_value,
+    encode_task_cursor,
+)
 from source.models.task_filters import TaskFilters
-from source.models.task_sort import TaskSort
+from source.models.task_sort import SortDirection, SortField, TaskSort
 from source.repositories.create_task_repository import CreateTaskRepository
 from source.repositories.delete_task_repository import DeleteTaskRepository
 from source.repositories.fake.tasks_list_filter import filter_tasks_list
 from source.repositories.get_all_tasks_repository import GetAllTasksRepository
 from source.repositories.get_task_repository import GetTaskRepository
 from source.repositories.update_task_repository import UpdateTaskRepository
+
+
+def _get_task_sort_value(
+    task: Task, field: SortField
+) -> Union[str, int, date, TaskStatus]:
+    match field:
+        case SortField.TITLE:
+            return task.title.lower()
+        case SortField.DUE_DATE:
+            return task.due_date
+        case SortField.STATUS:
+            return task.status
+        case _:
+            return task.id
+
+
+def _is_after_cursor(
+    task: Task,
+    field: SortField,
+    prev_value: Union[str, int, date, TaskStatus],
+    prev_id: int,
+    asc: bool,
+) -> bool:
+    val = _get_task_sort_value(task, field)
+    if field == SortField.ID:
+        return val > prev_id if asc else val < prev_id  # type: ignore[operator]
+    if asc:
+        return val > prev_value or (val == prev_value and task.id > prev_id)  # type: ignore[operator]
+    return val < prev_value or (val == prev_value and task.id > prev_id)  # type: ignore[operator]
+
+
+def _filter_by_cursor(
+    elements: List[Task], cursor: TaskCursor, sort: Optional[TaskSort]
+) -> List[Task]:
+    field = sort.field if sort else SortField.ID
+    asc = (sort.direction if sort else SortDirection.ASC) == SortDirection.ASC
+    prev = convert_cursor_sort_value(cursor.sort_value, field)
+    return [t for t in elements if _is_after_cursor(t, field, prev, cursor.id, asc)]
+
+
+def _compute_next_cursor(
+    tasks: List[Task], page_size: int, sort: Optional[TaskSort]
+) -> Optional[str]:
+    if len(tasks) < page_size:
+        return None
+    last_task = tasks[page_size - 1]
+    return encode_task_cursor(last_task, sort or TaskSort())
 
 
 class TasksFakeRepository(
@@ -35,7 +88,7 @@ class TasksFakeRepository(
         self,
         filters: Optional[TaskFilters] = None,
         sort: Optional[TaskSort] = None,
-        cursor: Optional[int] = None,
+        cursor: Optional[TaskCursor] = None,
         page_size: Optional[int] = None,
     ) -> FilteredList[Task]:
         elements: Iterable[Task] = chain(self._tasks)
@@ -46,9 +99,15 @@ class TasksFakeRepository(
         sorted_elements: List[Task] = sort.apply(elements) if sort else list(elements)
 
         if cursor:
-            sorted_elements = self._filtered_by_cursor(sorted_elements, cursor)
+            sorted_elements = _filter_by_cursor(sorted_elements, cursor, sort)
 
-        return map_to_filtered_list(sorted_elements, page_size)
+        filtered = map_to_filtered_list(sorted_elements, page_size)
+        next_cursor = (
+            _compute_next_cursor(sorted_elements, page_size, sort)
+            if page_size and filtered.has_next
+            else None
+        )
+        return FilteredList(filtered.elements, filtered.has_next, next_cursor)
 
     def get_task(self, id: int) -> Task:
         return self._find_by_id(id)
@@ -81,10 +140,3 @@ class TasksFakeRepository(
             return next(task for task in self._tasks if task.id == id)
         except StopIteration:
             raise NotFoundError()
-
-    def _filtered_by_cursor(self, elements: List[Task], cursor: int) -> List[Task]:
-        for i, task in enumerate(elements):
-            if task.id == cursor:
-                return elements[i + 1 :]
-
-        raise NotImplementedError()

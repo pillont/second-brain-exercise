@@ -13,6 +13,7 @@ from source.controllers.entities.task_entity import (
 )
 from source.controllers.mappers.task_mapper import (
     map_to_filtered_tasks_list,
+    to_task_cursor,
     to_task_data,
     to_task_entity,
     to_task_filters,
@@ -68,7 +69,7 @@ def get_all_tasks(
     all_tasks = get_all_tasks_service.get_all_tasks(
         to_task_filters(args),
         to_task_sort(args),
-        args.get("cursor", None),
+        to_task_cursor(args),
         args.get("page_size", None),
     )
 

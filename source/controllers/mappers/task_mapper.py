@@ -1,3 +1,5 @@
+from typing import Optional
+
 from source.controllers.entities.list_entity import ListEntity
 from source.controllers.entities.tasks_list_argument_entity import (
     TasksListArgumentEntity,
@@ -5,6 +7,7 @@ from source.controllers.entities.tasks_list_argument_entity import (
 from source.controllers.mappers.list_entity_mapper import map_to_list_entity
 from source.models.filtered_list import FilteredList
 from source.models.task import Task, TaskData, TaskUpdateData
+from source.models.task_cursor import TaskCursor, decode_task_cursor
 from source.models.task_filters import TaskFilters
 from source.models.task_sort import SortDirection, SortField, TaskSort
 from source.controllers.entities.task_entity import (
@@ -30,6 +33,11 @@ def to_task_sort(entity: TasksListArgumentEntity) -> TaskSort:
         field=entity.get("sort_by") or SortField.ID,
         direction=entity.get("sort_direction") or SortDirection.ASC,
     )
+
+
+def to_task_cursor(entity: TasksListArgumentEntity) -> Optional[TaskCursor]:
+    cursor_b64 = entity.get("cursor")
+    return decode_task_cursor(cursor_b64) if cursor_b64 else None
 
 
 def to_task_data(entity: TaskDataEntity) -> TaskData:
@@ -64,7 +72,9 @@ def to_task_entity(task: Task) -> TaskEntity:
 def map_to_filtered_tasks_list(all_tasks: FilteredList[Task]) -> ListEntity[TaskEntity]:
     return map_to_list_entity(
         FilteredList(
-            (to_task_entity(t) for t in all_tasks.elements), has_next=all_tasks.has_next
+            (to_task_entity(t) for t in all_tasks.elements),
+            has_next=all_tasks.has_next,
+            next_cursor=all_tasks.next_cursor,
         )
     )
 

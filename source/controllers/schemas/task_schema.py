@@ -21,3 +21,4 @@ class TaskSchema(Schema):
 class TasksListSchema(Schema):
     elements = fields.List(fields.Nested(TaskSchema))
     has_next = fields.Bool(required=True)
+    next_cursor = fields.Str(allow_none=True, load_default=None)
