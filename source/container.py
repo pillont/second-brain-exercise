@@ -2,7 +2,7 @@ import pkgutil
 import logging
 
 from sqlalchemy import create_engine
-import source.controllers
+import source.controllers.v1
 from typing import Any, Callable, List, cast
 from dependency_injector import containers
 from dependency_injector import providers
@@ -154,4 +154,6 @@ def _wire_controllers_by_container(container: Container) -> None:
             prefix="source.controllers.",
         )
     ]
+
+
     container.wire(modules=modules)

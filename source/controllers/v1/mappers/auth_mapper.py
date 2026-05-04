@@ -1,13 +1,13 @@
 from flask_jwt_extended import create_access_token
 
-from source.controllers.entities.auth_entity import (
+from source.controllers.v1.entities.auth_entity import (
     AuthDataEntity,
     TokenEntity,
     TokenLinksEntity,
     UserEntity,
     UserLinksEntity,
 )
-from source.controllers.entities.link import HttpMethod, LinkEntity
+from source.controllers.v1.entities.link import HttpMethod, LinkEntity
 from source.models.user import User, UserData
 
 
@@ -17,8 +17,8 @@ def to_auth_data(entity: AuthDataEntity) -> UserData:
 
 def _build_user_links() -> UserLinksEntity:
     return UserLinksEntity(
-        self_link=LinkEntity(href="/auth/register"),
-        login=LinkEntity(href="/auth/login", type=HttpMethod.POST),
+        self_link=LinkEntity(href="/v1/auth/register"),
+        login=LinkEntity(href="/v1/auth/login", type=HttpMethod.POST),
     )
 
 
@@ -28,10 +28,10 @@ def to_user_entity(user: User) -> UserEntity:
 
 def _build_token_links() -> TokenLinksEntity:
     return TokenLinksEntity(
-        self_link=LinkEntity(href="/auth/login"),
-        register=LinkEntity(href="/auth/register", type=HttpMethod.POST),
-        get_all_tasks=LinkEntity(href="/tasks/"),
-        create_task=LinkEntity(href="/tasks/", type=HttpMethod.POST),
+        self_link=LinkEntity(href="/v1/auth/login"),
+        register=LinkEntity(href="/v1/auth/register", type=HttpMethod.POST),
+        get_all_tasks=LinkEntity(href="/v1/tasks/"),
+        create_task=LinkEntity(href="/v1/tasks/", type=HttpMethod.POST),
     )
 
 

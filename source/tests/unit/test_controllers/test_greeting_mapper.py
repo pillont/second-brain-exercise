@@ -1,6 +1,6 @@
 from source.models.greeting import Greeting
-from source.controllers.entities.greeting_entity import GreetingEntity
-from source.controllers.mappers.greeting_mapper import to_greeting_entity
+from source.controllers.v1.entities.greeting_entity import GreetingEntity
+from source.controllers.v1.mappers.greeting_mapper import to_greeting_entity
 
 
 def test_to_greeting_entity_maps_fields() -> None:
@@ -18,4 +18,4 @@ def test_to_greeting_entity_sets_self_link() -> None:
 
     result = to_greeting_entity(greeting)
 
-    assert result.links["self_link"]["href"] == "/hello"
+    assert result.links["self_link"]["href"] == "/v1/hello"

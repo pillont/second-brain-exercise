@@ -2,14 +2,14 @@ from datetime import date
 
 from marshmallow import ValidationError
 
-from source.controllers.entities.link import HttpMethod, LinkEntity
-from source.controllers.entities.task_entity import (
+from source.controllers.v1.entities.link import HttpMethod, LinkEntity
+from source.controllers.v1.entities.task_entity import (
     TaskEntity,
     TaskLinks,
 )
-from source.controllers.schemas.task_data_schema import TaskDataSchema
-from source.controllers.schemas.task_schema import TaskSchema
-from source.controllers.schemas.task_update_data_schema import TaskUpdateDataSchema
+from source.controllers.v1.schemas.task_data_schema import TaskDataSchema
+from source.controllers.v1.schemas.task_schema import TaskSchema
+from source.controllers.v1.schemas.task_update_data_schema import TaskUpdateDataSchema
 from source.models.task import TaskStatus
 
 
@@ -37,10 +37,10 @@ def test_task_schema_dump_has_correct_keys() -> None:
         due_date=date(2026, 5, 1),
         status=TaskStatus.INCOMPLETE,
         links=TaskLinks(
-            self_link=LinkEntity(href="/tasks/1"),
-            tasks=LinkEntity(href="/tasks/"),
-            update=LinkEntity(href="/tasks/1", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/tasks/1", type=HttpMethod.DELETE),
+            self_link=LinkEntity(href="/v1/tasks/1"),
+            tasks=LinkEntity(href="/v1/tasks/"),
+            update=LinkEntity(href="/v1/tasks/1", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/v1/tasks/1", type=HttpMethod.DELETE),
         ),
     )
 
@@ -63,16 +63,16 @@ def test_task_schema_dump_links_structure() -> None:
         due_date=date(2026, 5, 1),
         status=TaskStatus.INCOMPLETE,
         links=TaskLinks(
-            self_link=LinkEntity(href="/tasks/1"),
-            tasks=LinkEntity(href="/tasks/"),
-            update=LinkEntity(href="/tasks/1", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/tasks/1", type=HttpMethod.DELETE),
+            self_link=LinkEntity(href="/v1/tasks/1"),
+            tasks=LinkEntity(href="/v1/tasks/"),
+            update=LinkEntity(href="/v1/tasks/1", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/v1/tasks/1", type=HttpMethod.DELETE),
         ),
     )
 
     result = schema.dump(entity)
 
-    assert result["_links"]["self"]["href"] == "/tasks/1"
+    assert result["_links"]["self"]["href"] == "/v1/tasks/1"
 
 
 def test_task_schema_dump_links_includes_tasks() -> None:
@@ -84,16 +84,16 @@ def test_task_schema_dump_links_includes_tasks() -> None:
         due_date=date(2026, 5, 1),
         status=TaskStatus.INCOMPLETE,
         links=TaskLinks(
-            self_link=LinkEntity(href="/tasks/1"),
-            tasks=LinkEntity(href="/tasks/"),
-            update=LinkEntity(href="/tasks/1", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/tasks/1", type=HttpMethod.DELETE),
+            self_link=LinkEntity(href="/v1/tasks/1"),
+            tasks=LinkEntity(href="/v1/tasks/"),
+            update=LinkEntity(href="/v1/tasks/1", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/v1/tasks/1", type=HttpMethod.DELETE),
         ),
     )
 
     result = schema.dump(entity)
 
-    assert result["_links"]["tasks"]["href"] == "/tasks/"
+    assert result["_links"]["tasks"]["href"] == "/v1/tasks/"
 
 
 def test_task_schema_with_many_true_dumps_list() -> None:
@@ -105,10 +105,10 @@ def test_task_schema_with_many_true_dumps_list() -> None:
         due_date=date(2026, 5, 1),
         status=TaskStatus.INCOMPLETE,
         links=TaskLinks(
-            self_link=LinkEntity(href="/tasks/1"),
-            tasks=LinkEntity(href="/tasks/"),
-            update=LinkEntity(href="/tasks/1", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/tasks/1", type=HttpMethod.DELETE),
+            self_link=LinkEntity(href="/v1/tasks/1"),
+            tasks=LinkEntity(href="/v1/tasks/"),
+            update=LinkEntity(href="/v1/tasks/1", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/v1/tasks/1", type=HttpMethod.DELETE),
         ),
     )
     entity2 = TaskEntity(
@@ -118,10 +118,10 @@ def test_task_schema_with_many_true_dumps_list() -> None:
         due_date=date(2026, 5, 2),
         status=TaskStatus.INCOMPLETE,
         links=TaskLinks(
-            self_link=LinkEntity(href="/tasks/2"),
-            tasks=LinkEntity(href="/tasks/"),
-            update=LinkEntity(href="/tasks/2", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/tasks/2", type=HttpMethod.DELETE),
+            self_link=LinkEntity(href="/v1/tasks/2"),
+            tasks=LinkEntity(href="/v1/tasks/"),
+            update=LinkEntity(href="/v1/tasks/2", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/v1/tasks/2", type=HttpMethod.DELETE),
         ),
     )
 
@@ -151,10 +151,10 @@ def test_task_schema_with_many_true_includes_links_per_entity() -> None:
         due_date=date(2026, 5, 1),
         status=TaskStatus.INCOMPLETE,
         links=TaskLinks(
-            self_link=LinkEntity(href="/tasks/1"),
-            tasks=LinkEntity(href="/tasks/"),
-            update=LinkEntity(href="/tasks/1", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/tasks/1", type=HttpMethod.DELETE),
+            self_link=LinkEntity(href="/v1/tasks/1"),
+            tasks=LinkEntity(href="/v1/tasks/"),
+            update=LinkEntity(href="/v1/tasks/1", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/v1/tasks/1", type=HttpMethod.DELETE),
         ),
     )
     entity2 = TaskEntity(
@@ -164,17 +164,17 @@ def test_task_schema_with_many_true_includes_links_per_entity() -> None:
         due_date=date(2026, 5, 2),
         status=TaskStatus.INCOMPLETE,
         links=TaskLinks(
-            self_link=LinkEntity(href="/tasks/2"),
-            tasks=LinkEntity(href="/tasks/"),
-            update=LinkEntity(href="/tasks/2", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/tasks/2", type=HttpMethod.DELETE),
+            self_link=LinkEntity(href="/v1/tasks/2"),
+            tasks=LinkEntity(href="/v1/tasks/"),
+            update=LinkEntity(href="/v1/tasks/2", type=HttpMethod.PUT),
+            delete=LinkEntity(href="/v1/tasks/2", type=HttpMethod.DELETE),
         ),
     )
 
     result = schema.dump([entity1, entity2])
 
-    assert result[0]["_links"]["self"]["href"] == "/tasks/1"
-    assert result[1]["_links"]["self"]["href"] == "/tasks/2"
+    assert result[0]["_links"]["self"]["href"] == "/v1/tasks/1"
+    assert result[1]["_links"]["self"]["href"] == "/v1/tasks/2"
 
 
 def test_task_update_data_schema_loads_valid_data() -> None:

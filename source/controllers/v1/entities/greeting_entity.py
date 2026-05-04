@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from source.controllers.entities.link import LinksEntity
+from source.controllers.v1.entities.link import LinksEntity
 
 
 @dataclass

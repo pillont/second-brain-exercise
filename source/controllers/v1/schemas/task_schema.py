@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields
-from source.controllers.schemas.link_schema import LinkSchema, LinksSchema
+from source.controllers.v1.schemas.link_schema import LinkSchema, LinksSchema
 from source.models.task import TaskStatus
 
 
