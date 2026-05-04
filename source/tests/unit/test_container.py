@@ -1,12 +1,5 @@
 from source.container import Container
-from source.create_app import create_app
-from source.config.app_config import get_app_config
-from source.config.flask_config import TestingFlaskConfig
-from source.repositories.create_task_repository import CreateTaskRepository
-from source.repositories.delete_task_repository import DeleteTaskRepository
 from source.repositories.fake.tasks_fake_repository import TasksFakeRepository
-from source.repositories.get_all_tasks_repository import GetAllTasksRepository
-from source.repositories.get_task_repository import GetTaskRepository
 from source.repositories.sqlalchemy.tasks.repositories.create.create_task_sqlalchemy_repository import (
     CreateTaskSqlalchemyRepository,
 )
@@ -22,7 +15,6 @@ from source.repositories.sqlalchemy.tasks.repositories.get_task_sqlalchemy_repos
 from source.repositories.sqlalchemy.tasks.repositories.update_task_sqlalchemy_repository import (
     UpdateTaskSqlalchemyRepository,
 )
-from source.repositories.update_task_repository import UpdateTaskRepository
 
 
 def _get_container(is_fake: bool) -> Container:

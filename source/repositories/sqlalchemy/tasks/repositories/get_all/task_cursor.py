@@ -3,7 +3,6 @@ from typing import Any, Optional
 from sqlalchemy import and_, func, or_
 from sqlalchemy.sql import Select
 
-from source.models.task import Task
 from source.models.task_sort import SortDirection, SortField, TaskSort
 from source.repositories.sqlalchemy.session_utils import OrmSession
 from source.repositories.sqlalchemy.tasks.task_orm_model import TaskOrmModel

@@ -1,4 +1,4 @@
-from typing import Callable, Final, Generic, List, Optional, TypeVar
+from typing import Callable, Final, Generic, List, TypeVar
 
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session

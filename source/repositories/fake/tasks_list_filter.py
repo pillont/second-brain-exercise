@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Final, Iterable, Optional
+from typing import Iterable
 
 from source.models.task import Task, TaskStatus
 from source.models.task_filters import TaskFilters
