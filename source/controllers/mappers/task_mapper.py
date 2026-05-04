@@ -22,7 +22,6 @@ def to_task_filters(entity: TasksListArgumentEntity) -> TaskFilters:
         due_date_from=entity.get("due_date_from"),
         due_date_to=entity.get("due_date_to"),
         title=entity.get("title"),
-        description=entity.get("description"),
     )
 
 

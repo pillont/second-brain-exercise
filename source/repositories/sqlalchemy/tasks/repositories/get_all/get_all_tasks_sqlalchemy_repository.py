@@ -9,17 +9,27 @@ from source.models.task import Task
 from source.models.task_filters import TaskFilters
 from source.models.task_sort import TaskSort
 from source.repositories.get_all_tasks_repository import GetAllTasksRepository
-from source.repositories.sqlalchemy.tasks.repositories.get_all.task_cursor import apply_cursor, get_cursor_row
-from source.repositories.sqlalchemy.tasks.repositories.get_all.tasks_sorter import apply_sort
+from source.repositories.sqlalchemy.tasks.repositories.get_all.task_cursor import (
+    apply_cursor,
+    get_cursor_row,
+)
+from source.repositories.sqlalchemy.tasks.repositories.get_all.tasks_sorter import (
+    apply_sort,
+)
 from source.repositories.sqlalchemy.session_utils import OrmSession, initialize_schema
 from source.repositories.sqlalchemy.tasks.task_orm_model import TaskOrmModel
-from source.repositories.sqlalchemy.tasks.repositories.create.task_sqlalchemy_mapper import to_task
-from source.repositories.sqlalchemy.tasks.repositories.get_all.tasks_statement_filter import apply_tasks_filters
+from source.repositories.sqlalchemy.tasks.repositories.create.task_sqlalchemy_mapper import (
+    to_task,
+)
+from source.repositories.sqlalchemy.tasks.repositories.get_all.tasks_statement_filter import (
+    apply_tasks_filters,
+)
+
 
 def _build_query_without_cursor(
     filters: Optional[TaskFilters],
     sort: Optional[TaskSort],
-)-> Select:
+) -> Select:
     select_statement = select(TaskOrmModel)
     filtered_tasks = apply_tasks_filters(select_statement, filters)
     query = apply_sort(filtered_tasks, sort)
@@ -41,20 +51,14 @@ class GetAllTasksSqlalchemyRepository(GetAllTasksRepository):
         return self._map_to_filtered_tasks_list(query, page_size)
 
     def _map_to_filtered_tasks_list(
-        self, 
-        query: Select, 
-        page_size: Optional[int]
-    )-> FilteredList[Task]:
+        self, query: Select, page_size: Optional[int]
+    ) -> FilteredList[Task]:
         tasks = self._execute_query(query)
         return map_to_filtered_list(tasks, page_size)
 
-    def _execute_query(self, query:Select)->Iterable[Task]:
-        return (
-            to_task(t) 
-            for t 
-            in self._orm_session.select(query)
-        )
-        
+    def _execute_query(self, query: Select) -> Iterable[Task]:
+        return (to_task(t) for t in self._orm_session.select(query))
+
     def _build_get_all_query(
         self,
         filters: Optional[TaskFilters],
@@ -64,15 +68,12 @@ class GetAllTasksSqlalchemyRepository(GetAllTasksRepository):
         query = _build_query_without_cursor(filters, sort)
         if not cursor:
             return query
-        
+
         return self._apply_cursor_on_query(query, cursor, sort)
 
-    def _apply_cursor_on_query(    
-        self,
-        query: Select,
-        cursor: int,
-        sort: Optional[TaskSort]
-    )-> Select:
+    def _apply_cursor_on_query(
+        self, query: Select, cursor: int, sort: Optional[TaskSort]
+    ) -> Select:
         cursor_row = get_cursor_row(self._orm_session, cursor)
         if not cursor_row:
             raise NotImplementedError()

@@ -55,15 +55,34 @@ def get_all(
 
 ## Pure functions & classes
 
-If a method doesn't use `self`, extract it as a **module-level private function** (`_` prefix). The class method becomes a pure orchestrator that passes the needed values as explicit parameters:
+If a method doesn't use `self`, extract it as a **module-level private function** (`_` prefix). The class method becomes a pure orchestrator that passes the needed values as explicit parameters.
+
+## Filter logic belongs in the repository layer, not the model
+
+`TaskFilters` is a pure `@dataclass` — a data container. It does **not** have an `apply()` method. Filter logic lives in the repository implementation:
+
+- Fake: `repositories/fake/tasks_list_filter.py` → operates on Python lists
+- SQLAlchemy: `repositories/sqlalchemy/tasks/repositories/get_all/tasks_statement_filter.py` → builds SQL `WHERE` clauses
 
 ```python
-def _filter_by_status(elements: Iterable[Task], status: TaskStatus) -> Iterable[Task]:
-    return (t for t in elements if t.status == status)
-
+# model — pure data, no logic
+@dataclass
 class TaskFilters:
-    def apply(self, elements: Iterable[Task]) -> Iterable[Task]:
-        if self.status:
-            elements = _filter_by_status(elements, self.status)
-        return elements
+    status: Optional[TaskStatus] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+# fake filter module
+def filter_tasks_list(elements: Iterable[Task], filters: TaskFilters) -> Iterable[Task]:
+    if filters.status:
+        elements = _filter_by_status(elements, filters.status)
+    return elements
+
+# SQLAlchemy filter module
+def apply_tasks_filters(select_statement: Select, filters: Optional[TaskFilters]) -> Select:
+    if not filters:
+        return select_statement
+    if filters.status:
+        select_statement = _filter_by_status(select_statement, filters.status)
+    return select_statement
 ```

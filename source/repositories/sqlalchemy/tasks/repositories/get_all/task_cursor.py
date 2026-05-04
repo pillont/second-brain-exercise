@@ -20,6 +20,7 @@ def _get_cursor_val(field: SortField, cursor_row: TaskOrmModel) -> Any:
         case _:
             raise NotImplementedError()
 
+
 def _get_cursor_col(field: SortField) -> Any:
     match field:
         case SortField.TITLE:
@@ -30,6 +31,7 @@ def _get_cursor_col(field: SortField) -> Any:
             return TaskOrmModel.status
         case _:
             raise NotImplementedError()
+
 
 def apply_cursor(
     select_statement: Select, sort: Optional[TaskSort], cursor_row: TaskOrmModel
@@ -47,17 +49,12 @@ def apply_cursor(
     val = _get_cursor_val(field, cursor_row)
 
     return select_statement.where(
-            or_(
-                (
-                    col > val 
-                    if asc 
-                    else col < val
-                ), 
-                and_(
-                    col == val, 
-                    TaskOrmModel.id > cursor_id)
-                )
+        or_(
+            (col > val if asc else col < val),
+            and_(col == val, TaskOrmModel.id > cursor_id),
         )
+    )
+
 
 def get_cursor_row(orm_session: OrmSession[TaskOrmModel], cursor: int) -> TaskOrmModel:
     return orm_session.get_or_raise(cursor)

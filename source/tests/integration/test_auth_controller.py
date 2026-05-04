@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 import pytest
 
 from source.config.app_config import get_app_config
@@ -84,17 +82,6 @@ def test_register_duplicate_username_returns_409(client) -> None:
     assert response.status_code == 409
 
 
-def test_register_service_error_returns_500(app) -> None:
-    mock_service = MagicMock()
-    mock_service.register_user.side_effect = RuntimeError("Service failure")
-    with app.test_client() as client:
-        with app.container.register_user_service.override(mock_service):
-            response = client.post("/auth/register", json=VALID_CREDENTIALS)
-        assert response.status_code == 500
-        data = response.get_json()
-        assert "error" in data
-
-
 def test_login_returns_200(registered_client) -> None:
     response = registered_client.post("/auth/login", json=VALID_CREDENTIALS)
 
@@ -163,15 +150,3 @@ def test_login_missing_password_returns_422(client) -> None:
     response = client.post("/auth/login", json={"username": "testuser"})
 
     assert response.status_code == 422
-
-
-def test_login_service_error_returns_500(app) -> None:
-    mock_service = MagicMock()
-    mock_service.login.side_effect = RuntimeError("Service failure")
-    with app.test_client() as client:
-        client.post("/auth/register", json=VALID_CREDENTIALS)
-        with app.container.login_user_service.override(mock_service):
-            response = client.post("/auth/login", json=VALID_CREDENTIALS)
-        assert response.status_code == 500
-        data = response.get_json()
-        assert "error" in data

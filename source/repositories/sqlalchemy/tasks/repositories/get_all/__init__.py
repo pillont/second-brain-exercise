@@ -2,6 +2,4 @@ from source.repositories.sqlalchemy.tasks.repositories.get_all.get_all_tasks_sql
     GetAllTasksSqlalchemyRepository,
 )
 
-__all__ = [
-    "GetAllTasksSqlalchemyRepository"
-]
+__all__ = ["GetAllTasksSqlalchemyRepository"]

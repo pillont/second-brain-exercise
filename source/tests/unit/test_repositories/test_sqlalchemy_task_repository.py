@@ -9,17 +9,21 @@ from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
 from source.models.task_filters import TaskFilters
 from source.models.task_sort import SortDirection, SortField, TaskSort
 from source.repositories.sqlalchemy.tasks.repositories import (
-    SqlalchemyCreateTaskRepository,
-    SqlalchemyDeleteTaskRepository,
-    SqlalchemyGetTaskRepository,
-    SqlalchemyUpdateTaskRepository,
+    CreateTaskSqlalchemyRepository,
+    DeleteTaskSqlalchemyRepository,
+    GetTaskSqlalchemyRepository,
+    UpdateTaskSqlalchemyRepository,
 )
 from source.repositories.sqlalchemy.tasks.repositories.get_all import (
     GetAllTasksSqlalchemyRepository,
 )
 
-TASK_DATA = TaskData(title="Buy milk", description="At the store", due_date=date(2026, 5, 1))
-TASK_DATA_2 = TaskData(title="Buy eggs", description="At the market", due_date=date(2026, 5, 2))
+TASK_DATA = TaskData(
+    title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
+)
+TASK_DATA_2 = TaskData(
+    title="Buy eggs", description="At the market", due_date=date(2026, 5, 2)
+)
 
 
 @pytest.fixture
@@ -28,8 +32,8 @@ def engine(tmp_path: pytest.TempPathFactory) -> Engine:
 
 
 @pytest.fixture
-def create_repo(engine: Engine) -> SqlalchemyCreateTaskRepository:
-    return SqlalchemyCreateTaskRepository(engine)
+def create_repo(engine: Engine) -> CreateTaskSqlalchemyRepository:
+    return CreateTaskSqlalchemyRepository(engine)
 
 
 @pytest.fixture
@@ -38,23 +42,23 @@ def get_all_repo(engine: Engine) -> GetAllTasksSqlalchemyRepository:
 
 
 @pytest.fixture
-def get_repo(engine: Engine) -> SqlalchemyGetTaskRepository:
-    return SqlalchemyGetTaskRepository(engine)
+def get_repo(engine: Engine) -> GetTaskSqlalchemyRepository:
+    return GetTaskSqlalchemyRepository(engine)
 
 
 @pytest.fixture
-def update_repo(engine: Engine) -> SqlalchemyUpdateTaskRepository:
-    return SqlalchemyUpdateTaskRepository(engine)
+def update_repo(engine: Engine) -> UpdateTaskSqlalchemyRepository:
+    return UpdateTaskSqlalchemyRepository(engine)
 
 
 @pytest.fixture
-def delete_repo(engine: Engine) -> SqlalchemyDeleteTaskRepository:
-    return SqlalchemyDeleteTaskRepository(engine)
+def delete_repo(engine: Engine) -> DeleteTaskSqlalchemyRepository:
+    return DeleteTaskSqlalchemyRepository(engine)
 
 
 def _make_complete(
-    create_repo: SqlalchemyCreateTaskRepository,
-    update_repo: SqlalchemyUpdateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
+    update_repo: UpdateTaskSqlalchemyRepository,
     task_data: TaskData,
 ) -> Task:
     created = create_repo.create(task_data)
@@ -70,14 +74,14 @@ def _make_complete(
     return created
 
 
-def test_create_returns_task(create_repo: SqlalchemyCreateTaskRepository) -> None:
+def test_create_returns_task(create_repo: CreateTaskSqlalchemyRepository) -> None:
     result = create_repo.create(TASK_DATA)
 
     assert isinstance(result, Task)
 
 
 def test_create_assigns_auto_incremented_id(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
 ) -> None:
     result = create_repo.create(TASK_DATA)
 
@@ -85,7 +89,7 @@ def test_create_assigns_auto_incremented_id(
     assert result.id >= 1
 
 
-def test_create_increments_id(create_repo: SqlalchemyCreateTaskRepository) -> None:
+def test_create_increments_id(create_repo: CreateTaskSqlalchemyRepository) -> None:
     first = create_repo.create(TASK_DATA)
     second = create_repo.create(TASK_DATA_2)
 
@@ -93,14 +97,14 @@ def test_create_increments_id(create_repo: SqlalchemyCreateTaskRepository) -> No
 
 
 def test_create_sets_status_incomplete(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
 ) -> None:
     result = create_repo.create(TASK_DATA)
 
     assert result.status == TaskStatus.INCOMPLETE
 
 
-def test_create_stores_task_data(create_repo: SqlalchemyCreateTaskRepository) -> None:
+def test_create_stores_task_data(create_repo: CreateTaskSqlalchemyRepository) -> None:
     result = create_repo.create(TASK_DATA)
 
     assert result.title == TASK_DATA.title
@@ -117,7 +121,7 @@ def test_get_all_returns_empty_initially(
 
 
 def test_get_all_returns_created_task(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     created = create_repo.create(TASK_DATA)
@@ -130,7 +134,7 @@ def test_get_all_returns_created_task(
 
 
 def test_get_all_returns_multiple_tasks(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     create_repo.create(TASK_DATA)
@@ -142,7 +146,7 @@ def test_get_all_returns_multiple_tasks(
 
 
 def test_get_all_has_next_false_when_all_returned(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     for _ in range(5):
@@ -153,7 +157,7 @@ def test_get_all_has_next_false_when_all_returned(
 
 
 def test_get_all_has_next_true_when_more_available(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     for _ in range(5):
@@ -163,7 +167,7 @@ def test_get_all_has_next_true_when_more_available(
 
 
 def test_get_all_returns_first_n_elements_with_page_size(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     tasks = [create_repo.create(TASK_DATA) for _ in range(5)]
@@ -175,7 +179,7 @@ def test_get_all_returns_first_n_elements_with_page_size(
 
 
 def test_get_all_returns_elements_after_cursor(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     tasks = [create_repo.create(TASK_DATA) for _ in range(5)]
@@ -188,7 +192,7 @@ def test_get_all_returns_elements_after_cursor(
 
 
 def test_get_all_cursor_and_page_size(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     tasks = [create_repo.create(TASK_DATA) for _ in range(6)]
@@ -201,9 +205,9 @@ def test_get_all_cursor_and_page_size(
 
 
 def test_get_all_filter_by_status(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
-    update_repo: SqlalchemyUpdateTaskRepository,
+    update_repo: UpdateTaskSqlalchemyRepository,
 ) -> None:
     _make_complete(create_repo, update_repo, TASK_DATA)
     create_repo.create(TASK_DATA_2)
@@ -217,9 +221,9 @@ def test_get_all_filter_by_status(
 
 
 def test_get_all_filter_by_status_excludes_non_matching(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
-    update_repo: SqlalchemyUpdateTaskRepository,
+    update_repo: UpdateTaskSqlalchemyRepository,
 ) -> None:
     _make_complete(create_repo, update_repo, TASK_DATA)
     create_repo.create(TASK_DATA_2)
@@ -233,11 +237,13 @@ def test_get_all_filter_by_status_excludes_non_matching(
 
 
 def test_get_all_filter_by_due_date_from(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     create_repo.create(TaskData(title="T1", description="D", due_date=date(2026, 1, 1)))
-    create_repo.create(TaskData(title="T2", description="D", due_date=date(2026, 12, 31)))
+    create_repo.create(
+        TaskData(title="T2", description="D", due_date=date(2026, 12, 31))
+    )
 
     result = list(
         get_all_repo.get_all(
@@ -250,16 +256,16 @@ def test_get_all_filter_by_due_date_from(
 
 
 def test_get_all_filter_by_due_date_to(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     create_repo.create(TaskData(title="T1", description="D", due_date=date(2026, 1, 1)))
-    create_repo.create(TaskData(title="T2", description="D", due_date=date(2026, 12, 31)))
+    create_repo.create(
+        TaskData(title="T2", description="D", due_date=date(2026, 12, 31))
+    )
 
     result = list(
-        get_all_repo.get_all(
-            filters=TaskFilters(due_date_to=date(2026, 6, 1))
-        ).elements
+        get_all_repo.get_all(filters=TaskFilters(due_date_to=date(2026, 6, 1))).elements
     )
 
     assert len(result) == 1
@@ -267,11 +273,15 @@ def test_get_all_filter_by_due_date_to(
 
 
 def test_get_all_filter_by_title_case_insensitive(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
-    create_repo.create(TaskData(title="Buy Milk", description="D", due_date=date(2026, 5, 1)))
-    create_repo.create(TaskData(title="Walk the dog", description="D", due_date=date(2026, 5, 1)))
+    create_repo.create(
+        TaskData(title="Buy Milk", description="D", due_date=date(2026, 5, 1))
+    )
+    create_repo.create(
+        TaskData(title="Walk the dog", description="D", due_date=date(2026, 5, 1))
+    )
 
     result = list(get_all_repo.get_all(filters=TaskFilters(title="BUY")).elements)
 
@@ -280,11 +290,13 @@ def test_get_all_filter_by_title_case_insensitive(
 
 
 def test_get_all_combined_filters(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
-    update_repo: SqlalchemyUpdateTaskRepository,
+    update_repo: UpdateTaskSqlalchemyRepository,
 ) -> None:
-    create_repo.create(TaskData(title="Buy milk", description="D", due_date=date(2026, 5, 1)))
+    create_repo.create(
+        TaskData(title="Buy milk", description="D", due_date=date(2026, 5, 1))
+    )
     _make_complete(
         create_repo,
         update_repo,
@@ -302,9 +314,9 @@ def test_get_all_combined_filters(
 
 
 def test_get_all_filters_applied_before_pagination(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
-    update_repo: SqlalchemyUpdateTaskRepository,
+    update_repo: UpdateTaskSqlalchemyRepository,
 ) -> None:
     create_repo.create(TaskData(title="T1", description="D", due_date=date(2026, 5, 1)))
     create_repo.create(TaskData(title="T2", description="D", due_date=date(2026, 5, 1)))
@@ -323,7 +335,7 @@ def test_get_all_filters_applied_before_pagination(
 
 
 def test_get_all_empty_filters_returns_all(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     create_repo.create(TASK_DATA)
@@ -335,11 +347,13 @@ def test_get_all_empty_filters_returns_all(
 
 
 def test_get_all_sort_by_title_asc(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     for title in ["Cherry", "Apple", "Banana"]:
-        create_repo.create(TaskData(title=title, description="D", due_date=date(2026, 5, 1)))
+        create_repo.create(
+            TaskData(title=title, description="D", due_date=date(2026, 5, 1))
+        )
 
     result = list(
         get_all_repo.get_all(
@@ -351,11 +365,13 @@ def test_get_all_sort_by_title_asc(
 
 
 def test_get_all_sort_by_title_desc(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     for title in ["Apple", "Cherry", "Banana"]:
-        create_repo.create(TaskData(title=title, description="D", due_date=date(2026, 5, 1)))
+        create_repo.create(
+            TaskData(title=title, description="D", due_date=date(2026, 5, 1))
+        )
 
     result = list(
         get_all_repo.get_all(
@@ -367,10 +383,12 @@ def test_get_all_sort_by_title_desc(
 
 
 def test_get_all_sort_by_due_date_asc(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
-    create_repo.create(TaskData(title="T1", description="D", due_date=date(2026, 12, 31)))
+    create_repo.create(
+        TaskData(title="T1", description="D", due_date=date(2026, 12, 31))
+    )
     create_repo.create(TaskData(title="T2", description="D", due_date=date(2026, 1, 1)))
 
     result = list(
@@ -384,11 +402,13 @@ def test_get_all_sort_by_due_date_asc(
 
 
 def test_get_all_sort_by_due_date_desc(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     create_repo.create(TaskData(title="T1", description="D", due_date=date(2026, 1, 1)))
-    create_repo.create(TaskData(title="T2", description="D", due_date=date(2026, 12, 31)))
+    create_repo.create(
+        TaskData(title="T2", description="D", due_date=date(2026, 12, 31))
+    )
 
     result = list(
         get_all_repo.get_all(
@@ -401,9 +421,9 @@ def test_get_all_sort_by_due_date_desc(
 
 
 def test_get_all_sort_by_status_asc(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
-    update_repo: SqlalchemyUpdateTaskRepository,
+    update_repo: UpdateTaskSqlalchemyRepository,
 ) -> None:
     _make_complete(create_repo, update_repo, TASK_DATA)
     create_repo.create(TASK_DATA_2)
@@ -419,11 +439,13 @@ def test_get_all_sort_by_status_asc(
 
 
 def test_get_all_cursor_works_after_sort_by_title(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
 ) -> None:
     for title in ["Cherry", "Apple", "Banana"]:
-        create_repo.create(TaskData(title=title, description="D", due_date=date(2026, 5, 1)))
+        create_repo.create(
+            TaskData(title=title, description="D", due_date=date(2026, 5, 1))
+        )
     sort = TaskSort(field=SortField.TITLE, direction=SortDirection.ASC)
 
     page1 = list(get_all_repo.get_all(sort=sort, page_size=2).elements)
@@ -436,12 +458,14 @@ def test_get_all_cursor_works_after_sort_by_title(
 
 
 def test_get_all_filter_sort_cursor_pagination_combined(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
-    update_repo: SqlalchemyUpdateTaskRepository,
+    update_repo: UpdateTaskSqlalchemyRepository,
 ) -> None:
     for title in ["Cherry", "Banana", "Date"]:
-        create_repo.create(TaskData(title=title, description="D", due_date=date(2026, 5, 1)))
+        create_repo.create(
+            TaskData(title=title, description="D", due_date=date(2026, 5, 1))
+        )
     _make_complete(
         create_repo,
         update_repo,
@@ -466,8 +490,8 @@ def test_get_all_filter_sort_cursor_pagination_combined(
 
 
 def test_get_task_returns_task_by_id(
-    create_repo: SqlalchemyCreateTaskRepository,
-    get_repo: SqlalchemyGetTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
+    get_repo: GetTaskSqlalchemyRepository,
 ) -> None:
     created = create_repo.create(TASK_DATA)
 
@@ -478,8 +502,8 @@ def test_get_task_returns_task_by_id(
 
 
 def test_get_task_returns_correct_task_among_multiple(
-    create_repo: SqlalchemyCreateTaskRepository,
-    get_repo: SqlalchemyGetTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
+    get_repo: GetTaskSqlalchemyRepository,
 ) -> None:
     create_repo.create(TASK_DATA)
     created_2 = create_repo.create(TASK_DATA_2)
@@ -491,16 +515,16 @@ def test_get_task_returns_correct_task_among_multiple(
 
 
 def test_get_task_raises_not_found_error(
-    get_repo: SqlalchemyGetTaskRepository,
+    get_repo: GetTaskSqlalchemyRepository,
 ) -> None:
     with pytest.raises(NotFoundError):
         get_repo.get_task(999)
 
 
 def test_update_persists_changes(
-    create_repo: SqlalchemyCreateTaskRepository,
-    get_repo: SqlalchemyGetTaskRepository,
-    update_repo: SqlalchemyUpdateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
+    get_repo: GetTaskSqlalchemyRepository,
+    update_repo: UpdateTaskSqlalchemyRepository,
 ) -> None:
     created = create_repo.create(TASK_DATA)
     update_data = TaskUpdateData(
@@ -520,7 +544,7 @@ def test_update_persists_changes(
 
 
 def test_update_raises_not_found_error(
-    update_repo: SqlalchemyUpdateTaskRepository,
+    update_repo: UpdateTaskSqlalchemyRepository,
 ) -> None:
     update_data = TaskUpdateData(
         title="X",
@@ -534,9 +558,9 @@ def test_update_raises_not_found_error(
 
 
 def test_delete_removes_task(
-    create_repo: SqlalchemyCreateTaskRepository,
+    create_repo: CreateTaskSqlalchemyRepository,
     get_all_repo: GetAllTasksSqlalchemyRepository,
-    delete_repo: SqlalchemyDeleteTaskRepository,
+    delete_repo: DeleteTaskSqlalchemyRepository,
 ) -> None:
     created = create_repo.create(TASK_DATA)
 
@@ -546,7 +570,7 @@ def test_delete_removes_task(
 
 
 def test_delete_raises_not_found_error(
-    delete_repo: SqlalchemyDeleteTaskRepository,
+    delete_repo: DeleteTaskSqlalchemyRepository,
 ) -> None:
     with pytest.raises(NotFoundError):
         delete_repo.delete_task(999)

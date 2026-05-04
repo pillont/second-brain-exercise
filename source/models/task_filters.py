@@ -4,6 +4,7 @@ from typing import Optional
 
 from source.models.task import TaskStatus
 
+
 @dataclass
 class TaskFilters:
     status: Optional[TaskStatus] = None

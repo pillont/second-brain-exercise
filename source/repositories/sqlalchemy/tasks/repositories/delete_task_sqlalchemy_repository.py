@@ -7,7 +7,7 @@ from source.repositories.sqlalchemy.session_utils import OrmSession, initialize_
 from source.repositories.sqlalchemy.tasks.task_orm_model import TaskOrmModel
 
 
-class SqlalchemyDeleteTaskRepository(DeleteTaskRepository):
+class DeleteTaskSqlalchemyRepository(DeleteTaskRepository):
     def __init__(self, engine: Engine) -> None:
         self._orm_session: Final = OrmSession(initialize_schema(engine), TaskOrmModel)
 

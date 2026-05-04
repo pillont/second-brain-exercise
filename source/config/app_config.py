@@ -31,6 +31,7 @@ def get_app_config(config_name: str = "development") -> AppConfig:
             return {
                 "LOG_LEVEL": logging.WARNING,
                 "JWT_SECRET_KEY": "test-jwt-secret",
+                "DATABASE_URL": "sqlite:///:memory:",
             }
 
         case "production":

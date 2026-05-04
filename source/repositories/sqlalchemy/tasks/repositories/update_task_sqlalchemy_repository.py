@@ -15,12 +15,11 @@ def _apply_update(orm_task: TaskOrmModel, task_update_data: TaskUpdateData) -> N
     orm_task.status = str(task_update_data.status)
 
 
-class SqlalchemyUpdateTaskRepository(UpdateTaskRepository):
+class UpdateTaskSqlalchemyRepository(UpdateTaskRepository):
     def __init__(self, engine: Engine) -> None:
         self._orm_session: Final = OrmSession(initialize_schema(engine), TaskOrmModel)
 
     def update(self, id: int, task_update_data: TaskUpdateData) -> None:
         self._orm_session.update_or_raise(
-            id, 
-            lambda orm_task: _apply_update(orm_task, task_update_data)
+            id, lambda orm_task: _apply_update(orm_task, task_update_data)
         )

@@ -1,4 +1,3 @@
-
 from datetime import date
 from typing import Optional
 
@@ -26,26 +25,25 @@ def _filter_by_title(select_statement: Select, title: str) -> Select:
         func.lower(TaskOrmModel.title).contains(title.lower())
     )
 
+
 def apply_tasks_filters(
     select_statement: Select, filters: Optional[TaskFilters]
 ) -> Select:
     if not filters:
         return select_statement
-    
+
     if filters.status:
         select_statement = _filter_by_status(select_statement, filters.status)
-    
+
     if filters.due_date_from:
         select_statement = _filter_by_due_date_from(
             select_statement, filters.due_date_from
         )
-    
+
     if filters.due_date_to:
-        select_statement = _filter_by_due_date_to(
-            select_statement, filters.due_date_to
-        )
-    
+        select_statement = _filter_by_due_date_to(select_statement, filters.due_date_to)
+
     if filters.title:
         select_statement = _filter_by_title(select_statement, filters.title)
-        
+
     return select_statement

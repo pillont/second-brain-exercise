@@ -42,7 +42,7 @@ class TasksFakeRepository(
 
         if filters:
             elements = filter_tasks_list(self._tasks, filters)
-            
+
         sorted_elements: List[Task] = sort.apply(elements) if sort else list(elements)
 
         if cursor:
@@ -86,5 +86,5 @@ class TasksFakeRepository(
         for i, task in enumerate(elements):
             if task.id == cursor:
                 return elements[i + 1 :]
-            
+
         raise NotImplementedError()

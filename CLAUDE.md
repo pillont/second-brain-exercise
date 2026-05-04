@@ -109,11 +109,21 @@ See [error-handling](.claude/commands/error-handling.md).
 ### Models
 - Use `StrEnum` for status/type enums — never `str, Enum` (Python 3.11+ breaks serialization)
 
+### Repository structure
+- `repositories/` contains only ABCs (interfaces) — its `__init__.py` exports ABCs only, never implementations
+- `repositories/fake/` — in-memory fake implementations (one file per resource)
+- `repositories/sqlalchemy/<resource>/` — SQLAlchemy implementations, one file per operation
+- Filter logic does **not** belong in the model (`TaskFilters` is a pure `@dataclass`) — it lives in the repository layer:
+  - Fake: `repositories/fake/<resource>_list_filter.py`
+  - SQLAlchemy: `repositories/sqlalchemy/<resource>/repositories/get_all/<resource>_statement_filter.py`
+
 ### Dependency Injection
 - ISP: one ABC per operation in `repositories/`, one service class per operation in `services/`
+- ISP applies at container level too — one provider per interface, even for fakes (not one shared repo for all services)
 - Controllers are auto-wired via `pkgutil.walk_packages` — never list them manually
+- The SQLAlchemy engine provider **must** be `providers.Singleton` — if `providers.Callable`, each repo gets its own engine and its own separate in-memory DB
 
-See [dependency-injection](.claude/commands/dependency-injection.md).
+See [dependency-injection](.claude/commands/dependency-injection.md) and [sqlalchemy-repositories](.claude/commands/sqlalchemy-repositories.md).
 
 ### Naming
 - **Function names must start with a verb** — `get_database_url`, `apply_filters`, `build_query`, not `database_url`, `filters`, `query`

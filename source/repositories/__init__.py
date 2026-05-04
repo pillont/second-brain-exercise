@@ -7,6 +7,7 @@ from source.repositories.register_user_repository import RegisterUserRepository
 from source.repositories.get_user_by_username_repository import (
     GetUserByUsernameRepository,
 )
+
 __all__ = [
     "CreateTaskRepository",
     "DeleteTaskRepository",
@@ -14,5 +15,5 @@ __all__ = [
     "GetTaskRepository",
     "UpdateTaskRepository",
     "RegisterUserRepository",
-    "GetUserByUsernameRepository"
+    "GetUserByUsernameRepository",
 ]

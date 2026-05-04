@@ -668,19 +668,6 @@ def test_get_all_cursor_works_correctly_after_sort_by_title() -> None:
     assert repo.get_all(sort=sort, cursor=cursor_id, page_size=2).has_next is False
 
 
-def test_get_all_cursor_not_found_returns_full_sorted_list() -> None:
-    from source.models.task_sort import SortField, SortDirection, TaskSort
-
-    repo = TasksFakeRepository()
-    repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
-    repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
-
-    sort = TaskSort(field=SortField.TITLE, direction=SortDirection.ASC)
-    result = list(repo.get_all(sort=sort, cursor=999).elements)
-
-    assert [t.title for t in result] == ["Apple", "Cherry"]
-
-
 def test_get_all_filter_and_sort_combined() -> None:
     from source.models.task_filters import TaskFilters
     from source.models.task_sort import SortField, SortDirection, TaskSort

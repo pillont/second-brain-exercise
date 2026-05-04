@@ -1,19 +1,19 @@
 from source.repositories.sqlalchemy.tasks.repositories.create.create_task_sqlalchemy_repository import (
-    SqlalchemyCreateTaskRepository,
+    CreateTaskSqlalchemyRepository,
 )
 from source.repositories.sqlalchemy.tasks.repositories.get_task_sqlalchemy_repository import (
-    SqlalchemyGetTaskRepository,
+    GetTaskSqlalchemyRepository,
 )
 from source.repositories.sqlalchemy.tasks.repositories.update_task_sqlalchemy_repository import (
-    SqlalchemyUpdateTaskRepository,
+    UpdateTaskSqlalchemyRepository,
 )
 from source.repositories.sqlalchemy.tasks.repositories.delete_task_sqlalchemy_repository import (
-    SqlalchemyDeleteTaskRepository,
+    DeleteTaskSqlalchemyRepository,
 )
 
 __all__ = [
-    "SqlalchemyCreateTaskRepository",
-    "SqlalchemyGetTaskRepository",
-    "SqlalchemyUpdateTaskRepository",
-    "SqlalchemyDeleteTaskRepository",
+    "CreateTaskSqlalchemyRepository",
+    "GetTaskSqlalchemyRepository",
+    "UpdateTaskSqlalchemyRepository",
+    "DeleteTaskSqlalchemyRepository",
 ]
