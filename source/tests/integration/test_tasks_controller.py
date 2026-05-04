@@ -702,7 +702,7 @@ def test_get_tasks_sort_with_pagination_page2(client) -> None:
     page1 = client.get(
         "/tasks/?sort_by=title&sort_direction=asc&page_size=2"
     ).get_json()
-    cursor = page1["elements"][-1]["id"]
+    cursor = page1["next_cursor"]
 
     response = client.get(
         f"/tasks/?sort_by=title&sort_direction=asc&page_size=2&cursor={cursor}"

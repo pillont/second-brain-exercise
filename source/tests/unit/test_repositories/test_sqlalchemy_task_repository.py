@@ -6,6 +6,7 @@ from sqlalchemy.engine import Engine
 
 from source.models.not_found_error import NotFoundError
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
+from source.models.task_cursor import TaskCursor, decode_task_cursor
 from source.models.task_filters import TaskFilters
 from source.models.task_sort import SortDirection, SortField, TaskSort
 from source.repositories.sqlalchemy.tasks.repositories import (
@@ -184,7 +185,11 @@ def test_get_all_returns_elements_after_cursor(
 ) -> None:
     tasks = [create_repo.create(TASK_DATA) for _ in range(5)]
 
-    result = list(get_all_repo.get_all(cursor=tasks[2].id).elements)
+    result = list(
+        get_all_repo.get_all(
+            cursor=TaskCursor(sort_value=str(tasks[2].id), id=tasks[2].id)
+        ).elements
+    )
 
     assert len(result) == 2
     assert result[0].id == tasks[3].id
@@ -197,7 +202,11 @@ def test_get_all_cursor_and_page_size(
 ) -> None:
     tasks = [create_repo.create(TASK_DATA) for _ in range(6)]
 
-    result = list(get_all_repo.get_all(cursor=tasks[1].id, page_size=2).elements)
+    result = list(
+        get_all_repo.get_all(
+            cursor=TaskCursor(sort_value=str(tasks[1].id), id=tasks[1].id), page_size=2
+        ).elements
+    )
 
     assert len(result) == 2
     assert result[0].id == tasks[2].id
@@ -448,11 +457,15 @@ def test_get_all_cursor_works_after_sort_by_title(
         )
     sort = TaskSort(field=SortField.TITLE, direction=SortDirection.ASC)
 
-    page1 = list(get_all_repo.get_all(sort=sort, page_size=2).elements)
-    assert [t.title for t in page1] == ["Apple", "Banana"]
+    page1 = get_all_repo.get_all(sort=sort, page_size=2)
+    assert [t.title for t in list(page1.elements)] == ["Apple", "Banana"]
 
     page2 = list(
-        get_all_repo.get_all(sort=sort, cursor=page1[-1].id, page_size=2).elements
+        get_all_repo.get_all(
+            sort=sort,
+            cursor=decode_task_cursor(page1.next_cursor if page1.next_cursor else ""),
+            page_size=2,
+        ).elements
     )
     assert [t.title for t in page2] == ["Cherry"]
 
@@ -479,11 +492,11 @@ def test_get_all_filter_sort_cursor_pagination_combined(
     assert [t.title for t in page1.elements] == ["Banana", "Cherry"]
     assert page1.has_next is True
 
-    cursor_id = list(
-        get_all_repo.get_all(filters=filters, sort=sort, page_size=2).elements
-    )[-1].id
     page2 = get_all_repo.get_all(
-        filters=filters, sort=sort, cursor=cursor_id, page_size=2
+        filters=filters,
+        sort=sort,
+        cursor=decode_task_cursor(page1.next_cursor if page1.next_cursor else ""),
+        page_size=2,
     )
     assert [t.title for t in page2.elements] == ["Date"]
     assert page2.has_next is False

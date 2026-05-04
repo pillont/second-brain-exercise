@@ -1,5 +1,6 @@
 from datetime import date
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
+from source.models.task_cursor import TaskCursor
 from source.repositories.fake.tasks_fake_repository import TasksFakeRepository
 
 
@@ -161,7 +162,7 @@ def test_get_all_returns_has_next_false_if_returns_all_values() -> None:
     result = repo.get_all(page_size=10)
     assert not result.has_next
 
-    result = repo.get_all(cursor=6, page_size=4)
+    result = repo.get_all(cursor=TaskCursor(sort_value="6", id=6), page_size=4)
     assert not result.has_next
 
 
@@ -180,7 +181,7 @@ def test_get_all_returns_has_next_true_if_not_returns_all_values() -> None:
     result = repo.get_all(page_size=8)
     assert result.has_next
 
-    result = repo.get_all(cursor=2, page_size=2)
+    result = repo.get_all(cursor=TaskCursor(sort_value="2", id=2), page_size=2)
     assert result.has_next
 
 
@@ -217,7 +218,12 @@ def test_get_all_returns_firsts_elements_if_page_size_and_cursor_is_defined() ->
             )
         )
 
-    result = [t for t in repo.get_all(page_size=4, cursor=4).elements]
+    result = [
+        t
+        for t in repo.get_all(
+            page_size=4, cursor=TaskCursor(sort_value="4", id=4)
+        ).elements
+    ]
 
     assert len(result) == 4
     assert result[0].id == 5
@@ -238,7 +244,7 @@ def test_get_all_returns_firsts_elements_if_cursor_is_defined() -> None:
             )
         )
 
-    result = [t for t in repo.get_all(cursor=4).elements]
+    result = [t for t in repo.get_all(cursor=TaskCursor(sort_value="4", id=4)).elements]
 
     assert len(result) == 6
     assert result[0].id == 5
@@ -651,6 +657,7 @@ def test_get_all_sort_by_status_asc() -> None:
 
 def test_get_all_cursor_works_correctly_after_sort_by_title() -> None:
     from source.models.task_sort import SortField, SortDirection, TaskSort
+    from source.models.task_cursor import decode_task_cursor
 
     repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
@@ -658,14 +665,18 @@ def test_get_all_cursor_works_correctly_after_sort_by_title() -> None:
     repo.create(TaskData(title="Banana", description="Desc", due_date=date(2026, 5, 1)))
 
     sort = TaskSort(field=SortField.TITLE, direction=SortDirection.ASC)
-    page1 = list(repo.get_all(sort=sort, page_size=2).elements)
+    page1_result = repo.get_all(sort=sort, page_size=2)
+    page1 = list(page1_result.elements)
     assert [t.title for t in page1] == ["Apple", "Banana"]
-    assert repo.get_all(sort=sort, page_size=2).has_next is True
+    assert page1_result.has_next is True
 
-    cursor_id = page1[-1].id
-    page2 = list(repo.get_all(sort=sort, cursor=cursor_id, page_size=2).elements)
+    cursor = decode_task_cursor(
+        page1_result.next_cursor if page1_result.next_cursor else ""
+    )
+    page2_result = repo.get_all(sort=sort, cursor=cursor, page_size=2)
+    page2 = list(page2_result.elements)
     assert [t.title for t in page2] == ["Cherry"]
-    assert repo.get_all(sort=sort, cursor=cursor_id, page_size=2).has_next is False
+    assert page2_result.has_next is False
 
 
 def test_get_all_filter_and_sort_combined() -> None:
@@ -701,6 +712,7 @@ def test_get_all_filter_and_sort_combined() -> None:
 def test_get_all_filter_sort_cursor_pagination_combined() -> None:
     from source.models.task_filters import TaskFilters
     from source.models.task_sort import SortField, SortDirection, TaskSort
+    from source.models.task_cursor import decode_task_cursor
 
     repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
@@ -726,10 +738,8 @@ def test_get_all_filter_sort_cursor_pagination_combined() -> None:
     assert [t.title for t in page1.elements] == ["Banana", "Cherry"]
     assert page1.has_next is True
 
-    cursor_id = list(repo.get_all(filters=filters, sort=sort, page_size=2).elements)[
-        -1
-    ].id
-    page2 = repo.get_all(filters=filters, sort=sort, cursor=cursor_id, page_size=2)
+    cursor = decode_task_cursor(page1.next_cursor if page1.next_cursor else "")
+    page2 = repo.get_all(filters=filters, sort=sort, cursor=cursor, page_size=2)
     assert [t.title for t in page2.elements] == ["Date"]
     assert page2.has_next is False
 

@@ -8,5 +8,7 @@ T = TypeVar("T")
 
 def map_to_list_entity(filtered_list: FilteredList[T]) -> ListEntity[T]:
     return ListEntity[T](
-        elements=filtered_list.elements, has_next=filtered_list.has_next
+        elements=filtered_list.elements,
+        has_next=filtered_list.has_next,
+        next_cursor=filtered_list.next_cursor,
     )

@@ -1,4 +1,4 @@
-from typing import Final, Iterable, Optional
+from typing import Final, List, Optional
 
 from sqlalchemy import select
 from sqlalchemy.engine import Engine
@@ -6,12 +6,12 @@ from sqlalchemy.sql import Select
 
 from source.models.filtered_list import FilteredList, map_to_filtered_list
 from source.models.task import Task
+from source.models.task_cursor import TaskCursor, encode_task_cursor
 from source.models.task_filters import TaskFilters
 from source.models.task_sort import TaskSort
 from source.repositories.get_all_tasks_repository import GetAllTasksRepository
 from source.repositories.sqlalchemy.tasks.repositories.get_all.task_cursor import (
     apply_cursor,
-    get_cursor_row,
 )
 from source.repositories.sqlalchemy.tasks.repositories.get_all.tasks_sorter import (
     apply_sort,
@@ -34,8 +34,16 @@ def _build_query_without_cursor(
 ) -> Select:
     select_statement = select(TaskOrmModel)
     filtered_tasks = apply_tasks_filters(select_statement, filters)
-    query = apply_sort(filtered_tasks, sort)
-    return query
+    return apply_sort(filtered_tasks, sort)
+
+
+def _compute_next_cursor(
+    tasks: List[Task], page_size: int, sort: Optional[TaskSort]
+) -> Optional[str]:
+    if len(tasks) < page_size:
+        return None
+    last_task = tasks[page_size - 1]
+    return encode_task_cursor(last_task, sort or TaskSort())
 
 
 class GetAllTasksSqlalchemyRepository(GetAllTasksRepository):
@@ -46,39 +54,25 @@ class GetAllTasksSqlalchemyRepository(GetAllTasksRepository):
         self,
         filters: Optional[TaskFilters] = None,
         sort: Optional[TaskSort] = None,
-        cursor: Optional[int] = None,
+        cursor: Optional[TaskCursor] = None,
         page_size: Optional[int] = None,
     ) -> FilteredList[Task]:
-        query = self._build_get_all_query(filters, sort, cursor)
-        return self._map_to_filtered_tasks_list(query, page_size)
-
-    def _map_to_filtered_tasks_list(
-        self, query: Select, page_size: Optional[int]
-    ) -> FilteredList[Task]:
-        tasks = self._execute_query(query)
-        return map_to_filtered_list(tasks, page_size)
-
-    def _execute_query(self, query: Select) -> Iterable[Task]:
-        return (to_task(t) for t in self._orm_session.select(query))
-
-    def _build_get_all_query(
-        self,
-        filters: Optional[TaskFilters],
-        sort: Optional[TaskSort],
-        cursor: Optional[int],
-    ) -> Select:
         query = _build_query_without_cursor(filters, sort)
-        if not cursor:
-            return query
+        if cursor:
+            query = apply_cursor(query, sort, cursor)
+        return self._build_filtered_list(query, sort, page_size)
 
-        return self._apply_cursor_on_query(query, cursor, sort)
-
-    def _apply_cursor_on_query(
-        self, query: Select, cursor: int, sort: Optional[TaskSort]
-    ) -> Select:
-        cursor_row = get_cursor_row(self._orm_session, cursor)
-        if not cursor_row:
-            raise NotImplementedError()
-
-        query = apply_cursor(query, sort, cursor_row)
-        return query
+    def _build_filtered_list(
+        self,
+        query: Select,
+        sort: Optional[TaskSort],
+        page_size: Optional[int],
+    ) -> FilteredList[Task]:
+        tasks = [to_task(t) for t in self._orm_session.select(query)]
+        filtered = map_to_filtered_list(tasks, page_size)
+        next_cursor = (
+            _compute_next_cursor(tasks, page_size, sort)
+            if page_size and filtered.has_next
+            else None
+        )
+        return FilteredList(filtered.elements, filtered.has_next, next_cursor)

@@ -4,6 +4,7 @@ from typing import Iterable, List
 from unittest.mock import MagicMock
 from source.models.filtered_list import FilteredList
 from source.models.task import Task, TaskStatus
+from source.models.task_cursor import TaskCursor
 from source.services.get_all_tasks_service import GetAllTasksService
 
 
@@ -101,9 +102,10 @@ def test_get_all_tasks_passes_cursor_and_page_size_to_repository() -> None:
     mock_repo.get_all.return_value = FilteredList(iter([]), False)
     service = GetAllTasksService(repository=mock_repo)
 
-    service.get_all_tasks(cursor=5, page_size=10)
+    cursor = TaskCursor(sort_value="2026-05-01", id=1)
+    service.get_all_tasks(cursor=cursor, page_size=10)
 
-    mock_repo.get_all.assert_called_once_with(None, None, 5, 10)
+    mock_repo.get_all.assert_called_once_with(None, None, cursor, 10)
 
 
 def test_get_all_tasks_passes_all_params_to_repository() -> None:
@@ -115,9 +117,10 @@ def test_get_all_tasks_passes_all_params_to_repository() -> None:
     service = GetAllTasksService(repository=mock_repo)
     filters = TaskFilters(status=TaskStatus.INCOMPLETE)
 
-    service.get_all_tasks(filters=filters, cursor=3, page_size=5)
+    cursor = TaskCursor(sort_value="2026-05-01", id=1)
+    service.get_all_tasks(filters=filters, cursor=cursor, page_size=5)
 
-    mock_repo.get_all.assert_called_once_with(filters, None, 3, 5)
+    mock_repo.get_all.assert_called_once_with(filters, None, cursor, 5)
 
 
 def test_get_all_tasks_propagates_repository_error() -> None:
@@ -156,6 +159,7 @@ def test_get_all_tasks_passes_all_params_including_sort_to_repository() -> None:
     filters = TaskFilters(status=TaskStatus.INCOMPLETE)
     sort = TaskSort(field=SortField.TITLE, direction=SortDirection.DESC)
 
-    service.get_all_tasks(filters=filters, sort=sort, cursor=2, page_size=5)
+    cursor = TaskCursor(sort_value="2026-05-01", id=1)
+    service.get_all_tasks(filters=filters, sort=sort, cursor=cursor, page_size=5)
 
-    mock_repo.get_all.assert_called_once_with(filters, sort, 2, 5)
+    mock_repo.get_all.assert_called_once_with(filters, sort, cursor, 5)

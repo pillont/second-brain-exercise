@@ -3,6 +3,7 @@ from typing import Optional
 
 from source.models.filtered_list import FilteredList
 from source.models.task import Task
+from source.models.task_cursor import TaskCursor
 from source.models.task_filters import TaskFilters
 from source.models.task_sort import TaskSort
 
@@ -13,6 +14,6 @@ class GetAllTasksRepository(ABC):
         self,
         filters: Optional[TaskFilters] = None,
         sort: Optional[TaskSort] = None,
-        cursor: Optional[int] = None,
+        cursor: Optional[TaskCursor] = None,
         page_size: Optional[int] = None,
     ) -> FilteredList[Task]: ...

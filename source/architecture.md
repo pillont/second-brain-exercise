@@ -195,7 +195,7 @@ Response
 **Pattern**:
 ```python
 import logging
-from flask_smorest import Blueprint  # type: ignore[import-untyped]
+from flask_smorest import Blueprint  
 from dependency_injector.wiring import inject, Provide
 from source.container import Container
 from source.models.my_model import MyModel
@@ -467,7 +467,7 @@ To maintain loose coupling, use dependency injection:
 
 ```python
 # source/__init__.py
-from flask_smorest import Api  # type: ignore[import-untyped]
+from flask_smorest import Api  
 from source.controllers.my_controller import my_blp
 
 def create_app(config_obj):
