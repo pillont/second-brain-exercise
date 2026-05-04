@@ -11,6 +11,5 @@ class TasksListArgumentEntity(ListArgumentEntity):
     due_date_from: Optional[date]
     due_date_to: Optional[date]
     title: Optional[str]
-    description: Optional[str]
     sort_by: Optional[SortField]
     sort_direction: Optional[SortDirection]

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/bin/python -m flake8 source/repositories/)",
+      "Bash(.venv/bin/python -m pytest source/tests/unit/test_repositories/test_sqlalchemy_task_repository.py -v)",
+      "Bash(.venv/bin/python -m pytest source/tests/unit/test_repositories/test_sqlalchemy_task_repository.py -q)",
+      "Bash(.venv/bin/python -m pytest source/tests/unit/test_repositories/test_sqlalchemy_task_repository.py -x -q)",
+      "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py::test_get_tasks_returns_list_of_tasks -q)",
+      "Bash(.venv/bin/python -m pytest source/tests/unit/test_repositories/test_sqlalchemy_task_repository.py::test_get_all_combined_filters -q)",
+      "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py::test_get_tasks_filter_by_description -q)"
+    ]
+  }
+}

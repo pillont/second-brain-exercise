@@ -10,7 +10,9 @@ class FilteredList(Generic[T]):
         self.has_next: Final = has_next
 
 
-def map_to_filtered(elements: Iterable[T], page_size: Optional[int]) -> FilteredList[T]:
+def map_to_filtered_list(
+    elements: Iterable[T], page_size: Optional[int]
+) -> FilteredList[T]:
     sliced_elements, has_next = _slice_with_has_next(elements, page_size)
     return FilteredList(sliced_elements, has_next)
 

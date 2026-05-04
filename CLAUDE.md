@@ -109,11 +109,38 @@ See [error-handling](.claude/commands/error-handling.md).
 ### Models
 - Use `StrEnum` for status/type enums — never `str, Enum` (Python 3.11+ breaks serialization)
 
+### Repository structure
+- `repositories/` contains only ABCs (interfaces) — its `__init__.py` exports ABCs only, never implementations
+- `repositories/fake/` — in-memory fake implementations (one file per resource)
+- `repositories/sqlalchemy/<resource>/` — SQLAlchemy implementations, one file per operation
+- Filter logic does **not** belong in the model (`TaskFilters` is a pure `@dataclass`) — it lives in the repository layer:
+  - Fake: `repositories/fake/<resource>_list_filter.py`
+  - SQLAlchemy: `repositories/sqlalchemy/<resource>/repositories/get_all/<resource>_statement_filter.py`
+
 ### Dependency Injection
 - ISP: one ABC per operation in `repositories/`, one service class per operation in `services/`
+- ISP applies at container level too — one provider per interface, even for fakes (not one shared repo for all services)
 - Controllers are auto-wired via `pkgutil.walk_packages` — never list them manually
+- The SQLAlchemy engine provider **must** be `providers.Singleton` — if `providers.Callable`, each repo gets its own engine and its own separate in-memory DB
 
-See [dependency-injection](.claude/commands/dependency-injection.md).
+See [dependency-injection](.claude/commands/dependency-injection.md) and [sqlalchemy-repositories](.claude/commands/sqlalchemy-repositories.md).
+
+### Naming
+- **Function names must start with a verb** — `get_database_url`, `apply_filters`, `build_query`, not `database_url`, `filters`, `query`
+
+### File size & function length
+- **120 lines max per `.py` file** (excluding test files) — if a file exceeds this, split it before adding more code
+- **6 lines max per function body** — if a function exceeds this, extract sub-functions
+- **A `match` statement generally deserves its own dedicated function** — extract it so the calling function stays an orchestrator
+- **Prefer descriptive names over abbreviations** — `select_statement` not `stmt`, `filters` not `f`, `task_update_data` not `tud`
+- One class per file; module-level helper functions stay in the file of the class that uses them
+- If helpers are shared across classes, extract them to a dedicated `_helpers.py` or a named utility module
+
+### Parameter ordering
+- **Context before values** — engine/session comes first in function parameters, then the data values (e.g. `persist(engine, orm_object)` not `persist(orm_object, engine)`)
+
+### Typing
+- **Avoid `Any`** — use the most precise type available; `Any` silences the type checker and hides bugs. Use a base class (`Base`), a `TypeVar`, or a protocol instead
 
 ### Coding patterns
 Inheritance for variants, update operations, `fields.Enum`, generic/resource-specific schemas & entities, filter param ordering, pure functions — see [conventions](.claude/commands/conventions.md).

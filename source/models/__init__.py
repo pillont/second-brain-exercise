@@ -1,7 +1,7 @@
 from source.models.task import Task, TaskData, TaskUpdateData, TaskStatus
 from source.models.user import User, UserData, HashedUserData
 from source.models.greeting import Greeting
-from source.models.filtered_list import FilteredList, map_to_filtered
+from source.models.filtered_list import FilteredList, map_to_filtered_list
 from source.models.not_found_error import NotFoundError
 from source.models.invalid_credentials_error import InvalidCredentialsError
 from source.models.user_already_exists_error import UserAlreadyExistsError
@@ -16,7 +16,7 @@ __all__ = [
     "HashedUserData",
     "Greeting",
     "FilteredList",
-    "map_to_filtered",
+    "map_to_filtered_list",
     "NotFoundError",
     "InvalidCredentialsError",
     "UserAlreadyExistsError",

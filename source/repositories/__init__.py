@@ -7,8 +7,6 @@ from source.repositories.register_user_repository import RegisterUserRepository
 from source.repositories.get_user_by_username_repository import (
     GetUserByUsernameRepository,
 )
-from source.repositories.fake_task_repository import FakeTaskRepository
-from source.repositories.fake_user_repository import FakeUserRepository
 
 __all__ = [
     "CreateTaskRepository",
@@ -18,6 +16,4 @@ __all__ = [
     "UpdateTaskRepository",
     "RegisterUserRepository",
     "GetUserByUsernameRepository",
-    "FakeTaskRepository",
-    "FakeUserRepository",
 ]

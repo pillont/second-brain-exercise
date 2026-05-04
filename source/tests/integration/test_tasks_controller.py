@@ -514,27 +514,6 @@ def test_get_tasks_filter_by_title_case_insensitive(client) -> None:
     assert len(data) == 1
 
 
-def test_get_tasks_filter_by_description(client) -> None:
-    client.post("/tasks/", json={**VALID_BODY, "description": "At the store"})
-    client.post("/tasks/", json={**VALID_BODY, "description": "In the park"})
-
-    response = client.get("/tasks/?description=store")
-    data = response.get_json()["elements"]
-
-    assert len(data) == 1
-    assert data[0]["description"] == "At the store"
-
-
-def test_get_tasks_filter_by_description_case_insensitive(client) -> None:
-    client.post("/tasks/", json={**VALID_BODY, "description": "At the Store"})
-    client.post("/tasks/", json={**VALID_BODY, "description": "In the park"})
-
-    response = client.get("/tasks/?description=STORE")
-    data = response.get_json()["elements"]
-
-    assert len(data) == 1
-
-
 def test_get_tasks_filter_combined_status_and_title(client) -> None:
     client.post("/tasks/", json={**VALID_BODY, "title": "Buy milk"})
     created = client.post(

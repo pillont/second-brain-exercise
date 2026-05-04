@@ -10,6 +10,5 @@ class TasksListArgumentSchema(ListArgumentSchema):
     due_date_from = fields.Date(required=False)
     due_date_to = fields.Date(required=False)
     title = fields.String(required=False)
-    description = fields.String(required=False)
     sort_by = fields.Enum(SortField, by_value=True, required=False)
     sort_direction = fields.Enum(SortDirection, by_value=True, required=False)
