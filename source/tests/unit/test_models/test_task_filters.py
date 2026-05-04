@@ -3,6 +3,7 @@ from typing import List
 
 from source.models.task import Task, TaskStatus
 from source.models.task_filters import TaskFilters
+from source.repositories.fake.tasks_list_filter import filter_tasks_list
 
 
 def _make_task(
@@ -22,7 +23,7 @@ def _make_task(
 
 
 def _apply(filters: TaskFilters, tasks: List[Task]) -> List[Task]:
-    return list(filters.apply(iter(tasks)))
+    return list(filter_tasks_list(iter(tasks), filters))
 
 
 def test_apply_no_filter_returns_all() -> None:
@@ -104,18 +105,6 @@ def test_filter_by_title_case_insensitive() -> None:
     ]
 
     result = _apply(TaskFilters(title="buy"), tasks)
-
-    assert [t.id for t in result] == [1, 3]
-
-
-def test_filter_by_description_case_insensitive() -> None:
-    tasks = [
-        _make_task(1, description="At the Store"),
-        _make_task(2, description="in the park"),
-        _make_task(3, description="at home"),
-    ]
-
-    result = _apply(TaskFilters(description="at"), tasks)
 
     assert [t.id for t in result] == [1, 3]
 

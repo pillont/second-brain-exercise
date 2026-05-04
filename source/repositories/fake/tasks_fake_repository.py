@@ -1,19 +1,20 @@
 from itertools import chain
 from typing import Iterable, List, Optional
 
-from source.models.filtered_list import FilteredList, map_to_filtered
+from source.models.filtered_list import FilteredList, map_to_filtered_list
 from source.models.not_found_error import NotFoundError
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
 from source.models.task_filters import TaskFilters
 from source.models.task_sort import TaskSort
 from source.repositories.create_task_repository import CreateTaskRepository
 from source.repositories.delete_task_repository import DeleteTaskRepository
+from source.repositories.fake.tasks_list_filter import filter_tasks_list
 from source.repositories.get_all_tasks_repository import GetAllTasksRepository
 from source.repositories.get_task_repository import GetTaskRepository
 from source.repositories.update_task_repository import UpdateTaskRepository
 
 
-class FakeTaskRepository(
+class TasksFakeRepository(
     CreateTaskRepository,
     GetAllTasksRepository,
     GetTaskRepository,
@@ -40,14 +41,14 @@ class FakeTaskRepository(
         elements: Iterable[Task] = chain(self._tasks)
 
         if filters:
-            elements = filters.apply(elements)
-
+            elements = filter_tasks_list(self._tasks, filters)
+            
         sorted_elements: List[Task] = sort.apply(elements) if sort else list(elements)
 
         if cursor:
             sorted_elements = self._filtered_by_cursor(sorted_elements, cursor)
 
-        return map_to_filtered(sorted_elements, page_size)
+        return map_to_filtered_list(sorted_elements, page_size)
 
     def get_task(self, id: int) -> Task:
         return self._find_by_id(id)
@@ -85,4 +86,5 @@ class FakeTaskRepository(
         for i, task in enumerate(elements):
             if task.id == cursor:
                 return elements[i + 1 :]
-        return elements
+            
+        raise NotImplementedError()

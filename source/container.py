@@ -13,22 +13,31 @@ from source.services.greeting_service import GreetingService
 from source.services.login_user_service import LoginUserService
 from source.services.register_user_service import RegisterUserService
 from source.services.update_task_service import UpdateTaskService
-from source.repositories.fake_task_repository import FakeTaskRepository
-from source.repositories.fake_user_repository import FakeUserRepository
+from source.repositories.fake.tasks_fake_repository import TasksFakeRepository
+from source.repositories.fake.users_fake_repository import FakeUserRepository
 
 logger = logging.getLogger(__name__)
 
 
 class Container(containers.DeclarativeContainer):
     config = Configuration()
+    
     greeting_service = Singleton(GreetingService)
-    task_repository = Singleton(FakeTaskRepository)
-    create_task_service = Singleton(CreateTaskService, repository=task_repository)
-    get_all_tasks_service = Singleton(GetAllTasksService, repository=task_repository)
-    get_task_service = Singleton(GetTaskService, repository=task_repository)
-    update_task_service = Singleton(UpdateTaskService, repository=task_repository)
-    delete_task_service = Singleton(DeleteTaskService, repository=task_repository)
+    
+    create_task_repository = Singleton(TasksFakeRepository)
+    get_all_task_repository = Singleton(TasksFakeRepository)
+    get_task_repository = Singleton(TasksFakeRepository)
+    update_task_repository = Singleton(TasksFakeRepository)
+    delete_task_repository = Singleton(TasksFakeRepository)
+
+    create_task_service = Singleton(CreateTaskService, repository=create_task_repository)
+    get_all_tasks_service = Singleton(GetAllTasksService, repository=get_all_task_repository)
+    get_task_service = Singleton(GetTaskService, repository=get_task_repository)
+    update_task_service = Singleton(UpdateTaskService, repository=update_task_repository)
+    delete_task_service = Singleton(DeleteTaskService, repository=delete_task_repository)
+
     user_repository = Singleton(FakeUserRepository)
+
     register_user_service = Singleton(RegisterUserService, repository=user_repository)
     login_user_service = Singleton(
         LoginUserService,

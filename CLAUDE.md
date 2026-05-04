@@ -115,6 +115,23 @@ See [error-handling](.claude/commands/error-handling.md).
 
 See [dependency-injection](.claude/commands/dependency-injection.md).
 
+### Naming
+- **Function names must start with a verb** — `get_database_url`, `apply_filters`, `build_query`, not `database_url`, `filters`, `query`
+
+### File size & function length
+- **120 lines max per `.py` file** (excluding test files) — if a file exceeds this, split it before adding more code
+- **6 lines max per function body** — if a function exceeds this, extract sub-functions
+- **A `match` statement generally deserves its own dedicated function** — extract it so the calling function stays an orchestrator
+- **Prefer descriptive names over abbreviations** — `select_statement` not `stmt`, `filters` not `f`, `task_update_data` not `tud`
+- One class per file; module-level helper functions stay in the file of the class that uses them
+- If helpers are shared across classes, extract them to a dedicated `_helpers.py` or a named utility module
+
+### Parameter ordering
+- **Context before values** — engine/session comes first in function parameters, then the data values (e.g. `persist(engine, orm_object)` not `persist(orm_object, engine)`)
+
+### Typing
+- **Avoid `Any`** — use the most precise type available; `Any` silences the type checker and hides bugs. Use a base class (`Base`), a `TypeVar`, or a protocol instead
+
 ### Coding patterns
 Inheritance for variants, update operations, `fields.Enum`, generic/resource-specific schemas & entities, filter param ordering, pure functions — see [conventions](.claude/commands/conventions.md).
 

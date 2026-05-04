@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/bin/python -m flake8 source/repositories/)",
+      "Bash(.venv/bin/python -m pytest source/tests/unit/test_repositories/test_sqlalchemy_task_repository.py -v)",
+      "Bash(.venv/bin/python -m pytest source/tests/unit/test_repositories/test_sqlalchemy_task_repository.py -q)"
+    ]
+  }
+}

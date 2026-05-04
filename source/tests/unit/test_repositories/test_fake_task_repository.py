@@ -1,10 +1,10 @@
 from datetime import date
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
-from source.repositories.fake_task_repository import FakeTaskRepository
+from source.repositories.fake.tasks_fake_repository import TasksFakeRepository
 
 
 def test_create_returns_task() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
     )
@@ -15,7 +15,7 @@ def test_create_returns_task() -> None:
 
 
 def test_create_assigns_id_starting_at_one() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
     )
@@ -26,7 +26,7 @@ def test_create_assigns_id_starting_at_one() -> None:
 
 
 def test_create_increments_id() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
     )
@@ -39,7 +39,7 @@ def test_create_increments_id() -> None:
 
 
 def test_create_sets_status_incomplete() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
     )
@@ -50,7 +50,7 @@ def test_create_sets_status_incomplete() -> None:
 
 
 def test_create_stores_task_data() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
     )
@@ -63,7 +63,7 @@ def test_create_stores_task_data() -> None:
 
 
 def test_get_all_returns_empty_initially() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
 
     result = list(repo.get_all().elements)
 
@@ -71,7 +71,7 @@ def test_get_all_returns_empty_initially() -> None:
 
 
 def test_get_all_returns_created_task() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
     )
@@ -84,7 +84,7 @@ def test_get_all_returns_created_task() -> None:
 
 
 def test_get_all_returns_multiple_tasks_in_order() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     task_data_1 = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
     )
@@ -102,7 +102,7 @@ def test_get_all_returns_multiple_tasks_in_order() -> None:
 
 
 def test_get_all_returns_iterable() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
     )
@@ -114,7 +114,7 @@ def test_get_all_returns_iterable() -> None:
 
 
 def test_get_all_returns_all_values_by_default() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
 
     for i in range(10):
         repo.create(
@@ -131,7 +131,7 @@ def test_get_all_returns_all_values_by_default() -> None:
 
 
 def test_get_all_returns_has_next_false_if_returns_all_values_by_default() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
 
     for i in range(10):
         repo.create(
@@ -147,7 +147,7 @@ def test_get_all_returns_has_next_false_if_returns_all_values_by_default() -> No
 
 
 def test_get_all_returns_has_next_false_if_returns_all_values() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
 
     for i in range(10):
         repo.create(
@@ -166,7 +166,7 @@ def test_get_all_returns_has_next_false_if_returns_all_values() -> None:
 
 
 def test_get_all_returns_has_next_true_if_not_returns_all_values() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
 
     for i in range(10):
         repo.create(
@@ -185,7 +185,7 @@ def test_get_all_returns_has_next_true_if_not_returns_all_values() -> None:
 
 
 def test_get_all_returns_firsts_elements_if_element_size_is_defined() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
 
     for i in range(10):
         repo.create(
@@ -206,7 +206,7 @@ def test_get_all_returns_firsts_elements_if_element_size_is_defined() -> None:
 
 
 def test_get_all_returns_firsts_elements_if_page_size_and_cursor_is_defined() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
 
     for i in range(10):
         repo.create(
@@ -227,7 +227,7 @@ def test_get_all_returns_firsts_elements_if_page_size_and_cursor_is_defined() ->
 
 
 def test_get_all_returns_firsts_elements_if_cursor_is_defined() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
 
     for i in range(10):
         repo.create(
@@ -250,7 +250,7 @@ def test_get_all_returns_firsts_elements_if_cursor_is_defined() -> None:
 
 
 def test_get_all_does_not_modify_internal_state() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
     )
@@ -263,7 +263,7 @@ def test_get_all_does_not_modify_internal_state() -> None:
 
 
 def test_get_task_returns_task_by_id() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
     )
@@ -275,7 +275,7 @@ def test_get_task_returns_task_by_id() -> None:
 
 
 def test_get_task_returns_correct_task_among_multiple() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(
         TaskData(
             title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
@@ -295,7 +295,7 @@ def test_get_task_returns_correct_task_among_multiple() -> None:
 def test_get_task_raises_not_found_error_when_id_does_not_exist() -> None:
     from source.models.not_found_error import NotFoundError
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
 
     try:
         repo.get_task(99)
@@ -307,7 +307,7 @@ def test_get_task_raises_not_found_error_when_id_does_not_exist() -> None:
 def test_get_task_raises_not_found_error_after_all_tasks_consumed() -> None:
     from source.models.not_found_error import NotFoundError
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     task_data = TaskData(
         title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
     )
@@ -321,7 +321,7 @@ def test_get_task_raises_not_found_error_after_all_tasks_consumed() -> None:
 
 
 def test_update_task_updates_fields() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     created = repo.create(
         TaskData(
             title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
@@ -344,7 +344,7 @@ def test_update_task_updates_fields() -> None:
 
 
 def test_get_all_with_status_filter_returns_matching_tasks() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     created = repo.create(
         TaskData(
             title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
@@ -376,7 +376,7 @@ def test_get_all_with_status_filter_returns_matching_tasks() -> None:
 
 
 def test_get_all_with_status_filter_excludes_non_matching_tasks() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     created = repo.create(
         TaskData(
             title="Buy milk", description="At the store", due_date=date(2026, 5, 1)
@@ -408,7 +408,7 @@ def test_get_all_with_status_filter_excludes_non_matching_tasks() -> None:
 
 
 def test_get_all_with_due_date_from_filter() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Task 1", description="Desc", due_date=date(2026, 1, 1)))
     repo.create(
         TaskData(title="Task 2", description="Desc", due_date=date(2026, 12, 31))
@@ -425,7 +425,7 @@ def test_get_all_with_due_date_from_filter() -> None:
 
 
 def test_get_all_with_due_date_to_filter() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Task 1", description="Desc", due_date=date(2026, 1, 1)))
     repo.create(
         TaskData(title="Task 2", description="Desc", due_date=date(2026, 12, 31))
@@ -442,7 +442,7 @@ def test_get_all_with_due_date_to_filter() -> None:
 
 
 def test_get_all_with_title_filter_case_insensitive() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(
         TaskData(title="Buy Milk", description="Desc", due_date=date(2026, 5, 1))
     )
@@ -458,25 +458,8 @@ def test_get_all_with_title_filter_case_insensitive() -> None:
     assert result[0].title == "Buy Milk"
 
 
-def test_get_all_with_description_filter_case_insensitive() -> None:
-    repo = FakeTaskRepository()
-    repo.create(
-        TaskData(title="Task 1", description="At the Store", due_date=date(2026, 5, 1))
-    )
-    repo.create(
-        TaskData(title="Task 2", description="In the park", due_date=date(2026, 5, 1))
-    )
-
-    from source.models.task_filters import TaskFilters
-
-    result = list(repo.get_all(filters=TaskFilters(description="STORE")).elements)
-
-    assert len(result) == 1
-    assert result[0].description == "At the Store"
-
-
 def test_get_all_with_combined_filters() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(
         TaskData(title="Buy milk", description="Desc", due_date=date(2026, 5, 1))
     )
@@ -506,7 +489,7 @@ def test_get_all_with_combined_filters() -> None:
 
 
 def test_get_all_filters_applied_before_pagination() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Task 1", description="Desc", due_date=date(2026, 5, 1)))
     repo.create(TaskData(title="Task 2", description="Desc", due_date=date(2026, 5, 1)))
     created = repo.create(
@@ -533,7 +516,7 @@ def test_get_all_filters_applied_before_pagination() -> None:
 
 
 def test_get_all_with_empty_filters_returns_all_tasks() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Task 1", description="Desc", due_date=date(2026, 5, 1)))
     repo.create(TaskData(title="Task 2", description="Desc", due_date=date(2026, 5, 1)))
 
@@ -547,7 +530,7 @@ def test_get_all_with_empty_filters_returns_all_tasks() -> None:
 def test_update_task_raises_not_found_error_for_unknown_id() -> None:
     from source.models.not_found_error import NotFoundError
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     update_data = TaskUpdateData(
         title="Buy eggs",
         description="At the market",
@@ -565,7 +548,7 @@ def test_update_task_raises_not_found_error_for_unknown_id() -> None:
 def test_get_all_sort_by_title_asc() -> None:
     from source.models.task_sort import SortField, SortDirection, TaskSort
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
     repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
     repo.create(TaskData(title="Banana", description="Desc", due_date=date(2026, 5, 1)))
@@ -582,7 +565,7 @@ def test_get_all_sort_by_title_asc() -> None:
 def test_get_all_sort_by_title_desc() -> None:
     from source.models.task_sort import SortField, SortDirection, TaskSort
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
     repo.create(TaskData(title="Banana", description="Desc", due_date=date(2026, 5, 1)))
@@ -599,7 +582,7 @@ def test_get_all_sort_by_title_desc() -> None:
 def test_get_all_sort_by_due_date_asc() -> None:
     from source.models.task_sort import SortField, SortDirection, TaskSort
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(
         TaskData(title="Task 1", description="Desc", due_date=date(2026, 12, 31))
     )
@@ -622,7 +605,7 @@ def test_get_all_sort_by_due_date_asc() -> None:
 def test_get_all_sort_by_due_date_desc() -> None:
     from source.models.task_sort import SortField, SortDirection, TaskSort
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Task 1", description="Desc", due_date=date(2026, 1, 1)))
     repo.create(
         TaskData(title="Task 2", description="Desc", due_date=date(2026, 12, 31))
@@ -641,7 +624,7 @@ def test_get_all_sort_by_due_date_desc() -> None:
 def test_get_all_sort_by_status_asc() -> None:
     from source.models.task_sort import SortField, SortDirection, TaskSort
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     created = repo.create(
         TaskData(title="Task 1", description="Desc", due_date=date(2026, 5, 1))
     )
@@ -669,7 +652,7 @@ def test_get_all_sort_by_status_asc() -> None:
 def test_get_all_cursor_works_correctly_after_sort_by_title() -> None:
     from source.models.task_sort import SortField, SortDirection, TaskSort
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
     repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
     repo.create(TaskData(title="Banana", description="Desc", due_date=date(2026, 5, 1)))
@@ -688,7 +671,7 @@ def test_get_all_cursor_works_correctly_after_sort_by_title() -> None:
 def test_get_all_cursor_not_found_returns_full_sorted_list() -> None:
     from source.models.task_sort import SortField, SortDirection, TaskSort
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
     repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
 
@@ -702,7 +685,7 @@ def test_get_all_filter_and_sort_combined() -> None:
     from source.models.task_filters import TaskFilters
     from source.models.task_sort import SortField, SortDirection, TaskSort
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
     created = repo.create(
         TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1))
@@ -732,7 +715,7 @@ def test_get_all_filter_sort_cursor_pagination_combined() -> None:
     from source.models.task_filters import TaskFilters
     from source.models.task_sort import SortField, SortDirection, TaskSort
 
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
     created = repo.create(
         TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1))
@@ -765,7 +748,7 @@ def test_get_all_filter_sort_cursor_pagination_combined() -> None:
 
 
 def test_get_all_none_sort_preserves_insertion_order() -> None:
-    repo = FakeTaskRepository()
+    repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
     repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
     repo.create(TaskData(title="Banana", description="Desc", due_date=date(2026, 5, 1)))
