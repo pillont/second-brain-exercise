@@ -86,6 +86,14 @@ See [config](.claude/commands/config.md).
 
 See [jwt-authentication](.claude/commands/jwt-authentication.md) and [jwt_security.md](docs/jwt_security.md).
 
+### Swagger Documentation
+- Every Blueprint **must** have a `description=` parameter
+- Every endpoint **must** have `@blp.doc(summary=..., description=...)` — no docstrings
+- Decorator order: `@blp.route` → `@jwt_required()` → `@blp.doc(...)` → `@blp.arguments(...)` / `@blp.response(...)`
+- Use multi-line format when the decorator exceeds 88 characters
+
+See [serialization](.claude/commands/serialization.md) for the full pattern.
+
 ### Error Handling
 - Controllers must **not** wrap endpoint logic in `try/except` (except `auth_controller.py`)
 - Controllers must **not** log the incoming request — `request_logger.py` does it globally

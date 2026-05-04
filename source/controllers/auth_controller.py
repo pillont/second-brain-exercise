@@ -21,10 +21,13 @@ from source.models.user_already_exists_error import UserAlreadyExistsError
 from source.services.login_user_service import LoginUserService
 from source.services.register_user_service import RegisterUserService
 
-auth_blp = Blueprint("auth", __name__, url_prefix="/auth")
+auth_blp = Blueprint(
+    "auth", __name__, url_prefix="/auth", description="Authentication endpoints."
+)
 
 
 @auth_blp.route("/register", methods=["POST"])
+@auth_blp.doc(summary="Register", description="Create a new user account.")
 @auth_blp.arguments(AuthDataSchema)
 @auth_blp.response(409)
 @auth_blp.response(201, UserSchema)
@@ -45,6 +48,9 @@ def register(
 
 
 @auth_blp.route("/login", methods=["POST"])
+@auth_blp.doc(
+    summary="Login", description="Authenticate and receive a JWT access token."
+)
 @auth_blp.arguments(AuthDataSchema)
 @auth_blp.response(401)
 @auth_blp.response(200, TokenSchema)

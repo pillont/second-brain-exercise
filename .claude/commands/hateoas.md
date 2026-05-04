@@ -103,7 +103,15 @@ def to_greeting_entity(greeting: Greeting) -> GreetingEntity:
 
 **greeting_controller.py**:
 ```python
+greeting_blp = Blueprint(
+    "greeting",
+    __name__,
+    url_prefix="",
+    description="Greeting endpoints.",
+)
+
 @greeting_blp.route("/hello", methods=["GET"])
+@greeting_blp.doc(summary="Greeting", description="Returns a greeting message.")
 @greeting_blp.response(200, GreetingSchema)
 @inject
 def get_greeting(greeting_service=Provide[Container.greeting_service]) -> GreetingEntity:
