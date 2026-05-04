@@ -1,6 +1,6 @@
 from datetime import date
 from itertools import chain
-from typing import Iterable, List, Optional, Union
+from typing import Any, Iterable, List, Optional, Union
 
 from source.models.filtered_list import FilteredList, map_to_filtered_list
 from source.models.not_found_error import NotFoundError
@@ -41,12 +41,13 @@ def _is_after_cursor(
     prev_id: int,
     asc: bool,
 ) -> bool:
-    val = _get_task_sort_value(task, field)
+    val: Any = _get_task_sort_value(task, field)
     if field == SortField.ID:
-        return val > prev_id if asc else val < prev_id  # type: ignore[operator]
+        return val > prev_id if asc else val < prev_id
     if asc:
-        return val > prev_value or (val == prev_value and task.id > prev_id)  # type: ignore[operator]
-    return val < prev_value or (val == prev_value and task.id > prev_id)  # type: ignore[operator]
+        return val > prev_value or (val == prev_value and task.id > prev_id)
+
+    return val < prev_value or (val == prev_value and task.id > prev_id)
 
 
 def _filter_by_cursor(

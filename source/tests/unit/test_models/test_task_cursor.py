@@ -1,7 +1,5 @@
 from datetime import date
 
-import pytest
-
 from source.models.task import Task, TaskStatus
 from source.models.task_cursor import (
     TaskCursor,
