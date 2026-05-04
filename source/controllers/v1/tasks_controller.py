@@ -2,16 +2,16 @@ from flask_jwt_extended import jwt_required
 from flask_smorest import Blueprint
 from dependency_injector.wiring import inject, Provide
 from source.container import Container
-from source.controllers.entities.tasks_list_argument_entity import (
+from source.controllers.v1.entities.tasks_list_argument_entity import (
     TasksListArgumentEntity,
 )
-from source.controllers.entities.list_entity import ListEntity
-from source.controllers.entities.task_entity import (
+from source.controllers.v1.entities.list_entity import ListEntity
+from source.controllers.v1.entities.task_entity import (
     TaskDataEntity,
     TaskEntity,
     TaskUpdateDataEntity,
 )
-from source.controllers.mappers.task_mapper import (
+from source.controllers.v1.mappers.task_mapper import (
     map_to_filtered_tasks_list,
     to_task_cursor,
     to_task_data,
@@ -20,28 +20,28 @@ from source.controllers.mappers.task_mapper import (
     to_task_sort,
     to_task_update_data,
 )
-from source.controllers.schemas.tasks_list_argument_schema import (
+from source.controllers.v1.schemas.tasks_list_argument_schema import (
     TasksListArgumentSchema,
 )
-from source.controllers.schemas.task_data_schema import TaskDataSchema
-from source.controllers.schemas.task_schema import TasksListSchema, TaskSchema
-from source.controllers.schemas.task_update_data_schema import TaskUpdateDataSchema
+from source.controllers.v1.schemas.task_data_schema import TaskDataSchema
+from source.controllers.v1.schemas.task_schema import TasksListSchema, TaskSchema
+from source.controllers.v1.schemas.task_update_data_schema import TaskUpdateDataSchema
 from source.services.create_task_service import CreateTaskService
 from source.services.delete_task_service import DeleteTaskService
 from source.services.get_all_tasks_service import GetAllTasksService
 from source.services.get_task_service import GetTaskService
 from source.services.update_task_service import UpdateTaskService
 
-tasks_blp = Blueprint(
-    "tasks", __name__, url_prefix="/tasks", description="Task management."
+v1_tasks_blp = Blueprint(
+    "tasks", __name__, url_prefix="/v1/tasks", description="Task management."
 )
 
 
-@tasks_blp.route("/", methods=["POST"])
+@v1_tasks_blp.route("/", methods=["POST"])
 @jwt_required()
-@tasks_blp.doc(summary="Create a task", description="Create a new task.")
-@tasks_blp.arguments(TaskDataSchema)
-@tasks_blp.response(201, TaskSchema)
+@v1_tasks_blp.doc(summary="Create a task", description="Create a new task.")
+@v1_tasks_blp.arguments(TaskDataSchema)
+@v1_tasks_blp.response(201, TaskSchema)
 @inject
 def create_task(
     task_data_entity: TaskDataEntity,
@@ -51,14 +51,14 @@ def create_task(
     return to_task_entity(task)
 
 
-@tasks_blp.route("/", methods=["GET"])
+@v1_tasks_blp.route("/", methods=["GET"])
 @jwt_required()
-@tasks_blp.doc(
+@v1_tasks_blp.doc(
     summary="List tasks",
     description="Retrieve all tasks with optional filters and pagination.",
 )
-@tasks_blp.arguments(TasksListArgumentSchema, location="query")
-@tasks_blp.response(200, TasksListSchema)
+@v1_tasks_blp.arguments(TasksListArgumentSchema, location="query")
+@v1_tasks_blp.response(200, TasksListSchema)
 @inject
 def get_all_tasks(
     args: TasksListArgumentEntity,
@@ -76,11 +76,11 @@ def get_all_tasks(
     return map_to_filtered_tasks_list(all_tasks)
 
 
-@tasks_blp.route("/<int:id>", methods=["GET"])
+@v1_tasks_blp.route("/<int:id>", methods=["GET"])
 @jwt_required()
-@tasks_blp.doc(summary="Get a task", description="Retrieve a single task by its ID.")
-@tasks_blp.response(404)
-@tasks_blp.response(200, TaskSchema)
+@v1_tasks_blp.doc(summary="Get a task", description="Retrieve a single task by its ID.")
+@v1_tasks_blp.response(404)
+@v1_tasks_blp.response(200, TaskSchema)
 @inject
 def get_task(
     id: int,
@@ -90,14 +90,14 @@ def get_task(
     return to_task_entity(task)
 
 
-@tasks_blp.route("/<int:id>", methods=["PUT"])
+@v1_tasks_blp.route("/<int:id>", methods=["PUT"])
 @jwt_required()
-@tasks_blp.doc(
+@v1_tasks_blp.doc(
     summary="Update a task", description="Update an existing task by its ID."
 )
-@tasks_blp.arguments(TaskUpdateDataSchema)
-@tasks_blp.response(404)
-@tasks_blp.response(204)
+@v1_tasks_blp.arguments(TaskUpdateDataSchema)
+@v1_tasks_blp.response(404)
+@v1_tasks_blp.response(204)
 @inject
 def update_task(
     task_update_data_entity: TaskUpdateDataEntity,
@@ -107,11 +107,11 @@ def update_task(
     update_task_service.update_task(id, to_task_update_data(task_update_data_entity))
 
 
-@tasks_blp.route("/<int:id>", methods=["DELETE"])
+@v1_tasks_blp.route("/<int:id>", methods=["DELETE"])
 @jwt_required()
-@tasks_blp.doc(summary="Delete a task", description="Delete a task by its ID.")
-@tasks_blp.response(404)
-@tasks_blp.response(204)
+@v1_tasks_blp.doc(summary="Delete a task", description="Delete a task by its ID.")
+@v1_tasks_blp.response(404)
+@v1_tasks_blp.response(204)
 @inject
 def delete_task(
     id: int,

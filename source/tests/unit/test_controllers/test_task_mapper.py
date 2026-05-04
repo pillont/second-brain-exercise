@@ -1,10 +1,10 @@
 from datetime import date
-from source.controllers.entities.link import HttpMethod
-from source.controllers.entities.task_entity import (
+from source.controllers.v1.entities.link import HttpMethod
+from source.controllers.v1.entities.task_entity import (
     TaskDataEntity,
     TaskUpdateDataEntity,
 )
-from source.controllers.mappers.task_mapper import (
+from source.controllers.v1.mappers.task_mapper import (
     to_task_data,
     to_task_entity,
     to_task_update_data,
@@ -55,7 +55,7 @@ def test_to_task_entity_sets_self_link() -> None:
 
     result = to_task_entity(task)
 
-    assert result["links"]["self_link"]["href"] == "/tasks/42"
+    assert result["links"]["self_link"]["href"] == "/v1/tasks/42"
 
 
 def test_to_task_entity_sets_tasks_link() -> None:
@@ -70,7 +70,7 @@ def test_to_task_entity_sets_tasks_link() -> None:
     result = to_task_entity(task)
 
     assert isinstance(result["links"], dict)
-    assert result["links"]["tasks"]["href"] == "/tasks/"
+    assert result["links"]["tasks"]["href"] == "/v1/tasks/"
 
 
 def test_to_task_entity_sets_update_link() -> None:
@@ -84,7 +84,7 @@ def test_to_task_entity_sets_update_link() -> None:
 
     result = to_task_entity(task)
 
-    assert result["links"]["update"]["href"] == "/tasks/42"
+    assert result["links"]["update"]["href"] == "/v1/tasks/42"
     assert result["links"]["update"]["type"] == HttpMethod.PUT
 
 
@@ -99,7 +99,7 @@ def test_to_task_entity_sets_delete_link() -> None:
 
     result = to_task_entity(task)
 
-    assert result["links"]["delete"]["href"] == "/tasks/42"
+    assert result["links"]["delete"]["href"] == "/v1/tasks/42"
     assert result["links"]["delete"]["type"] == HttpMethod.DELETE
 
 
@@ -124,7 +124,7 @@ def _make_list_entity(
     sort_by=None,
     sort_direction=None,
 ):
-    from source.controllers.entities.tasks_list_argument_entity import (
+    from source.controllers.v1.entities.tasks_list_argument_entity import (
         TasksListArgumentEntity,
     )
 
@@ -142,7 +142,7 @@ def _make_list_entity(
 
 
 def test_to_task_sort_defaults_to_id_asc_when_no_params() -> None:
-    from source.controllers.mappers.task_mapper import to_task_sort
+    from source.controllers.v1.mappers.task_mapper import to_task_sort
     from source.models.task_sort import SortField, SortDirection
 
     result = to_task_sort(_make_list_entity())
@@ -152,7 +152,7 @@ def test_to_task_sort_defaults_to_id_asc_when_no_params() -> None:
 
 
 def test_to_task_sort_maps_sort_by_title() -> None:
-    from source.controllers.mappers.task_mapper import to_task_sort
+    from source.controllers.v1.mappers.task_mapper import to_task_sort
     from source.models.task_sort import SortField, SortDirection
 
     result = to_task_sort(_make_list_entity(sort_by=SortField.TITLE))
@@ -162,7 +162,7 @@ def test_to_task_sort_maps_sort_by_title() -> None:
 
 
 def test_to_task_sort_maps_sort_direction_desc() -> None:
-    from source.controllers.mappers.task_mapper import to_task_sort
+    from source.controllers.v1.mappers.task_mapper import to_task_sort
     from source.models.task_sort import SortField, SortDirection
 
     result = to_task_sort(_make_list_entity(sort_direction=SortDirection.DESC))
@@ -172,7 +172,7 @@ def test_to_task_sort_maps_sort_direction_desc() -> None:
 
 
 def test_to_task_sort_maps_sort_by_and_direction() -> None:
-    from source.controllers.mappers.task_mapper import to_task_sort
+    from source.controllers.v1.mappers.task_mapper import to_task_sort
     from source.models.task_sort import SortField, SortDirection
 
     result = to_task_sort(
