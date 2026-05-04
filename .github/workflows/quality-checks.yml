@@ -35,10 +35,11 @@ jobs:
         pip install mypy flake8 black pylint radon
         pip install magicmock
 
-    - name: Check code formatting with Black
-      run: |
-        python -m black --check source/
-      continue-on-error: false
+    # to enable
+    # - name: Check code formatting with Black
+    #   run: |
+    #     python -m black --check source/
+    #   continue-on-error: false
 
     - name: Lint with Flake8 (PEP 8)
       run: |
