@@ -7,21 +7,26 @@ from typing import Any, Callable, List, cast
 from dependency_injector import containers
 from dependency_injector import providers
 from source.config.app_config import AppConfig
-from source.repositories.sqlalchemy.tasks.repositories.create.create_task_sqlalchemy_repository import (
-    CreateTaskSqlalchemyRepository,
-)
-from source.repositories.sqlalchemy.tasks.repositories.delete_task_sqlalchemy_repository import (
-    DeleteTaskSqlalchemyRepository,
-)
-from source.repositories.sqlalchemy.tasks.repositories.get_all.get_all_tasks_sqlalchemy_repository import (
-    GetAllTasksSqlalchemyRepository,
-)
-from source.repositories.sqlalchemy.tasks.repositories.get_task_sqlalchemy_repository import (
-    GetTaskSqlalchemyRepository,
-)
-from source.repositories.sqlalchemy.tasks.repositories.update_task_sqlalchemy_repository import (
-    UpdateTaskSqlalchemyRepository,
-)
+from source.repositories.sqlalchemy.tasks.repositories\
+    .create.create_task_sqlalchemy_repository import (
+        CreateTaskSqlalchemyRepository,
+    )
+from source.repositories.sqlalchemy.tasks.repositories\
+    .delete_task_sqlalchemy_repository import (
+        DeleteTaskSqlalchemyRepository,
+    )
+from source.repositories.sqlalchemy.tasks.repositories\
+    .get_all.get_all_tasks_sqlalchemy_repository import (
+        GetAllTasksSqlalchemyRepository,
+    )
+from source.repositories.sqlalchemy.tasks.repositories\
+    .get_task_sqlalchemy_repository import (
+        GetTaskSqlalchemyRepository,
+    )
+from source.repositories.sqlalchemy.tasks.repositories\
+    .update_task_sqlalchemy_repository import (
+        UpdateTaskSqlalchemyRepository,
+    )
 from source.services.create_task_service import CreateTaskService
 from source.services.delete_task_service import DeleteTaskService
 from source.services.get_all_tasks_service import GetAllTasksService

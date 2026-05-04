@@ -18,12 +18,14 @@ from source.repositories.sqlalchemy.tasks.repositories.get_all.tasks_sorter impo
 )
 from source.repositories.sqlalchemy.session_utils import OrmSession, initialize_schema
 from source.repositories.sqlalchemy.tasks.task_orm_model import TaskOrmModel
-from source.repositories.sqlalchemy.tasks.repositories.create.task_sqlalchemy_mapper import (
-    to_task,
-)
-from source.repositories.sqlalchemy.tasks.repositories.get_all.tasks_statement_filter import (
-    apply_tasks_filters,
-)
+from source.repositories.sqlalchemy.tasks\
+    .repositories.create.task_sqlalchemy_mapper import (
+        to_task,
+    )
+from source.repositories.sqlalchemy.tasks\
+    .repositories.get_all.tasks_statement_filter import (
+        apply_tasks_filters,
+    )
 
 
 def _build_query_without_cursor(
