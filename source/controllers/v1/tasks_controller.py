@@ -1,15 +1,16 @@
+from dependency_injector.wiring import Provide, inject
 from flask_jwt_extended import jwt_required
 from flask_smorest import Blueprint
-from dependency_injector.wiring import inject, Provide
+
 from source.container import Container
-from source.controllers.v1.entities.tasks_list_argument_entity import (
-    TasksListArgumentEntity,
-)
 from source.controllers.v1.entities.list_entity import ListEntity
 from source.controllers.v1.entities.task_entity import (
     TaskDataEntity,
     TaskEntity,
     TaskUpdateDataEntity,
+)
+from source.controllers.v1.entities.tasks_list_argument_entity import (
+    TasksListArgumentEntity,
 )
 from source.controllers.v1.mappers.task_mapper import (
     map_to_filtered_tasks_list,
@@ -20,12 +21,12 @@ from source.controllers.v1.mappers.task_mapper import (
     to_task_sort,
     to_task_update_data,
 )
+from source.controllers.v1.schemas.task_data_schema import TaskDataSchema
+from source.controllers.v1.schemas.task_schema import TaskSchema, TasksListSchema
+from source.controllers.v1.schemas.task_update_data_schema import TaskUpdateDataSchema
 from source.controllers.v1.schemas.tasks_list_argument_schema import (
     TasksListArgumentSchema,
 )
-from source.controllers.v1.schemas.task_data_schema import TaskDataSchema
-from source.controllers.v1.schemas.task_schema import TasksListSchema, TaskSchema
-from source.controllers.v1.schemas.task_update_data_schema import TaskUpdateDataSchema
 from source.services.create_task_service import CreateTaskService
 from source.services.delete_task_service import DeleteTaskService
 from source.services.get_all_tasks_service import GetAllTasksService

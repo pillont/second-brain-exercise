@@ -7,7 +7,12 @@
       "Bash(.venv/bin/python -m pytest source/tests/unit/test_repositories/test_sqlalchemy_task_repository.py -x -q)",
       "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py::test_get_tasks_returns_list_of_tasks -q)",
       "Bash(.venv/bin/python -m pytest source/tests/unit/test_repositories/test_sqlalchemy_task_repository.py::test_get_all_combined_filters -q)",
-      "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py::test_get_tasks_filter_by_description -q)"
+      "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py::test_get_tasks_filter_by_description -q)",
+      "Bash(.venv/bin/python -m pytest source/tests/integration/test_root_controller.py -v)",
+      "Bash(.venv/bin/python -m pytest source/tests/integration/ -v --tb=short --cov=source --cov-append --cov-report=term-missing)",
+      "Bash(.venv/bin/python -m pylint source/ --init-hook='import sys; sys.path.insert\\(0, \".\"\\)' --extension-pkg-allow-list=dependency_injector --disable=C0111,C0103,R0903,W0621,R0801 --exit-zero)",
+      "Bash(.venv/bin/python -m radon cc source/ -a --show-closures)",
+      "Bash(.venv/bin/python -m radon mi source/ -nb -s)"
     ]
   }
 }

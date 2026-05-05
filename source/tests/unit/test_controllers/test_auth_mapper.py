@@ -1,4 +1,5 @@
 import pytest
+
 from source.config.app_config import get_app_config
 from source.config.flask_config import TestingFlaskConfig
 from source.controllers.v1.entities.auth_entity import AuthDataEntity

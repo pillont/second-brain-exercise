@@ -1,4 +1,5 @@
 from marshmallow import Schema, fields, post_load
+
 from source.controllers.v1.entities.task_entity import TaskDataEntity
 
 

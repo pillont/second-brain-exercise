@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 from typing import NotRequired, TypedDict
 
 
@@ -7,6 +7,7 @@ class AppConfig(TypedDict):
     LOG_LEVEL: int
     JWT_SECRET_KEY: str
     DATABASE_URL: NotRequired[str]
+    SLOW_REQUEST_THRESHOLD_MS: int
 
 
 JWT_SECRET_KEY: str = os.environ.get(
@@ -25,6 +26,7 @@ def get_app_config(config_name: str = "development") -> AppConfig:
                 "LOG_LEVEL": logging.DEBUG,
                 "JWT_SECRET_KEY": JWT_SECRET_KEY,
                 "DATABASE_URL": _get_database_url(),
+                "SLOW_REQUEST_THRESHOLD_MS": 2000,
             }
 
         case "testing":
@@ -32,6 +34,7 @@ def get_app_config(config_name: str = "development") -> AppConfig:
                 "LOG_LEVEL": logging.WARNING,
                 "JWT_SECRET_KEY": "test-jwt-secret",
                 "DATABASE_URL": "sqlite:///:memory:",
+                "SLOW_REQUEST_THRESHOLD_MS": 9999,
             }
 
         case "production":
@@ -39,6 +42,7 @@ def get_app_config(config_name: str = "development") -> AppConfig:
                 "LOG_LEVEL": logging.INFO,
                 "JWT_SECRET_KEY": JWT_SECRET_KEY,
                 "DATABASE_URL": _get_database_url(),
+                "SLOW_REQUEST_THRESHOLD_MS": 500,
             }
 
         case "default":
@@ -46,6 +50,7 @@ def get_app_config(config_name: str = "development") -> AppConfig:
                 "LOG_LEVEL": logging.INFO,
                 "JWT_SECRET_KEY": JWT_SECRET_KEY,
                 "DATABASE_URL": _get_database_url(),
+                "SLOW_REQUEST_THRESHOLD_MS": 500,
             }
 
         case _:

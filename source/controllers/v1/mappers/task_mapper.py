@@ -1,6 +1,13 @@
 from typing import Optional
 
+from source.controllers.v1.entities.link import HttpMethod, LinkEntity
 from source.controllers.v1.entities.list_entity import ListEntity
+from source.controllers.v1.entities.task_entity import (
+    TaskDataEntity,
+    TaskEntity,
+    TaskLinks,
+    TaskUpdateDataEntity,
+)
 from source.controllers.v1.entities.tasks_list_argument_entity import (
     TasksListArgumentEntity,
 )
@@ -10,13 +17,6 @@ from source.models.task import Task, TaskData, TaskUpdateData
 from source.models.task_cursor import TaskCursor, decode_task_cursor
 from source.models.task_filters import TaskFilters
 from source.models.task_sort import SortDirection, SortField, TaskSort
-from source.controllers.v1.entities.task_entity import (
-    TaskDataEntity,
-    TaskEntity,
-    TaskLinks,
-    TaskUpdateDataEntity,
-)
-from source.controllers.v1.entities.link import HttpMethod, LinkEntity
 
 
 def to_task_filters(entity: TasksListArgumentEntity) -> TaskFilters:

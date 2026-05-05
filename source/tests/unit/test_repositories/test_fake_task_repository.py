@@ -1,4 +1,5 @@
 from datetime import date
+
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
 from source.models.task_cursor import TaskCursor
 from source.repositories.fake.tasks_fake_repository import TasksFakeRepository
@@ -552,7 +553,7 @@ def test_update_task_raises_not_found_error_for_unknown_id() -> None:
 
 
 def test_get_all_sort_by_title_asc() -> None:
-    from source.models.task_sort import SortField, SortDirection, TaskSort
+    from source.models.task_sort import SortDirection, SortField, TaskSort
 
     repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
@@ -569,7 +570,7 @@ def test_get_all_sort_by_title_asc() -> None:
 
 
 def test_get_all_sort_by_title_desc() -> None:
-    from source.models.task_sort import SortField, SortDirection, TaskSort
+    from source.models.task_sort import SortDirection, SortField, TaskSort
 
     repo = TasksFakeRepository()
     repo.create(TaskData(title="Apple", description="Desc", due_date=date(2026, 5, 1)))
@@ -586,7 +587,7 @@ def test_get_all_sort_by_title_desc() -> None:
 
 
 def test_get_all_sort_by_due_date_asc() -> None:
-    from source.models.task_sort import SortField, SortDirection, TaskSort
+    from source.models.task_sort import SortDirection, SortField, TaskSort
 
     repo = TasksFakeRepository()
     repo.create(
@@ -609,7 +610,7 @@ def test_get_all_sort_by_due_date_asc() -> None:
 
 
 def test_get_all_sort_by_due_date_desc() -> None:
-    from source.models.task_sort import SortField, SortDirection, TaskSort
+    from source.models.task_sort import SortDirection, SortField, TaskSort
 
     repo = TasksFakeRepository()
     repo.create(TaskData(title="Task 1", description="Desc", due_date=date(2026, 1, 1)))
@@ -628,7 +629,7 @@ def test_get_all_sort_by_due_date_desc() -> None:
 
 
 def test_get_all_sort_by_status_asc() -> None:
-    from source.models.task_sort import SortField, SortDirection, TaskSort
+    from source.models.task_sort import SortDirection, SortField, TaskSort
 
     repo = TasksFakeRepository()
     created = repo.create(
@@ -656,8 +657,8 @@ def test_get_all_sort_by_status_asc() -> None:
 
 
 def test_get_all_cursor_works_correctly_after_sort_by_title() -> None:
-    from source.models.task_sort import SortField, SortDirection, TaskSort
     from source.models.task_cursor import decode_task_cursor
+    from source.models.task_sort import SortDirection, SortField, TaskSort
 
     repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
@@ -681,7 +682,7 @@ def test_get_all_cursor_works_correctly_after_sort_by_title() -> None:
 
 def test_get_all_filter_and_sort_combined() -> None:
     from source.models.task_filters import TaskFilters
-    from source.models.task_sort import SortField, SortDirection, TaskSort
+    from source.models.task_sort import SortDirection, SortField, TaskSort
 
     repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))
@@ -710,9 +711,9 @@ def test_get_all_filter_and_sort_combined() -> None:
 
 
 def test_get_all_filter_sort_cursor_pagination_combined() -> None:
-    from source.models.task_filters import TaskFilters
-    from source.models.task_sort import SortField, SortDirection, TaskSort
     from source.models.task_cursor import decode_task_cursor
+    from source.models.task_filters import TaskFilters
+    from source.models.task_sort import SortDirection, SortField, TaskSort
 
     repo = TasksFakeRepository()
     repo.create(TaskData(title="Cherry", description="Desc", due_date=date(2026, 5, 1)))

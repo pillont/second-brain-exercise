@@ -1,10 +1,15 @@
 import base64
 import json
 from datetime import date
-from typing import Final, Union
+from typing import Final, TypedDict, Union
 
 from source.models.task import Task, TaskStatus
 from source.models.task_sort import SortField, TaskSort
+
+
+class _TaskCursorPayload(TypedDict):
+    v: str
+    id: int
 
 
 class TaskCursor:
@@ -15,12 +20,12 @@ class TaskCursor:
 
 def encode_task_cursor(task: Task, sort: TaskSort) -> str:
     value = _extract_sort_value(task, sort.field)
-    payload = json.dumps({"v": value, "id": task.id})
-    return base64.b64encode(payload.encode()).decode()
+    payload: _TaskCursorPayload = {"v": value, "id": task.id}
+    return base64.b64encode(json.dumps(payload).encode()).decode()
 
 
 def decode_task_cursor(cursor_b64: str) -> TaskCursor:
-    payload = json.loads(base64.b64decode(cursor_b64).decode())
+    payload: _TaskCursorPayload = json.loads(base64.b64decode(cursor_b64).decode())
     return TaskCursor(sort_value=payload["v"], id=payload["id"])
 
 

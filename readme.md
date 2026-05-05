@@ -1,178 +1,150 @@
-# Exercise: Building a Simple Task Management API
+# Task Management API
 
-## Objective:
-Design and implement a RESTful API for managing tasks. The API should allow users to create, retrieve, update, and delete tasks. Additionally, implement user authentication to secure the API.
+A RESTful task management API built with Flask, implementing JWT authentication, HATEOAS, cursor-based pagination, and a clean 5-layer MVC architecture.
 
-## Requirements:
-
-### Task Model:
-
-Define a Task model with the following attributes:
-* ID (auto-generated)
-* Title
-* Description
-* Due Date
-* Status (e.g., "Incomplete," "Complete")
-
-### API Endpoints:
-
-Implement the following RESTful endpoints using a framework of your choice (e.g., Flask, Express, Django):
-* POST /tasks: Create a new task.
-* GET /tasks: Retrieve a list of all tasks.
-* GET /tasks/{id}: Retrieve details of a specific task by ID.
-* PUT /tasks/{id}: Update the details of a specific task.
-* DELETE /tasks/{id}: Delete a specific task.
-
-### User Authentication:
-
-* Implement a simple user authentication system using JWT.
-* Create endpoints for user registration and login.
-* Ensure that task-related endpoints are protected and can only be accessed by authenticated users.
-
-### Validation and Error Handling:
-
-* Implement proper input validation for task creation and update.
-* Handle errors gracefully and return meaningful error messages with appropriate HTTP status codes.
-
-### Testing:
-
-* Write unit tests for at least one endpoint.
-* Include tests for both successful and unsuccessful scenarios.
-
-## Additional Considerations (Optional):
-
-* Implement pagination for the list of tasks to manage large datasets.
-* Add filtering options to retrieve tasks based on status, due date, etc.
-* Include sorting options for the list of tasks.
-* Use a database of your choice (e.g., SQLite, PostgreSQL) to persist task and user data.
-
-## Submission:
-Share the codebase along with a README file explaining how to set up and run the application. Include details on API usage, authentication, and any additional features implemented.
-
+---
 
 ## Quick Start
 
 ### Prerequisites
-- Python 3.8 or higher
-- pip (Python package manager)
-- Virtual environment (recommended)
 
-### Installation
+- Python 3.14
+- pip
 
-1. **Set up virtual environment** (optional but recommended):
+### Install
+
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
-
-2. **Install dependencies**:
-```bash
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Running the API
+### Run
 
-**Option 1 — VS Code (recommended)**: press **F5** (Run & Debug). The server starts and the Swagger UI opens automatically in the browser.
+**VS Code (recommended):** press **F5** — the server starts and Swagger UI opens automatically.
 
-**Option 2 — terminal**: always run from the project root using `-m` (not `python source/app.py`):
+**Terminal:**
+
 ```bash
 .venv/bin/python -m source.app
 ```
 
-The API runs on **http://127.0.0.1:5001** (port 5001, not 5000 — macOS AirPlay Receiver occupies port 5000).
+The API runs on **http://127.0.0.1:5001** (port 5001 — macOS AirPlay Receiver occupies 5000).
 
 Swagger UI: **http://127.0.0.1:5001/swagger-ui**
 
-### Testing the API
+### Test & Lint
 
-**Example 1: Using curl**
 ```bash
-curl http://127.0.0.1:5001/hello
+# Tests
+python -m pytest source/tests/ -v
+python -m pytest source/tests/unit/ -v
+python -m pytest source/tests/integration/ -v
+python -m pytest source/tests/ --cov=source --cov-report=html
+
+# Quality checks
+python -m flake8 source/
+python -m black source/
+python -m mypy source/
+python -m pylint source/ --disable=C0111
 ```
 
-Expected response:
-```json
-{
-  "id": 1,
-  "message": "Hello from API!"
-}
-```
+---
+
+## Exercise
+
+The original exercise brief: [EXERCISE.md](./EXERCISE.md)
+
+---
+
+## What Was Built
 
 ### Project Structure
 
-The project follows a **5-layer MVC architecture** for clean separation of concerns:
+5-layer MVC: `config → models → repositories → services → controllers`.
 
-```
-source/
-├── __init__.py           # Flask app factory (create_app function)
-├── app.py                # Application entry point
-├── config.py             # Configuration by environment
-├── container.py          # Dependency injection container
-├── controllers/          # HTTP endpoints and request handling
-├── services/             # Business logic and validation
-├── repositories/         # Data access layer (future)
-├── models/               # Domain entities
-├── utils/                # Helper functions and decorators
-└── tests/                # Unit and integration tests
-```
+Each layer has a single responsibility — no business logic in controllers, no HTTP concepts in services.
+See [project-structure](.claude/commands/project-structure.md) for the full file tree and layer responsibilities.
 
-For detailed architecture documentation, see [source/architecture.md](source/architecture.md)
+### Code Conventions
 
-## Implementation Decisions for Future Development
+- PEP 8: snake_case, 88-char line limit, `black` formatting
+- No comments or docstrings — code is self-documenting through naming
+- 120-line max per file, 6-line max per function body
+- Function names always start with a verb (`get_`, `apply_`, `build_`)
+- Module-level pure functions over private class methods when `self` is not needed
 
-### 1. Dependency Injection
-- **Library**: `dependency-injector` for professional-grade service management
-- **Pattern**: Services are singleton instances registered in container
-- **Injection**: Use `@inject` decorator in controllers with `Provide[Container.service_name]`
-- **Never**: Don't use static methods or manual instantiation
+See [conventions](.claude/commands/conventions.md).
 
-### 2. Service Definition
-- Services must be **instance methods** (not static)
-- Services can receive dependencies via constructor (injected by container)
-- Services contain pure business logic, not HTTP handling
+### SOLID & Dependency Injection
 
-Example service pattern:
-```python
-class MyService:
-    def __init__(self, repository):
-        self.repository = repository
-    
-    def do_something(self, param):
-        return self.repository.query(param)
-```
+ISP is applied at every layer: one interface (ABC) per operation in both `repositories/` and `services/` — e.g. `CreateTaskRepository`, `GetAllTasksRepository`, `UpdateTaskRepository`. No fat interfaces.
 
-### 3. Container Registration
-All services must be registered in `source/container.py`:
-```python
-class Container(containers.DeclarativeContainer):
-    my_repository = providers.Singleton(MyRepository)
-    my_service = providers.Singleton(MyService, repository=my_repository)
-```
+The DI container wires dependencies automatically. Controllers are registered via `pkgutil.walk_packages` — no manual listing. Each provider maps to exactly one interface, even for fakes.
 
-And wired in `source/__init__.py`:
-```python
-container.wire(modules=['source.controllers.my_controller'])
-```
+See [dependency-injection](.claude/commands/dependency-injection.md).
 
-### 4. Controller Endpoints
-Endpoints must use `@inject` decorator:
-```python
-@inject
-def my_endpoint(my_service=Provide[Container.my_service]):
-    return my_service.do_something()
-```
+### Type Safety
 
-### 5. Code Style
-- **No docstrings**: Only inline comments if logic is not obvious
-- **Type hints**: All function parameters and returns must have types
-- **Logging**: Use logger.info/warning/error for tracking
-- **Errors**: Return JSON errors with appropriate HTTP status codes
+100% type-annotated codebase validated with MyPy. No `Any` — the most precise type is always used. `Final` is applied to every immutable `__init__` attribute across all classes.
 
----
+### RESTful API + HATEOAS
 
-For detailed architecture documentation, see [source/architecture.md](source/architecture.md)
+Every response includes a `_links` object so clients can navigate the API without hardcoding URLs. Link construction is isolated in dedicated mapper files — never inline in controllers.
 
----
+Swagger UI is auto-generated from code via `flask-smorest` — no YAML, no hand-written OpenAPI specs.
 
-Note:
-Feel free to use any programming language, framework, or additional libraries that you are comfortable with. The exercise is designed to assess your skills in API design, database interaction, user authentication, and testing.
+See [hateoas](.claude/commands/hateoas.md) and [serialization](.claude/commands/serialization.md).
+
+### Testing (2 Levels)
+
+**Unit tests** (`source/tests/unit/`) — services, repositories, models, and mappers tested in isolation using in-memory fakes.
+
+**Integration tests** (`source/tests/integration/`) — full HTTP stack: real Flask app, fakes injected via the DI container, no mocks. Tests exercise the complete request/response cycle including serialization, JWT validation, and error handling.
+
+See [testing-conventions](.claude/commands/testing-conventions.md).
+
+### JWT Authentication
+
+`@jwt_required()` protects all task endpoints. Passwords are hashed with `werkzeug`. Token creation is isolated in `auth_mapper.py` — services stay free of HTTP concerns.
+
+See [jwt_security.md](docs/jwt_security.md) and [jwt-authentication](.claude/commands/jwt-authentication.md).
+
+### Volume Management
+
+#### Pagination & Filtering
+
+`GET /v1/tasks` supports **cursor-based pagination** — more robust than offset-based: no duplicate rows when data is inserted or deleted between pages. Supports filtering by `status`, `title`, `due_date_from`, `due_date_to` and sorting by any field (`id`, `title`, `due_date`, `status`) in either direction.
+
+Inspired by: [Pagination Demystified — Three Layers You Shouldn't Mix Up](https://medium.com/@tpierrain/pagination-demystified-three-layers-you-shouldnt-mix-up-b5cca3b8e755)
+
+See [pagination.md](docs/pagination.md) for the cursor encoding strategy and filter implementation details.
+
+#### Database Indexes
+
+`title`, `due_date`, and `status` are indexed at the SQLAlchemy ORM level — filter and sort queries stay performant as the dataset grows, with no manual migration required.
+
+### SQLAlchemy Integration
+
+Repository pattern with one class per operation, each in its own file. The SQLAlchemy engine is declared as `providers.Singleton` in the DI container so all repositories share the same connection pool.
+
+See [sqlalchemy-repositories](.claude/commands/sqlalchemy-repositories.md).
+
+### CI/CD
+
+Every push and PR runs: `flake8`, `black --check`, `mypy`, `pylint`, and `pytest` via GitHub Actions.
+
+See [CI-CD.md](.github/CI-CD.md).
+
+### Claude Integration (Vibe Coding)
+
+This project is fully configured for AI-assisted development with [Claude Code](https://claude.ai/code).
+
+**What's in place:**
+
+- **[CLAUDE.md](./CLAUDE.md)** — project instructions loaded automatically into every Claude session: architecture rules, naming conventions, layer responsibilities, and coding standards
+- **[.claude/commands/](.claude/commands/)** — skill files for each convention (HATEOAS, serialization, JWT, DI, error handling, testing…) referenced directly from CLAUDE.md and invocable as slash commands
+- **[.claude/settings.json](.claude/settings.json)** — pre-authorized tools and permissions so Claude can run tests, linters, and the dev server without interruption
+- **Memory system** — cross-session memory stores feedback, decisions, and project context so Claude maintains consistency across conversations
+
+The result: Claude understands the full architecture, applies the conventions automatically, and can take a feature from model to integration test without guidance on structure or style.
