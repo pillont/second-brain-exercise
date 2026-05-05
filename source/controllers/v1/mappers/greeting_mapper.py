@@ -1,6 +1,6 @@
-from source.models.greeting import Greeting
 from source.controllers.v1.entities.greeting_entity import GreetingEntity
 from source.controllers.v1.entities.link import LinkEntity, LinksEntity
+from source.models.greeting import Greeting
 
 
 def _build_links() -> LinksEntity:

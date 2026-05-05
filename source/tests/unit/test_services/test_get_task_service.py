@@ -1,7 +1,8 @@
 from datetime import date
 from unittest.mock import MagicMock
-from source.models.task import Task, TaskStatus
+
 from source.models.not_found_error import NotFoundError
+from source.models.task import Task, TaskStatus
 from source.services.get_task_service import GetTaskService
 
 

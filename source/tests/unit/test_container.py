@@ -1,25 +1,15 @@
 from source.container import Container
 from source.repositories.fake.tasks_fake_repository import TasksFakeRepository
-from source.repositories.sqlalchemy.tasks.repositories\
-    .create.create_task_sqlalchemy_repository import (
-        CreateTaskSqlalchemyRepository,
-    )
-from source.repositories.sqlalchemy.tasks.repositories\
-    .delete_task_sqlalchemy_repository import (
-        DeleteTaskSqlalchemyRepository,
-    )
-from source.repositories.sqlalchemy.tasks.repositories\
-    .get_all.get_all_tasks_sqlalchemy_repository import (
-        GetAllTasksSqlalchemyRepository,
-    )
-from source.repositories.sqlalchemy.tasks.repositories\
-    .get_task_sqlalchemy_repository import (
-        GetTaskSqlalchemyRepository,
-    )
-from source.repositories.sqlalchemy.tasks.repositories\
-    .update_task_sqlalchemy_repository import (
-        UpdateTaskSqlalchemyRepository,
-    )
+from source.repositories.sqlalchemy.tasks.repositories.create.create_task_sqlalchemy_repository import \
+    CreateTaskSqlalchemyRepository
+from source.repositories.sqlalchemy.tasks.repositories.delete_task_sqlalchemy_repository import \
+    DeleteTaskSqlalchemyRepository
+from source.repositories.sqlalchemy.tasks.repositories.get_all.get_all_tasks_sqlalchemy_repository import \
+    GetAllTasksSqlalchemyRepository
+from source.repositories.sqlalchemy.tasks.repositories.get_task_sqlalchemy_repository import \
+    GetTaskSqlalchemyRepository
+from source.repositories.sqlalchemy.tasks.repositories.update_task_sqlalchemy_repository import \
+    UpdateTaskSqlalchemyRepository
 
 
 def _get_container(is_fake: bool) -> Container:

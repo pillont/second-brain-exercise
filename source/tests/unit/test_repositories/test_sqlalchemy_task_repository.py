@@ -10,14 +10,10 @@ from source.models.task_cursor import TaskCursor, decode_task_cursor
 from source.models.task_filters import TaskFilters
 from source.models.task_sort import SortDirection, SortField, TaskSort
 from source.repositories.sqlalchemy.tasks.repositories import (
-    CreateTaskSqlalchemyRepository,
-    DeleteTaskSqlalchemyRepository,
-    GetTaskSqlalchemyRepository,
-    UpdateTaskSqlalchemyRepository,
-)
-from source.repositories.sqlalchemy.tasks.repositories.get_all import (
-    GetAllTasksSqlalchemyRepository,
-)
+    CreateTaskSqlalchemyRepository, DeleteTaskSqlalchemyRepository,
+    GetTaskSqlalchemyRepository, UpdateTaskSqlalchemyRepository)
+from source.repositories.sqlalchemy.tasks.repositories.get_all import \
+    GetAllTasksSqlalchemyRepository
 
 TASK_DATA = TaskData(
     title="Buy milk", description="At the store", due_date=date(2026, 5, 1)

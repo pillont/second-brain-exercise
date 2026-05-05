@@ -3,7 +3,8 @@ from typing import Final
 from sqlalchemy.engine import Engine
 
 from source.models.task import TaskUpdateData
-from source.repositories.sqlalchemy.session_utils import OrmSession, initialize_schema
+from source.repositories.sqlalchemy.session_utils import (OrmSession,
+                                                          initialize_schema)
 from source.repositories.sqlalchemy.tasks.task_orm_model import TaskOrmModel
 from source.repositories.update_task_repository import UpdateTaskRepository
 

@@ -2,6 +2,7 @@ from datetime import date
 from itertools import chain
 from typing import Iterable, List
 from unittest.mock import MagicMock
+
 from source.models.filtered_list import FilteredList
 from source.models.task import Task, TaskStatus
 from source.models.task_cursor import TaskCursor
@@ -84,8 +85,8 @@ def test_get_all_tasks_returns_multiple_tasks() -> None:
 
 
 def test_get_all_tasks_passes_filters_to_repository() -> None:
-    from source.models.task_filters import TaskFilters
     from source.models.task import TaskStatus
+    from source.models.task_filters import TaskFilters
 
     mock_repo = MagicMock()
     mock_repo.get_all.return_value = FilteredList(iter([]), False)
@@ -109,8 +110,8 @@ def test_get_all_tasks_passes_cursor_and_page_size_to_repository() -> None:
 
 
 def test_get_all_tasks_passes_all_params_to_repository() -> None:
-    from source.models.task_filters import TaskFilters
     from source.models.task import TaskStatus
+    from source.models.task_filters import TaskFilters
 
     mock_repo = MagicMock()
     mock_repo.get_all.return_value = FilteredList(iter([]), False)
@@ -136,7 +137,7 @@ def test_get_all_tasks_propagates_repository_error() -> None:
 
 
 def test_get_all_tasks_passes_sort_to_repository() -> None:
-    from source.models.task_sort import TaskSort, SortField
+    from source.models.task_sort import SortField, TaskSort
 
     mock_repo = MagicMock()
     mock_repo.get_all.return_value = FilteredList(iter([]), False)
@@ -149,9 +150,9 @@ def test_get_all_tasks_passes_sort_to_repository() -> None:
 
 
 def test_get_all_tasks_passes_all_params_including_sort_to_repository() -> None:
-    from source.models.task_filters import TaskFilters
-    from source.models.task_sort import TaskSort, SortField, SortDirection
     from source.models.task import TaskStatus
+    from source.models.task_filters import TaskFilters
+    from source.models.task_sort import SortDirection, SortField, TaskSort
 
     mock_repo = MagicMock()
     mock_repo.get_all.return_value = FilteredList(iter([]), False)

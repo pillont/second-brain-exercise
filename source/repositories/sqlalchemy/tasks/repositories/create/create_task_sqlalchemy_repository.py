@@ -4,13 +4,11 @@ from sqlalchemy.engine import Engine
 
 from source.models.task import Task, TaskData
 from source.repositories.create_task_repository import CreateTaskRepository
-from source.repositories.sqlalchemy.session_utils import OrmSession, initialize_schema
+from source.repositories.sqlalchemy.session_utils import (OrmSession,
+                                                          initialize_schema)
+from source.repositories.sqlalchemy.tasks.repositories.create.task_sqlalchemy_mapper import (
+    to_orm_task, to_task)
 from source.repositories.sqlalchemy.tasks.task_orm_model import TaskOrmModel
-from source.repositories.sqlalchemy.tasks.repositories\
-    .create.task_sqlalchemy_mapper import (
-        to_orm_task,
-        to_task,
-    )
 
 
 class CreateTaskSqlalchemyRepository(CreateTaskRepository):

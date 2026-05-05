@@ -1,8 +1,9 @@
 import logging
 from logging import Logger
-from source.create_app import create_app
+
 from source.config.app_config import get_app_config
 from source.config.flask_config import get_flask_config
+from source.create_app import create_app
 
 
 def _init_logger() -> Logger:

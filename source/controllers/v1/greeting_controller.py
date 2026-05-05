@@ -1,6 +1,8 @@
 import logging
+
+from dependency_injector.wiring import Provide, inject
 from flask_smorest import Blueprint
-from dependency_injector.wiring import inject, Provide
+
 from source.container import Container
 from source.controllers.v1.entities.greeting_entity import GreetingEntity
 from source.controllers.v1.mappers.greeting_mapper import to_greeting_entity

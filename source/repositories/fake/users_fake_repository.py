@@ -3,13 +3,12 @@ from typing import List
 from source.models.not_found_error import NotFoundError
 from source.models.user import HashedUserData, User
 from source.models.user_already_exists_error import UserAlreadyExistsError
-from source.repositories.get_user_by_username_repository import (
-    GetUserByUsernameRepository,
-)
+from source.repositories.get_user_by_username_repository import \
+    GetUserByUsernameRepository
 from source.repositories.register_user_repository import RegisterUserRepository
 
 
-class FakeUserRepository(RegisterUserRepository, GetUserByUsernameRepository):
+class UsersFakeRepository(RegisterUserRepository, GetUserByUsernameRepository):
     def __init__(self) -> None:
         self._users: List[User] = []
         self._next_id: int = 1

@@ -10,7 +10,7 @@ from flask_smorest import Api, Blueprint
 import source.controllers.v1
 from source.config.app_config import AppConfig
 from source.config.flask_config import FlaskConfig
-from source.container import setup_container, Container
+from source.container import Container, setup_container
 from source.controllers.utils.error_handlers import register_error_handlers
 from source.controllers.utils.request_logger import register_request_logger
 
@@ -50,7 +50,6 @@ def _iter_controller_modules() -> Iterator[pkgutil.ModuleInfo]:
     return controllers
 
 
-
 def _register_blueprints(app: FlaskApp) -> None:
     api = Api(app)
     for info in _iter_controller_modules():
@@ -58,14 +57,15 @@ def _register_blueprints(app: FlaskApp) -> None:
         _register_module_blueprints(api, module)
 
 
-def _register_utils(app: FlaskApp) -> None:
+def _register_utils(app: FlaskApp, app_config: AppConfig) -> None:
     register_error_handlers(app)
-    register_request_logger(app)
+    register_request_logger(app, app_config["SLOW_REQUEST_THRESHOLD_MS"])
 
 
 def create_app(flask_config: FlaskConfig, app_config: AppConfig) -> FlaskApp:
 
     app = _init_app(flask_config, app_config)
+    logging.getLogger().setLevel(app_config["LOG_LEVEL"])
     logger.info(
         "Configuration loaded: DEBUG=%s, TESTING=%s",
         app.config["DEBUG"],
@@ -76,6 +76,6 @@ def create_app(flask_config: FlaskConfig, app_config: AppConfig) -> FlaskApp:
     _register_blueprints(app)
     logger.info("Blueprints registered successfully")
 
-    _register_utils(app)
+    _register_utils(app, app_config)
 
     return app

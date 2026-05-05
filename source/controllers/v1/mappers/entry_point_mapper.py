@@ -1,7 +1,5 @@
 from source.controllers.v1.entities.entry_point_entity import (
-    EntryPointEntity,
-    EntryPointLinksEntity,
-)
+    EntryPointEntity, EntryPointLinksEntity)
 from source.controllers.v1.entities.link import HttpMethod, LinkEntity
 
 

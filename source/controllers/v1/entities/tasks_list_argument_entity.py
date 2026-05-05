@@ -1,7 +1,8 @@
 from datetime import date
 from typing import Optional
 
-from source.controllers.v1.entities.list_argument_entity import ListArgumentEntity
+from source.controllers.v1.entities.list_argument_entity import \
+    ListArgumentEntity
 from source.models.task import TaskStatus
 from source.models.task_sort import SortDirection, SortField
 

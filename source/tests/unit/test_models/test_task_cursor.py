@@ -1,12 +1,8 @@
 from datetime import date
 
 from source.models.task import Task, TaskStatus
-from source.models.task_cursor import (
-    TaskCursor,
-    convert_cursor_sort_value,
-    decode_task_cursor,
-    encode_task_cursor,
-)
+from source.models.task_cursor import (TaskCursor, convert_cursor_sort_value,
+                                       decode_task_cursor, encode_task_cursor)
 from source.models.task_sort import SortDirection, SortField, TaskSort
 
 TASK = Task(

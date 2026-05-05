@@ -3,16 +3,12 @@ from flask import abort
 from flask_smorest import Blueprint
 
 from source.container import Container
-from source.controllers.v1.entities.auth_entity import (
-    AuthDataEntity,
-    TokenEntity,
-    UserEntity,
-)
-from source.controllers.v1.mappers.auth_mapper import (
-    to_auth_data,
-    to_token_entity,
-    to_user_entity,
-)
+from source.controllers.v1.entities.auth_entity import (AuthDataEntity,
+                                                        TokenEntity,
+                                                        UserEntity)
+from source.controllers.v1.mappers.auth_mapper import (to_auth_data,
+                                                       to_token_entity,
+                                                       to_user_entity)
 from source.controllers.v1.schemas.auth_data_schema import AuthDataSchema
 from source.controllers.v1.schemas.token_schema import TokenSchema
 from source.controllers.v1.schemas.user_schema import UserSchema

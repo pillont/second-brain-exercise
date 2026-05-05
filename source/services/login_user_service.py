@@ -6,9 +6,8 @@ from source.config.app_config import AppConfig
 from source.models.invalid_credentials_error import InvalidCredentialsError
 from source.models.not_found_error import NotFoundError
 from source.models.user import User
-from source.repositories.get_user_by_username_repository import (
-    GetUserByUsernameRepository,
-)
+from source.repositories.get_user_by_username_repository import \
+    GetUserByUsernameRepository
 
 
 class LoginUserService:

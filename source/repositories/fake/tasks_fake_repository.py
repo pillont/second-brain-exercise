@@ -5,11 +5,8 @@ from typing import Any, Iterable, List, Optional, Union
 from source.models.filtered_list import FilteredList, map_to_filtered_list
 from source.models.not_found_error import NotFoundError
 from source.models.task import Task, TaskData, TaskStatus, TaskUpdateData
-from source.models.task_cursor import (
-    TaskCursor,
-    convert_cursor_sort_value,
-    encode_task_cursor,
-)
+from source.models.task_cursor import (TaskCursor, convert_cursor_sort_value,
+                                       encode_task_cursor)
 from source.models.task_filters import TaskFilters
 from source.models.task_sort import SortDirection, SortField, TaskSort
 from source.repositories.create_task_repository import CreateTaskRepository

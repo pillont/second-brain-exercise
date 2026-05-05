@@ -3,7 +3,8 @@ from typing import Final
 from sqlalchemy.engine import Engine
 
 from source.repositories.delete_task_repository import DeleteTaskRepository
-from source.repositories.sqlalchemy.session_utils import OrmSession, initialize_schema
+from source.repositories.sqlalchemy.session_utils import (OrmSession,
+                                                          initialize_schema)
 from source.repositories.sqlalchemy.tasks.task_orm_model import TaskOrmModel
 
 

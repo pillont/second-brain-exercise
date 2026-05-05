@@ -1,13 +1,12 @@
 import pytest
+
 from source.config.app_config import get_app_config
 from source.config.flask_config import TestingFlaskConfig
 from source.controllers.v1.entities.auth_entity import AuthDataEntity
 from source.controllers.v1.entities.link import HttpMethod
-from source.controllers.v1.mappers.auth_mapper import (
-    to_auth_data,
-    to_token_entity,
-    to_user_entity,
-)
+from source.controllers.v1.mappers.auth_mapper import (to_auth_data,
+                                                       to_token_entity,
+                                                       to_user_entity)
 from source.create_app import create_app
 from source.models.user import User, UserData
 
