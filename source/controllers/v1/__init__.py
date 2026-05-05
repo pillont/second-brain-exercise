@@ -1,4 +1,3 @@
 from typing import Any, List
 
-
-__all__:List[Any] = []
+__all__: List[Any] = []

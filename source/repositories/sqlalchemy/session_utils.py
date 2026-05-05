@@ -35,9 +35,7 @@ class OrmSession(Generic[T]):
             execusion = session.execute(select_statement).scalars().all()
             return list(execusion)
 
-    def update_or_raise(
-        self, DTO_id: int, apply_update: Callable[[T], None]
-    ) -> None:
+    def update_or_raise(self, DTO_id: int, apply_update: Callable[[T], None]) -> None:
         with Session(self._engine) as session:
             instance = self._get_or_raise_in_session(session, DTO_id)
             apply_update(instance)
