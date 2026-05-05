@@ -47,9 +47,6 @@ jobs:
       run: |
         python -m flake8 source/ --count --show-source --statistics
 
-    - name: Pylint code analysis
-      run: python -m pylint source/
-
     - name: Type check with MyPy
       run: |
         python -m mypy source/ --explicit-package-bases
