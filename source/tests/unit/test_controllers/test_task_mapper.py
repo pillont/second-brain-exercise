@@ -1,11 +1,11 @@
 from datetime import date
 
-from source.controllers.v1.entities.link import HttpMethod
-from source.controllers.v1.entities.task_entity import (
+from source.controllers.v1.utils.link import HttpMethod
+from source.controllers.v1.tasks.task_entity import (
     TaskDataEntity,
     TaskUpdateDataEntity,
 )
-from source.controllers.v1.mappers.task_mapper import (
+from source.controllers.v1.tasks.task_mapper import (
     to_task_data,
     to_task_entity,
     to_task_update_data,
@@ -125,7 +125,7 @@ def _make_list_entity(
     sort_by=None,
     sort_direction=None,
 ):
-    from source.controllers.v1.entities.tasks_list_argument_entity import (
+    from source.controllers.v1.tasks.tasks_list_argument_entity import (
         TasksListArgumentEntity,
     )
 
@@ -143,7 +143,7 @@ def _make_list_entity(
 
 
 def test_to_task_sort_defaults_to_id_asc_when_no_params() -> None:
-    from source.controllers.v1.mappers.task_mapper import to_task_sort
+    from source.controllers.v1.tasks.task_mapper import to_task_sort
     from source.models.task_sort import SortDirection, SortField
 
     result = to_task_sort(_make_list_entity())
@@ -153,7 +153,7 @@ def test_to_task_sort_defaults_to_id_asc_when_no_params() -> None:
 
 
 def test_to_task_sort_maps_sort_by_title() -> None:
-    from source.controllers.v1.mappers.task_mapper import to_task_sort
+    from source.controllers.v1.tasks.task_mapper import to_task_sort
     from source.models.task_sort import SortDirection, SortField
 
     result = to_task_sort(_make_list_entity(sort_by=SortField.TITLE))
@@ -163,7 +163,7 @@ def test_to_task_sort_maps_sort_by_title() -> None:
 
 
 def test_to_task_sort_maps_sort_direction_desc() -> None:
-    from source.controllers.v1.mappers.task_mapper import to_task_sort
+    from source.controllers.v1.tasks.task_mapper import to_task_sort
     from source.models.task_sort import SortDirection, SortField
 
     result = to_task_sort(_make_list_entity(sort_direction=SortDirection.DESC))
@@ -173,7 +173,7 @@ def test_to_task_sort_maps_sort_direction_desc() -> None:
 
 
 def test_to_task_sort_maps_sort_by_and_direction() -> None:
-    from source.controllers.v1.mappers.task_mapper import to_task_sort
+    from source.controllers.v1.tasks.task_mapper import to_task_sort
     from source.models.task_sort import SortDirection, SortField
 
     result = to_task_sort(

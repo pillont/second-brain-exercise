@@ -1,7 +1,7 @@
 from marshmallow import fields, post_load
 
-from source.controllers.v1.entities.task_entity import TaskUpdateDataEntity
-from source.controllers.v1.schemas.task_data_schema import TaskDataSchema
+from source.controllers.v1.tasks.task_entity import TaskUpdateDataEntity
+from source.controllers.v1.tasks.task_data_schema import TaskDataSchema
 from source.models.task import TaskStatus
 
 

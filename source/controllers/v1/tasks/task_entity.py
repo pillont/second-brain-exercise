@@ -1,7 +1,7 @@
 from datetime import date
 from typing import TypedDict
 
-from source.controllers.v1.entities.link import LinkEntity, LinksEntity
+from source.controllers.v1.utils.link import LinkEntity, LinksEntity
 from source.models.task import TaskStatus
 
 

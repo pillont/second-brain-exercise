@@ -2,9 +2,9 @@ import logging
 
 from flask_smorest import Blueprint
 
-from source.controllers.v1.entities.entry_point_entity import EntryPointEntity
-from source.controllers.v1.mappers.entry_point_mapper import to_entry_point_entity
-from source.controllers.v1.schemas.entry_point_schema import EntryPointSchema
+from source.controllers.v1.root.entry_point_entity import EntryPointEntity
+from source.controllers.v1.root.entry_point_mapper import to_entry_point_entity
+from source.controllers.v1.root.entry_point_schema import EntryPointSchema
 
 logger = logging.getLogger(__name__)
 

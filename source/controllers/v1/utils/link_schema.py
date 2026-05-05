@@ -2,7 +2,7 @@ from typing import Any
 
 from marshmallow import Schema, fields, post_dump
 
-from source.controllers.v1.entities.link import LinkEntity
+from source.controllers.v1.utils.link import LinkEntity
 
 
 class LinkSchema(Schema):

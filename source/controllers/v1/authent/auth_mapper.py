@@ -1,13 +1,13 @@
 from flask_jwt_extended import create_access_token
 
-from source.controllers.v1.entities.auth_entity import (
+from source.controllers.v1.authent.auth_entity import (
     AuthDataEntity,
     TokenEntity,
     TokenLinksEntity,
     UserEntity,
     UserLinksEntity,
 )
-from source.controllers.v1.entities.link import HttpMethod, LinkEntity
+from source.controllers.v1.utils.link import HttpMethod, LinkEntity
 from source.models.user import User, UserData
 
 

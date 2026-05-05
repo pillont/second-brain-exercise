@@ -1,8 +1,8 @@
-from source.controllers.v1.entities.entry_point_entity import (
+from source.controllers.v1.root.entry_point_entity import (
     EntryPointEntity,
     EntryPointLinksEntity,
 )
-from source.controllers.v1.entities.link import HttpMethod, LinkEntity
+from source.controllers.v1.utils.link import HttpMethod, LinkEntity
 
 
 def _build_links() -> EntryPointLinksEntity:
