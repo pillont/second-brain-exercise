@@ -3,4 +3,4 @@ max-line-length = 88
 extend-ignore = E203, W503, E501, W291
 max-function-length = 6
 per-file-ignores =
-    source/tests/*
+    source/tests/*:CFQ001
