@@ -2,15 +2,15 @@ from datetime import date
 
 from marshmallow import ValidationError
 
-from source.controllers.v1.utils.link import HttpMethod, LinkEntity
-from source.controllers.v1.tasks.task_entity import TaskEntity, TaskLinks
+from source.controllers.v1.utils.link import HttpMethod, LinkDTO
+from source.controllers.v1.tasks.task_dto import TaskDTO, TaskLinksDTO
 from source.controllers.v1.tasks.task_data_schema import TaskDataSchema
 from source.controllers.v1.tasks.task_schema import TaskSchema
 from source.controllers.v1.tasks.task_update_data_schema import TaskUpdateDataSchema
 from source.models.task import TaskStatus
 
 
-def test_task_data_schema_load_returns_entity() -> None:
+def test_task_data_schema_load_returns_dto() -> None:
     schema = TaskDataSchema()
     data = {
         "title": "Buy milk",
@@ -27,21 +27,21 @@ def test_task_data_schema_load_returns_entity() -> None:
 
 def test_task_schema_dump_has_correct_keys() -> None:
     schema = TaskSchema()
-    entity = TaskEntity(
+    DTO = TaskDTO(
         id=1,
         title="Buy milk",
         description="At the store",
         due_date=date(2026, 5, 1),
         status=TaskStatus.INCOMPLETE,
-        links=TaskLinks(
-            self_link=LinkEntity(href="/v1/tasks/1"),
-            tasks=LinkEntity(href="/v1/tasks/"),
-            update=LinkEntity(href="/v1/tasks/1", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/v1/tasks/1", type=HttpMethod.DELETE),
+        links=TaskLinksDTO(
+            self_link=LinkDTO(href="/v1/tasks/1"),
+            tasks=LinkDTO(href="/v1/tasks/"),
+            update=LinkDTO(href="/v1/tasks/1", type=HttpMethod.PUT),
+            delete=LinkDTO(href="/v1/tasks/1", type=HttpMethod.DELETE),
         ),
     )
 
-    result = schema.dump(entity)
+    result = schema.dump(DTO)
 
     assert "id" in result
     assert "title" in result
@@ -53,76 +53,76 @@ def test_task_schema_dump_has_correct_keys() -> None:
 
 def test_task_schema_dump_links_structure() -> None:
     schema = TaskSchema()
-    entity = TaskEntity(
+    DTO = TaskDTO(
         id=1,
         title="Buy milk",
         description="At the store",
         due_date=date(2026, 5, 1),
         status=TaskStatus.INCOMPLETE,
-        links=TaskLinks(
-            self_link=LinkEntity(href="/v1/tasks/1"),
-            tasks=LinkEntity(href="/v1/tasks/"),
-            update=LinkEntity(href="/v1/tasks/1", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/v1/tasks/1", type=HttpMethod.DELETE),
+        links=TaskLinksDTO(
+            self_link=LinkDTO(href="/v1/tasks/1"),
+            tasks=LinkDTO(href="/v1/tasks/"),
+            update=LinkDTO(href="/v1/tasks/1", type=HttpMethod.PUT),
+            delete=LinkDTO(href="/v1/tasks/1", type=HttpMethod.DELETE),
         ),
     )
 
-    result = schema.dump(entity)
+    result = schema.dump(DTO)
 
     assert result["_links"]["self"]["href"] == "/v1/tasks/1"
 
 
 def test_task_schema_dump_links_includes_tasks() -> None:
     schema = TaskSchema()
-    entity = TaskEntity(
+    DTO = TaskDTO(
         id=1,
         title="Buy milk",
         description="At the store",
         due_date=date(2026, 5, 1),
         status=TaskStatus.INCOMPLETE,
-        links=TaskLinks(
-            self_link=LinkEntity(href="/v1/tasks/1"),
-            tasks=LinkEntity(href="/v1/tasks/"),
-            update=LinkEntity(href="/v1/tasks/1", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/v1/tasks/1", type=HttpMethod.DELETE),
+        links=TaskLinksDTO(
+            self_link=LinkDTO(href="/v1/tasks/1"),
+            tasks=LinkDTO(href="/v1/tasks/"),
+            update=LinkDTO(href="/v1/tasks/1", type=HttpMethod.PUT),
+            delete=LinkDTO(href="/v1/tasks/1", type=HttpMethod.DELETE),
         ),
     )
 
-    result = schema.dump(entity)
+    result = schema.dump(DTO)
 
     assert result["_links"]["tasks"]["href"] == "/v1/tasks/"
 
 
 def test_task_schema_with_many_true_dumps_list() -> None:
     schema = TaskSchema(many=True)
-    entity1 = TaskEntity(
+    DTO1 = TaskDTO(
         id=1,
         title="Buy milk",
         description="At the store",
         due_date=date(2026, 5, 1),
         status=TaskStatus.INCOMPLETE,
-        links=TaskLinks(
-            self_link=LinkEntity(href="/v1/tasks/1"),
-            tasks=LinkEntity(href="/v1/tasks/"),
-            update=LinkEntity(href="/v1/tasks/1", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/v1/tasks/1", type=HttpMethod.DELETE),
+        links=TaskLinksDTO(
+            self_link=LinkDTO(href="/v1/tasks/1"),
+            tasks=LinkDTO(href="/v1/tasks/"),
+            update=LinkDTO(href="/v1/tasks/1", type=HttpMethod.PUT),
+            delete=LinkDTO(href="/v1/tasks/1", type=HttpMethod.DELETE),
         ),
     )
-    entity2 = TaskEntity(
+    DTO2 = TaskDTO(
         id=2,
         title="Buy eggs",
         description="At the market",
         due_date=date(2026, 5, 2),
         status=TaskStatus.INCOMPLETE,
-        links=TaskLinks(
-            self_link=LinkEntity(href="/v1/tasks/2"),
-            tasks=LinkEntity(href="/v1/tasks/"),
-            update=LinkEntity(href="/v1/tasks/2", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/v1/tasks/2", type=HttpMethod.DELETE),
+        links=TaskLinksDTO(
+            self_link=LinkDTO(href="/v1/tasks/2"),
+            tasks=LinkDTO(href="/v1/tasks/"),
+            update=LinkDTO(href="/v1/tasks/2", type=HttpMethod.PUT),
+            delete=LinkDTO(href="/v1/tasks/2", type=HttpMethod.DELETE),
         ),
     )
 
-    result = schema.dump([entity1, entity2])
+    result = schema.dump([DTO1, DTO2])
 
     assert isinstance(result, list)
     assert len(result) == 2
@@ -139,36 +139,36 @@ def test_task_schema_with_many_true_dumps_empty_list() -> None:
     assert len(result) == 0
 
 
-def test_task_schema_with_many_true_includes_links_per_entity() -> None:
+def test_task_schema_with_many_true_includes_links_per_dto() -> None:
     schema = TaskSchema(many=True)
-    entity1 = TaskEntity(
+    DTO1 = TaskDTO(
         id=1,
         title="Buy milk",
         description="At the store",
         due_date=date(2026, 5, 1),
         status=TaskStatus.INCOMPLETE,
-        links=TaskLinks(
-            self_link=LinkEntity(href="/v1/tasks/1"),
-            tasks=LinkEntity(href="/v1/tasks/"),
-            update=LinkEntity(href="/v1/tasks/1", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/v1/tasks/1", type=HttpMethod.DELETE),
+        links=TaskLinksDTO(
+            self_link=LinkDTO(href="/v1/tasks/1"),
+            tasks=LinkDTO(href="/v1/tasks/"),
+            update=LinkDTO(href="/v1/tasks/1", type=HttpMethod.PUT),
+            delete=LinkDTO(href="/v1/tasks/1", type=HttpMethod.DELETE),
         ),
     )
-    entity2 = TaskEntity(
+    DTO2 = TaskDTO(
         id=2,
         title="Buy eggs",
         description="At the market",
         due_date=date(2026, 5, 2),
         status=TaskStatus.INCOMPLETE,
-        links=TaskLinks(
-            self_link=LinkEntity(href="/v1/tasks/2"),
-            tasks=LinkEntity(href="/v1/tasks/"),
-            update=LinkEntity(href="/v1/tasks/2", type=HttpMethod.PUT),
-            delete=LinkEntity(href="/v1/tasks/2", type=HttpMethod.DELETE),
+        links=TaskLinksDTO(
+            self_link=LinkDTO(href="/v1/tasks/2"),
+            tasks=LinkDTO(href="/v1/tasks/"),
+            update=LinkDTO(href="/v1/tasks/2", type=HttpMethod.PUT),
+            delete=LinkDTO(href="/v1/tasks/2", type=HttpMethod.DELETE),
         ),
     )
 
-    result = schema.dump([entity1, entity2])
+    result = schema.dump([DTO1, DTO2])
 
     assert result[0]["_links"]["self"]["href"] == "/v1/tasks/1"
     assert result[1]["_links"]["self"]["href"] == "/v1/tasks/2"

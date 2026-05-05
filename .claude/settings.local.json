@@ -1,38 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(python -m mypy source/)",
-      "Bash(python -m pytest source/tests/ -v --tb=short)",
-      "Bash(.venv/bin/python -m flake8 source/)",
-      "Bash(.venv/bin/python -m mypy source/)",
-      "Bash(.venv/bin/python -m pytest source/tests/unit/ -v)",
-      "Bash(.venv/bin/python -m mypy source/ --explicit-package-bases)",
-      "Bash(.venv/bin/python -m flake8 source/ --count --show-source --statistics)",
-      "Bash(.venv/bin/python -m pytest source/tests/unit/ -v --tb=short)",
-      "Bash(.venv/bin/python -m flake8 source/controllers/entities/ source/controllers/schemas/link_schema.py source/controllers/schemas/greeting_schema.py source/controllers/greeting_controller.py)",
-      "Bash(.venv/bin/python source/app.py)",
-      "Bash(curl -s http://127.0.0.1:5001/hello)",
-      "Bash(python3 -m json.tool)",
-      "Bash(.venv/bin/python -m source.app)",
-      "Bash(pkill -f \"source.app\")",
-      "Bash(.venv/bin/python -m pytest source/tests/unit/ -q)",
-      "Bash(.venv/bin/python -m black --check source/)",
-      "Bash(.venv/bin/python -m black source/)",
-      "Bash(.venv/bin/python -m pylint source/ --disable=C0111)",
-      "Bash(.venv/bin/python -m pytest source/tests/unit/test_services/test_get_task_service.py source/tests/unit/test_repositories/test_fake_task_repository.py source/tests/integration/test_tasks_controller.py -v)",
-      "Bash(.venv/bin/python -m flake8 source/tests/integration/test_tasks_controller.py)",
-      "Bash(.venv/bin/python -m pytest source/tests/ -q)",
-      "Bash(/Users/thibautpillon/dev/python_env/.venv/bin/python -m pip install PyJWT)",
-      "Bash(.venv/bin/python -m pytest source/tests/ -v)",
-      "Bash(.venv/bin/python -m flake8 source/container.py)",
-      "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py::test_post_task_returns_201 -q)",
-      "Bash(.venv/bin/python -m pytest source/tests/integration/ -v)",
-      "Bash(.venv/bin/python -m pytest source/tests/integration/ -q)",
-      "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py -q)",
-      "Bash(/Users/thibautpillon/dev/python_env/.venv/bin/python -m pytest source/tests/integration/test_auth_controller.py -v)",
-      "Bash(/Users/thibautpillon/dev/python_env/.venv/bin/python -m pytest source/tests/ -v)",
-      "Bash(.venv/bin/python -m pytest source/tests/integration/test_tasks_controller.py::test_get_tasks_filter_by_status_complete -v -s)",
-      "Bash(.venv/bin/python -c ' *)"
-    ]
+    "allow": []
   }
 }

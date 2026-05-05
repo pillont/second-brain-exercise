@@ -1,4 +1,4 @@
-# HATEOAS & Controller Entities Pattern
+# HATEOAS & Controller DTO Pattern
 
 All API responses follow HATEOAS — each response includes a `_links` object with hypermedia links describing available actions and the current resource.
 
@@ -6,19 +6,19 @@ All API responses follow HATEOAS — each response includes a `_links` object wi
 
 **Domain models** (`source/models/`) are pure and never carry hypermedia links.
 
-**Controller entities** (`source/controllers/entities/`) are output DTOs specific to the controller layer. They wrap the domain model data and add the `_links` field before serialization.
+**Controller DTO** (`source/controllers/DTO/`) are output DTOs specific to the controller layer. They wrap the domain model data and add the `_links` field before serialization.
 
-**Mappers** (`source/controllers/mappers/`) handle the conversion between domain models and controller entities. Controllers delegate all mapping to them.
+**Mappers** (`source/controllers/mappers/`) handle the conversion between domain models and controller DTO. Controllers delegate all mapping to them.
 
 ## File structure
 
 | File | Purpose |
 |---|---|
-| `source/controllers/entities/link.py` | `Link` and `Links` dataclasses (shared by all controllers) |
-| `source/controllers/entities/<resource>_entity.py` | DTO for a given resource |
+| `source/controllers/DTO/link.py` | `Link` and `Links` dataclasses (shared by all controllers) |
+| `source/controllers/DTO/<resource>_dto.py` | DTO for a given resource |
 | `source/controllers/schemas/link_schema.py` | `LinkSchema` and `LinksSchema` (shared by all schemas) |
-| `source/controllers/schemas/<resource>_schema.py` | Schema for the entity, includes `_links` field |
-| `source/controllers/mappers/<resource>_mapper.py` | `to_<resource>_entity()` and input mapping functions |
+| `source/controllers/schemas/<resource>_schema.py` | Schema for the DTO, includes `_links` field |
+| `source/controllers/mappers/<resource>_mapper.py` | `to_<resource>_dto()` and input mapping functions |
 
 ## `data_key` mapping convention
 
@@ -29,7 +29,7 @@ All API responses follow HATEOAS — each response includes a `_links` object wi
 
 ## Full example
 
-**entities/link.py** (shared, do not duplicate):
+**DTO/link.py** (shared, do not duplicate):
 ```python
 from enum import StrEnum
 from typing import NotRequired, TypedDict
@@ -40,23 +40,23 @@ class HttpMethod(StrEnum):
     PUT = "PUT"
     DELETE = "DELETE"
 
-class LinkEntity(TypedDict):
+class LinkDTO(TypedDict):
     href: str
     type: NotRequired[HttpMethod]
 
-class LinksEntity(TypedDict):
-    self_link: LinkEntity
+class LinksDTO(TypedDict):
+    self_link: LinkDTO
 ```
 
-**entities/greeting_entity.py**:
+**DTO/greeting_dto.py**:
 ```python
 from typing import TypedDict
-from source.controllers.entities.link import LinksEntity
+from source.controllers.DTO.link import LinksDTO
 
-class GreetingLinks(LinksEntity):
+class GreetingLinks(LinksDTO):
     pass
 
-class GreetingEntity(TypedDict):
+class GreetingDTO(TypedDict):
     id: int
     message: str
     links: GreetingLinks
@@ -90,15 +90,15 @@ class GreetingSchema(Schema):
 
 **mappers/greeting_mapper.py**:
 ```python
-from source.controllers.entities.link import LinkEntity
-from source.controllers.entities.greeting_entity import GreetingEntity, GreetingLinks
+from source.controllers.DTO.link import LinkDTO
+from source.controllers.DTO.greeting_dto import GreetingDTO, GreetingLinks
 from source.models.greeting import Greeting
 
 def _build_links() -> GreetingLinks:
-    return GreetingLinks(self_link=LinkEntity(href="/v1/hello"))
+    return GreetingLinks(self_link=LinkDTO(href="/v1/hello"))
 
-def to_greeting_entity(greeting: Greeting) -> GreetingEntity:
-    return GreetingEntity(id=greeting.id, message=greeting.message, links=_build_links())
+def to_greeting_dto(greeting: Greeting) -> GreetingDTO:
+    return GreetingDTO(id=greeting.id, message=greeting.message, links=_build_links())
 ```
 
 **greeting_controller.py**:
@@ -114,8 +114,8 @@ greeting_blp = Blueprint(
 @greeting_blp.doc(summary="Greeting", description="Returns a greeting message.")
 @greeting_blp.response(200, GreetingSchema)
 @inject
-def get_greeting(greeting_service=Provide[Container.greeting_service]) -> GreetingEntity:
-    return to_greeting_entity(greeting_service.get_greeting())
+def get_greeting(greeting_service=Provide[Container.greeting_service]) -> GreetingDTO:
+    return to_greeting_dto(greeting_service.get_greeting())
 ```
 
 ## TypedDict constructor — never use `cast()`
@@ -124,10 +124,10 @@ Always use the constructor with keyword arguments:
 
 ```python
 return TaskLinks(
-    self_link=LinkEntity(href=f"/v1/tasks/{task.id}"),
-    tasks=LinkEntity(href="/v1/tasks/"),
-    update=LinkEntity(href=f"/v1/tasks/{task.id}", type=HttpMethod.PUT),
-    delete=LinkEntity(href=f"/v1/tasks/{task.id}", type=HttpMethod.DELETE),
+    self_link=LinkDTO(href=f"/v1/tasks/{task.id}"),
+    tasks=LinkDTO(href="/v1/tasks/"),
+    update=LinkDTO(href=f"/v1/tasks/{task.id}", type=HttpMethod.PUT),
+    delete=LinkDTO(href=f"/v1/tasks/{task.id}", type=HttpMethod.DELETE),
 )
 ```
 
@@ -151,7 +151,7 @@ return cast(TaskLinks, {"self_link": {"href": "..."}})
 - Never add `links` to a domain model — models stay pure
 - Never build links in a service or controller — link building belongs in the mapper
 - Never write mapping logic inline in a controller — delegate to `<resource>_mapper.py`
-- Reuse `link.py` and `link_schema.py` — do not create new `LinkEntity`/`LinksEntity` classes per resource
-- One entity file per resource — naming: `<resource>_entity.py` → `class <Resource>Entity`
+- Reuse `link.py` and `link_schema.py` — do not create new `LinkDTO`/`LinksDTO` classes per resource
+- One DTO file per resource — naming: `<resource>_dto.py` → `class <Resource>DTO`
 - One mapper file per resource — naming: `<resource>_mapper.py`
 - Never use `cast()` — use the TypedDict constructor with kwargs instead

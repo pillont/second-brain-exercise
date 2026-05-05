@@ -55,17 +55,17 @@ source/
 │   │   ├── auth_data_schema.py        (AuthDataSchema — login/register body)
 │   │   ├── user_schema.py             (UserSchema — register response)
 │   │   └── token_schema.py            (TokenSchema — login response)
-│   ├── entities/             ← one file per controller output DTO
+│   ├── DTO/             ← one file per controller output DTO
 │   │   ├── __init__.py
-│   │   ├── link.py           (HttpMethod enum, LinkEntity, LinksEntity)
-│   │   ├── greeting_entity.py
-│   │   ├── task_entity.py    (TaskDataEntity, TaskUpdateDataEntity, TaskLinks, TaskEntity)
-│   │   └── auth_entity.py    (AuthDataEntity, UserLinksEntity, UserEntity, TokenLinksEntity, TokenEntity)
+│   │   ├── link.py           (HttpMethod enum, LinkDTO, LinksDTO)
+│   │   ├── greeting_dto.py
+│   │   ├── task_dto.py    (TaskDataDTO, TaskUpdateDataDTO, TaskLinks, TaskDTO)
+│   │   └── auth_dto.py    (AuthDataDTO, UserLinksDTO, UserDTO, TokenLinksDTO, TokenDTO)
 │   ├── mappers/              ← one file per resource
 │   │   ├── __init__.py
 │   │   ├── greeting_mapper.py
-│   │   ├── task_mapper.py    (to_task_data, to_task_update_data, to_task_entity)
-│   │   └── auth_mapper.py    (to_auth_data, to_user_entity, to_token_entity — calls create_access_token)
+│   │   ├── task_mapper.py    (to_task_data, to_task_update_data, to_task_dto)
+│   │   └── auth_mapper.py    (to_auth_data, to_user_dto, to_token_dto — calls create_access_token)
 │   └── utils/
 │       ├── error_handlers.py (centralized Flask error handler)
 │       ├── request_logger.py (before_request logger)

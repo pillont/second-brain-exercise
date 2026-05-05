@@ -3,20 +3,20 @@ from flask_jwt_extended import jwt_required
 from flask_smorest import Blueprint
 
 from source.container import Container
-from source.controllers.v1.utils.list_entity import ListEntity
-from source.controllers.v1.tasks.task_entity import (
-    TaskDataEntity,
-    TaskEntity,
-    TaskUpdateDataEntity,
+from source.controllers.v1.utils.list_dto import ListDTO
+from source.controllers.v1.tasks.task_dto import (
+    TaskDataDTO,
+    TaskDTO,
+    TaskUpdateDataDTO,
 )
-from source.controllers.v1.tasks.tasks_list_argument_entity import (
-    TasksListArgumentEntity,
+from source.controllers.v1.tasks.tasks_list_argument_dto import (
+    TasksListArgumentDTO,
 )
 from source.controllers.v1.tasks.task_mapper import (
     map_to_filtered_tasks_list,
     to_task_cursor,
     to_task_data,
-    to_task_entity,
+    to_task_dto,
     to_task_filters,
     to_task_sort,
     to_task_update_data,
@@ -45,11 +45,11 @@ v1_tasks_blp = Blueprint(
 @v1_tasks_blp.response(201, TaskSchema)
 @inject
 def create_task(
-    task_data_entity: TaskDataEntity,
+    task_data_dto: TaskDataDTO,
     create_task_service: CreateTaskService = Provide[Container.create_task_service],
-) -> TaskEntity:
-    task = create_task_service.create_task(to_task_data(task_data_entity))
-    return to_task_entity(task)
+) -> TaskDTO:
+    task = create_task_service.create_task(to_task_data(task_data_dto))
+    return to_task_dto(task)
 
 
 @v1_tasks_blp.route("/", methods=["GET"])
@@ -62,11 +62,11 @@ def create_task(
 @v1_tasks_blp.response(200, TasksListSchema)
 @inject
 def get_all_tasks(
-    args: TasksListArgumentEntity,
+    args: TasksListArgumentDTO,
     get_all_tasks_service: GetAllTasksService = Provide[
         Container.get_all_tasks_service
     ],
-) -> ListEntity[TaskEntity]:
+) -> ListDTO[TaskDTO]:
     all_tasks = get_all_tasks_service.get_all_tasks(
         to_task_filters(args),
         to_task_sort(args),
@@ -86,9 +86,9 @@ def get_all_tasks(
 def get_task(
     id: int,
     get_task_service: GetTaskService = Provide[Container.get_task_service],
-) -> TaskEntity:
+) -> TaskDTO:
     task = get_task_service.get_task(id)
-    return to_task_entity(task)
+    return to_task_dto(task)
 
 
 @v1_tasks_blp.route("/<int:id>", methods=["PUT"])
@@ -101,11 +101,11 @@ def get_task(
 @v1_tasks_blp.response(204)
 @inject
 def update_task(
-    task_update_data_entity: TaskUpdateDataEntity,
+    task_update_data_dto: TaskUpdateDataDTO,
     id: int,
     update_task_service: UpdateTaskService = Provide[Container.update_task_service],
 ) -> None:
-    update_task_service.update_task(id, to_task_update_data(task_update_data_entity))
+    update_task_service.update_task(id, to_task_update_data(task_update_data_dto))
 
 
 @v1_tasks_blp.route("/<int:id>", methods=["DELETE"])

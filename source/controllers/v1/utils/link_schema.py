@@ -2,7 +2,7 @@ from typing import Any
 
 from marshmallow import Schema, fields, post_dump
 
-from source.controllers.v1.utils.link import LinkEntity
+from source.controllers.v1.utils.link import LinkDTO
 
 
 class LinkSchema(Schema):
@@ -10,7 +10,7 @@ class LinkSchema(Schema):
     type = fields.Str(required=False, allow_none=False)
 
     @post_dump
-    def remove_none(self, data: LinkEntity, **kwargs) -> Any:
+    def remove_none(self, data: LinkDTO, **kwargs) -> Any:
         if data.get("type") is None:
             data.pop("type", None)
         return data

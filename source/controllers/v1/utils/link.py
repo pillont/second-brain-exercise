@@ -9,10 +9,10 @@ class HttpMethod(StrEnum):
     DELETE = "DELETE"
 
 
-class LinkEntity(TypedDict):
+class LinkDTO(TypedDict):
     href: str
     type: NotRequired[HttpMethod]
 
 
-class LinksEntity(TypedDict):
-    self_link: LinkEntity
+class LinksListDTO(TypedDict):
+    self_link: LinkDTO

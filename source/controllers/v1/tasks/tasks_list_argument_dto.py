@@ -1,12 +1,12 @@
 from datetime import date
 from typing import Optional
 
-from source.controllers.v1.utils.list_argument_entity import ListArgumentEntity
+from source.controllers.v1.utils.list_argument_dto import ListArgumentDTO
 from source.models.task import TaskStatus
 from source.models.task_sort import SortDirection, SortField
 
 
-class TasksListArgumentEntity(ListArgumentEntity):
+class TasksListArgumentDTO(ListArgumentDTO):
     status: Optional[TaskStatus]
     due_date_from: Optional[date]
     due_date_to: Optional[date]

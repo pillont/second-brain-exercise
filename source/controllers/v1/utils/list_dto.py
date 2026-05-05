@@ -5,7 +5,7 @@ T = TypeVar("T")
 
 
 @dataclass
-class ListEntity(Generic[T]):
+class ListDTO(Generic[T]):
     elements: Iterable[T]
     has_next: bool
     next_cursor: Optional[str] = field(default=None)

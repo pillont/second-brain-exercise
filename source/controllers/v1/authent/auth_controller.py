@@ -3,15 +3,15 @@ from flask import abort
 from flask_smorest import Blueprint
 
 from source.container import Container
-from source.controllers.v1.authent.auth_entity import (
-    AuthDataEntity,
-    TokenEntity,
-    UserEntity,
+from source.controllers.v1.authent.auth_dto import (
+    AuthDataDTO,
+    TokenDTO,
+    UserDTO,
 )
 from source.controllers.v1.authent.auth_mapper import (
     to_auth_data,
-    to_token_entity,
-    to_user_entity,
+    to_token_dto,
+    to_user_dto,
 )
 from source.controllers.v1.authent.auth_data_schema import AuthDataSchema
 from source.controllers.v1.authent.token_schema import TokenSchema
@@ -33,18 +33,18 @@ v1_auth_blp = Blueprint(
 @v1_auth_blp.response(201, UserSchema)
 @inject
 def register(
-    auth_data_entity: AuthDataEntity,
+    auth_data_dto: AuthDataDTO,
     register_user_service: RegisterUserService = Provide[
         Container.register_user_service
     ],
-) -> UserEntity:
-    user_data = to_auth_data(auth_data_entity)
+) -> UserDTO:
+    user_data = to_auth_data(auth_data_dto)
     try:
         user = register_user_service.register_user(user_data)
     except UserAlreadyExistsError:
         abort(409)
 
-    return to_user_entity(user)
+    return to_user_dto(user)
 
 
 @v1_auth_blp.route("/login", methods=["POST"])
@@ -56,15 +56,15 @@ def register(
 @v1_auth_blp.response(200, TokenSchema)
 @inject
 def login(
-    auth_data_entity: AuthDataEntity,
+    auth_data_dto: AuthDataDTO,
     login_user_service: LoginUserService = Provide[Container.login_user_service],
-) -> TokenEntity:
+) -> TokenDTO:
     try:
         user = login_user_service.login(
-            auth_data_entity["username"],
-            auth_data_entity["password"],
+            auth_data_dto["username"],
+            auth_data_dto["password"],
         )
 
-        return to_token_entity(user)
+        return to_token_dto(user)
     except InvalidCredentialsError:
         abort(401)

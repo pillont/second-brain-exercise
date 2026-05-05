@@ -1,17 +1,17 @@
 from typing import Optional
 
-from source.controllers.v1.utils.link import HttpMethod, LinkEntity
-from source.controllers.v1.utils.list_entity import ListEntity
-from source.controllers.v1.tasks.task_entity import (
-    TaskDataEntity,
-    TaskEntity,
-    TaskLinks,
-    TaskUpdateDataEntity,
+from source.controllers.v1.utils.link import HttpMethod, LinkDTO
+from source.controllers.v1.utils.list_dto import ListDTO
+from source.controllers.v1.tasks.task_dto import (
+    TaskDataDTO,
+    TaskDTO,
+    TaskLinksDTO,
+    TaskUpdateDataDTO,
 )
-from source.controllers.v1.tasks.tasks_list_argument_entity import (
-    TasksListArgumentEntity,
+from source.controllers.v1.tasks.tasks_list_argument_dto import (
+    TasksListArgumentDTO,
 )
-from source.controllers.v1.utils.list_entity_mapper import map_to_list_entity
+from source.controllers.v1.utils.list_dto_mapper import map_to_list_dto
 from source.models.filtered_list import FilteredList
 from source.models.task import Task, TaskData, TaskUpdateData
 from source.models.task_cursor import TaskCursor, decode_task_cursor
@@ -19,47 +19,47 @@ from source.models.task_filters import TaskFilters
 from source.models.task_sort import SortDirection, SortField, TaskSort
 
 
-def to_task_filters(entity: TasksListArgumentEntity) -> TaskFilters:
+def to_task_filters(DTO: TasksListArgumentDTO) -> TaskFilters:
     return TaskFilters(
-        status=entity.get("status"),
-        due_date_from=entity.get("due_date_from"),
-        due_date_to=entity.get("due_date_to"),
-        title=entity.get("title"),
+        status=DTO.get("status"),
+        due_date_from=DTO.get("due_date_from"),
+        due_date_to=DTO.get("due_date_to"),
+        title=DTO.get("title"),
     )
 
 
-def to_task_sort(entity: TasksListArgumentEntity) -> TaskSort:
+def to_task_sort(DTO: TasksListArgumentDTO) -> TaskSort:
     return TaskSort(
-        field=entity.get("sort_by") or SortField.ID,
-        direction=entity.get("sort_direction") or SortDirection.ASC,
+        field=DTO.get("sort_by") or SortField.ID,
+        direction=DTO.get("sort_direction") or SortDirection.ASC,
     )
 
 
-def to_task_cursor(entity: TasksListArgumentEntity) -> Optional[TaskCursor]:
-    cursor_b64 = entity.get("cursor")
+def to_task_cursor(DTO: TasksListArgumentDTO) -> Optional[TaskCursor]:
+    cursor_b64 = DTO.get("cursor")
     return decode_task_cursor(cursor_b64) if cursor_b64 else None
 
 
-def to_task_data(entity: TaskDataEntity) -> TaskData:
+def to_task_data(DTO: TaskDataDTO) -> TaskData:
     return TaskData(
-        title=entity["title"],
-        description=entity["description"],
-        due_date=entity["due_date"],
+        title=DTO["title"],
+        description=DTO["description"],
+        due_date=DTO["due_date"],
     )
 
 
-def to_task_update_data(entity: TaskUpdateDataEntity) -> TaskUpdateData:
+def to_task_update_data(DTO: TaskUpdateDataDTO) -> TaskUpdateData:
     return TaskUpdateData(
-        title=entity["title"],
-        description=entity["description"],
-        due_date=entity["due_date"],
-        status=entity["status"],
+        title=DTO["title"],
+        description=DTO["description"],
+        due_date=DTO["due_date"],
+        status=DTO["status"],
     )
 
 
-def to_task_entity(task: Task) -> TaskEntity:
+def to_task_dto(task: Task) -> TaskDTO:
     links = _build_links(task)
-    return TaskEntity(
+    return TaskDTO(
         id=task.id,
         title=task.title,
         description=task.description,
@@ -69,20 +69,20 @@ def to_task_entity(task: Task) -> TaskEntity:
     )
 
 
-def map_to_filtered_tasks_list(all_tasks: FilteredList[Task]) -> ListEntity[TaskEntity]:
-    return map_to_list_entity(
+def map_to_filtered_tasks_list(all_tasks: FilteredList[Task]) -> ListDTO[TaskDTO]:
+    return map_to_list_dto(
         FilteredList(
-            (to_task_entity(t) for t in all_tasks.elements),
+            (to_task_dto(t) for t in all_tasks.elements),
             has_next=all_tasks.has_next,
             next_cursor=all_tasks.next_cursor,
         )
     )
 
 
-def _build_links(task: Task) -> TaskLinks:
-    return TaskLinks(
-        self_link=LinkEntity(href=f"/v1/tasks/{task.id}"),
-        tasks=LinkEntity(href="/v1/tasks/"),
-        update=LinkEntity(href=f"/v1/tasks/{task.id}", type=HttpMethod.PUT),
-        delete=LinkEntity(href=f"/v1/tasks/{task.id}", type=HttpMethod.DELETE),
+def _build_links(task: Task) -> TaskLinksDTO:
+    return TaskLinksDTO(
+        self_link=LinkDTO(href=f"/v1/tasks/{task.id}"),
+        tasks=LinkDTO(href="/v1/tasks/"),
+        update=LinkDTO(href=f"/v1/tasks/{task.id}", type=HttpMethod.PUT),
+        delete=LinkDTO(href=f"/v1/tasks/{task.id}", type=HttpMethod.DELETE),
     )

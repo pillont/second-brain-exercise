@@ -1,40 +1,40 @@
 from flask_jwt_extended import create_access_token
 
-from source.controllers.v1.authent.auth_entity import (
-    AuthDataEntity,
-    TokenEntity,
-    TokenLinksEntity,
-    UserEntity,
-    UserLinksEntity,
+from source.controllers.v1.authent.auth_dto import (
+    AuthDataDTO,
+    TokenDTO,
+    TokenLinksDTO,
+    UserDTO,
+    UserLinksDTO,
 )
-from source.controllers.v1.utils.link import HttpMethod, LinkEntity
+from source.controllers.v1.utils.link import HttpMethod, LinkDTO
 from source.models.user import User, UserData
 
 
-def to_auth_data(entity: AuthDataEntity) -> UserData:
-    return UserData(username=entity["username"], password=entity["password"])
+def to_auth_data(DTO: AuthDataDTO) -> UserData:
+    return UserData(username=DTO["username"], password=DTO["password"])
 
 
-def _build_user_links() -> UserLinksEntity:
-    return UserLinksEntity(
-        self_link=LinkEntity(href="/v1/auth/register"),
-        login=LinkEntity(href="/v1/auth/login", type=HttpMethod.POST),
+def _build_user_links() -> UserLinksDTO:
+    return UserLinksDTO(
+        self_link=LinkDTO(href="/v1/auth/register"),
+        login=LinkDTO(href="/v1/auth/login", type=HttpMethod.POST),
     )
 
 
-def to_user_entity(user: User) -> UserEntity:
-    return UserEntity(id=user.id, username=user.username, links=_build_user_links())
+def to_user_dto(user: User) -> UserDTO:
+    return UserDTO(id=user.id, username=user.username, links=_build_user_links())
 
 
-def _build_token_links() -> TokenLinksEntity:
-    return TokenLinksEntity(
-        self_link=LinkEntity(href="/v1/auth/login"),
-        register=LinkEntity(href="/v1/auth/register", type=HttpMethod.POST),
-        get_all_tasks=LinkEntity(href="/v1/tasks/"),
-        create_task=LinkEntity(href="/v1/tasks/", type=HttpMethod.POST),
+def _build_token_links() -> TokenLinksDTO:
+    return TokenLinksDTO(
+        self_link=LinkDTO(href="/v1/auth/login"),
+        register=LinkDTO(href="/v1/auth/register", type=HttpMethod.POST),
+        get_all_tasks=LinkDTO(href="/v1/tasks/"),
+        create_task=LinkDTO(href="/v1/tasks/", type=HttpMethod.POST),
     )
 
 
-def to_token_entity(user: User) -> TokenEntity:
+def to_token_dto(user: User) -> TokenDTO:
     token = create_access_token(str(user.id))
-    return TokenEntity(token=token, links=_build_token_links())
+    return TokenDTO(token=token, links=_build_token_links())
