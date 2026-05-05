@@ -34,7 +34,8 @@ def test_post_request_is_logged(client, caplog):
         logging.INFO, logger="source.controllers.utils.request_logger"
     ):
         client.post(
-            "/v1/tasks/", json={"title": "t", "description": "d", "due_date": "2026-05-01"}
+            "/v1/tasks/", 
+            json={"title": "t", "description": "d", "due_date": "2026-05-01"}
         )
 
     assert any(

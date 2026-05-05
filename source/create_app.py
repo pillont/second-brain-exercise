@@ -50,7 +50,6 @@ def _iter_controller_modules() -> Iterator[pkgutil.ModuleInfo]:
     return controllers
 
 
-
 def _register_blueprints(app: FlaskApp) -> None:
     api = Api(app)
     for info in _iter_controller_modules():

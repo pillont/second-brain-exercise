@@ -155,5 +155,4 @@ def _wire_controllers_by_container(container: Container) -> None:
         )
     ]
 
-
     container.wire(modules=modules)

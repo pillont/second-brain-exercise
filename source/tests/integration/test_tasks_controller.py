@@ -531,7 +531,9 @@ def test_get_tasks_filter_combined_status_and_title(client) -> None:
 def test_get_tasks_filter_with_pagination(client) -> None:
     client.post("/v1/tasks/", json={**VALID_BODY, "title": "Task 1"})
     client.post("/v1/tasks/", json={**VALID_BODY, "title": "Task 2"})
-    created = client.post("/v1/tasks/", json={**VALID_BODY, "title": "Task 3"}).get_json()
+    created = client.post(
+        "/v1/tasks/", json={**VALID_BODY, "title": "Task 3"}
+    ).get_json()
     client.put(f"/v1/tasks/{created['id']}", json=VALID_UPDATE_BODY)
 
     response = client.get("/v1/tasks/?status=Incomplete&page_size=1")
@@ -554,7 +556,9 @@ def test_get_tasks_filter_returns_empty_list_when_no_match(client) -> None:
 def test_get_tasks_filter_returns_multiple_matching_elements(client) -> None:
     client.post("/v1/tasks/", json={**VALID_BODY, "title": "Task 1"})
     client.post("/v1/tasks/", json={**VALID_BODY, "title": "Task 2"})
-    created = client.post("/v1/tasks/", json={**VALID_BODY, "title": "Task 3"}).get_json()
+    created = client.post(
+        "/v1/tasks/", json={**VALID_BODY, "title": "Task 3"}
+    ).get_json()
     client.put(f"/v1/tasks/{created['id']}", json=VALID_UPDATE_BODY)
 
     response = client.get("/v1/tasks/?status=Incomplete")
@@ -648,7 +652,9 @@ def test_get_tasks_sort_by_due_date_desc(client) -> None:
 
 def test_get_tasks_sort_by_status_asc_returns_complete_first(client) -> None:
     client.post("/v1/tasks/", json={**VALID_BODY, "title": "Task 1"})
-    created = client.post("/v1/tasks/", json={**VALID_BODY, "title": "Task 2"}).get_json()
+    created = client.post(
+        "/v1/tasks/", json={**VALID_BODY, "title": "Task 2"}
+    ).get_json()
     client.put(f"/v1/tasks/{created['id']}", json=VALID_UPDATE_BODY)
 
     response = client.get("/v1/tasks/?sort_by=status&sort_direction=asc")
@@ -672,11 +678,16 @@ def test_get_tasks_sort_direction_only_defaults_to_id_sort(client) -> None:
 
 def test_get_tasks_sort_with_filter(client) -> None:
     client.post("/v1/tasks/", json={**VALID_BODY, "title": "Cherry"})
-    created = client.post("/v1/tasks/", json={**VALID_BODY, "title": "Apple"}).get_json()
+    created = client.post(
+        "/v1/tasks/", 
+        json={**VALID_BODY, "title": "Apple"}
+    ).get_json()
     client.put(f"/v1/tasks/{created['id']}", json=VALID_UPDATE_BODY)
     client.post("/v1/tasks/", json={**VALID_BODY, "title": "Banana"})
 
-    response = client.get("/v1/tasks/?status=Incomplete&sort_by=title&sort_direction=asc")
+    response = client.get(
+        "/v1/tasks/?status=Incomplete&sort_by=title&sort_direction=asc"
+    )
     data = response.get_json()["elements"]
 
     assert [t["title"] for t in data] == ["Banana", "Cherry"]
@@ -687,7 +698,9 @@ def test_get_tasks_sort_with_pagination_page1(client) -> None:
     client.post("/v1/tasks/", json={**VALID_BODY, "title": "Apple"})
     client.post("/v1/tasks/", json={**VALID_BODY, "title": "Banana"})
 
-    response = client.get("/v1/tasks/?sort_by=title&sort_direction=asc&page_size=2")
+    response = client.get(
+        "/v1/tasks/?sort_by=title&sort_direction=asc&page_size=2"
+    )
     data = response.get_json()
 
     assert [t["title"] for t in data["elements"]] == ["Apple", "Banana"]
@@ -713,7 +726,9 @@ def test_get_tasks_sort_with_pagination_page2(client) -> None:
     assert data["has_next"] is False
 
 
-def test_get_tasks_sort_returns_empty_list_when_filter_matches_nothing(client) -> None:
+def test_get_tasks_sort_returns_empty_list_when_filter_matches_nothing(
+    client
+) -> None:
     client.post("/v1/tasks/", json=VALID_BODY)
 
     response = client.get("/v1/tasks/?sort_by=title&status=Complete")
