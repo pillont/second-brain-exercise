@@ -1,19 +1,19 @@
 # Configuration Architecture
 
-The config layer is split into two classes with responsibilities distinctes.
+The config layer is split into two classes with distinct responsibilities.
 
-## Deux classes, deux destinations
+## Two classes, two destinations
 
-| Classe | Fichier | Passée à | Contenu |
+| Class | File | Passed to | Content |
 |---|---|---|---|
-| `FlaskConfig` | `source/config/flask_config.py` | `app.config.from_object()` | Paramètres Flask/OpenAPI/JWT |
-| `AppConfig` | `source/config/app_config.py` | DI container via `setup_container()` | Paramètres applicatifs |
+| `FlaskConfig` | `source/config/flask_config.py` | `app.config.from_object()` | Flask/OpenAPI/JWT parameters |
+| `AppConfig` | `source/config/app_config.py` | DI container via `setup_container()` | Application parameters |
 
-**Règle** : ne jamais passer `FlaskConfig` au container DI, ne jamais passer `AppConfig` à Flask.
+**Rule**: never pass `FlaskConfig` to the DI container, never pass `AppConfig` to Flask.
 
 ## AppConfig — TypedDict
 
-`AppConfig` est un `TypedDict`, pas une classe :
+`AppConfig` is a `TypedDict`, not a class:
 
 ```python
 class AppConfig(TypedDict):
@@ -21,7 +21,7 @@ class AppConfig(TypedDict):
     JWT_SECRET_KEY: str
 ```
 
-`get_app_config(config_name)` retourne le bon dict via un `match` :
+`get_app_config(config_name)` returns the right dict via a `match`:
 
 ```python
 def get_app_config(config_name: str = "development") -> AppConfig:
@@ -36,22 +36,22 @@ def get_app_config(config_name: str = "development") -> AppConfig:
             raise NotImplementedError()
 ```
 
-Pour ajouter une nouvelle clé : l'ajouter dans `AppConfig` (TypedDict) **et** dans chaque `case` du `match`.
+To add a new key: add it to `AppConfig` (TypedDict) **and** to each `case` in the `match`.
 
-Ne jamais créer de sous-classe de `AppConfig` (ex: `TestingAppConfig`) — toujours utiliser `get_app_config("testing")`.
+Never subclass `AppConfig` (e.g. `TestingAppConfig`) — always use `get_app_config("testing")`.
 
-## FlaskConfig — hiérarchie de classes
+## FlaskConfig — class hierarchy
 
-`FlaskConfig` et ses variantes sont des classes standard Flask :
+`FlaskConfig` and its variants are standard Flask classes:
 
 ```
 FlaskConfig
 ├── DevelopmentFlaskConfig   DEBUG = True
 ├── TestingFlaskConfig       TESTING = True
-└── ProductionFlaskConfig    SECRET_KEY depuis env (obligatoire)
+└── ProductionFlaskConfig    SECRET_KEY from env (required)
 ```
 
-`get_flask_config(app_config, config_name)` prend `AppConfig` en premier argument — il appelle `apply_jwt_config()` pour copier les valeurs JWT dans le `FlaskConfig` avant de le retourner :
+`get_flask_config(app_config, config_name)` takes `AppConfig` as its first argument — it calls `apply_jwt_config()` to copy JWT values into the `FlaskConfig` before returning it:
 
 ```python
 def get_flask_config(
@@ -66,22 +66,22 @@ def apply_jwt_config(config: FlaskConfig, app_config: AppConfig) -> None:
     config.JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
 ```
 
-`JWT_SECRET_KEY` est ainsi la **source unique** : définie dans `AppConfig`, utilisée à la fois par Flask (pour signer les tokens via flask-jwt-extended) et par le container DI (pour `LoginUserService`).
+`JWT_SECRET_KEY` is the **single source of truth**: defined in `AppConfig`, used by both Flask (to sign tokens via flask-jwt-extended) and the DI container (for `LoginUserService`).
 
-## Flux complet
+## Full flow
 
 ```
 app.py
   ├── app_config = get_app_config()
   └── create_app(get_flask_config(app_config), app_config)
-        ├── app.config.from_object(flask_config)   ← Flask reçoit FlaskConfig
-        └── setup_container(app_config)            ← DI reçoit AppConfig
+        ├── app.config.from_object(flask_config)   ← Flask receives FlaskConfig
+        └── setup_container(app_config)            ← DI receives AppConfig
               └── container.config.from_dict(cast(dict, app_config))
 ```
 
-## Container DI et AppConfig
+## DI container and AppConfig
 
-Le container charge l'`AppConfig` via `from_dict`. Les services qui ont besoin de la config reçoivent `config.provided` (proxy résolu au moment de l'injection) :
+The container loads `AppConfig` via `from_dict`. Services that need config values receive `config.provided` (the resolved dict proxy at injection time):
 
 ```python
 class Container(containers.DeclarativeContainer):
@@ -89,7 +89,7 @@ class Container(containers.DeclarativeContainer):
     login_user_service = Singleton(
         LoginUserService,
         repository=user_repository,
-        config=config.provided,   # injecte le dict AppConfig résolu
+        config=config.provided,   # injects the resolved AppConfig dict
     )
 
 def setup_container(app_config: AppConfig) -> Container:
@@ -98,9 +98,9 @@ def setup_container(app_config: AppConfig) -> Container:
     ...
 ```
 
-Les services typent leur paramètre `config: AppConfig` et accèdent aux valeurs via la syntaxe dict : `self._config["JWT_SECRET_KEY"]`.
+Services type their `config` parameter as `AppConfig` and access values via dict syntax: `self._config["JWT_SECRET_KEY"]`.
 
-## En test
+## In tests
 
 ```python
 from source.config.app_config import get_app_config

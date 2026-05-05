@@ -3,10 +3,7 @@ from datetime import date
 from marshmallow import ValidationError
 
 from source.controllers.v1.entities.link import HttpMethod, LinkEntity
-from source.controllers.v1.entities.task_entity import (
-    TaskEntity,
-    TaskLinks,
-)
+from source.controllers.v1.entities.task_entity import TaskEntity, TaskLinks
 from source.controllers.v1.schemas.task_data_schema import TaskDataSchema
 from source.controllers.v1.schemas.task_schema import TaskSchema
 from source.controllers.v1.schemas.task_update_data_schema import TaskUpdateDataSchema

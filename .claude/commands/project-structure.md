@@ -1,7 +1,7 @@
 # Project Structure
 
 **Architecture Pattern**: 5-layer MVC with Flask
-- See detailed documentation in [architecture.md](../../source/architecture.md)
+- See data flow examples in [architecture.md](../../docs/architecture.md)
 
 ```
 source/

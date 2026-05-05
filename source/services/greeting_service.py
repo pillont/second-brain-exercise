@@ -1,4 +1,5 @@
 import logging
+
 from source.models.greeting import Greeting
 
 logger = logging.getLogger(__name__)

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from source.models.user import User
 
 

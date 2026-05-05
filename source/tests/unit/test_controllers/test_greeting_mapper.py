@@ -1,6 +1,6 @@
-from source.models.greeting import Greeting
 from source.controllers.v1.entities.greeting_entity import GreetingEntity
 from source.controllers.v1.mappers.greeting_mapper import to_greeting_entity
+from source.models.greeting import Greeting
 
 
 def test_to_greeting_entity_maps_fields() -> None:

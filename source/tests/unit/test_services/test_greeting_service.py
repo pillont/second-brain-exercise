@@ -1,5 +1,5 @@
-from source.services.greeting_service import GreetingService
 from source.models.greeting import Greeting
+from source.services.greeting_service import GreetingService
 
 
 def test_get_greeting_returns_greeting():

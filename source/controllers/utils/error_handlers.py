@@ -1,5 +1,6 @@
 import logging
-from flask import Flask, Response, jsonify, make_response
+
+from flask import Flask, Response, g, jsonify, make_response
 from werkzeug.exceptions import HTTPException
 
 from source.models.not_found_error import NotFoundError
@@ -18,5 +19,10 @@ def register_error_handlers(app: Flask) -> None:
         if isinstance(e, HTTPException):
             return make_response(e.get_response(), e.code or 500)
 
-        logger.error("Unexpected error: %s", str(e), exc_info=True)
+        logger.error(
+            "Unexpected error: %s request_id=%s",
+            str(e),
+            g.get("request_id", "-"),
+            exc_info=True,
+        )
         return jsonify({"error": "Internal server error"}), 500

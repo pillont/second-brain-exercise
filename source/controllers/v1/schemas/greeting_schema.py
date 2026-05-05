@@ -1,4 +1,5 @@
 from marshmallow import Schema, fields
+
 from source.controllers.v1.schemas.link_schema import LinksSchema
 
 

@@ -2,9 +2,10 @@ import logging
 
 import pytest
 from werkzeug.exceptions import NotFound
-from source.create_app import create_app
+
 from source.config.app_config import get_app_config
 from source.config.flask_config import TestingFlaskConfig
+from source.create_app import create_app
 
 
 @pytest.fixture

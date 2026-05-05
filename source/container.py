@@ -1,32 +1,29 @@
-import pkgutil
 import logging
-
-from sqlalchemy import create_engine
-import source.controllers.v1
+import pkgutil
 from typing import Any, Callable, List, cast
-from dependency_injector import containers
-from dependency_injector import providers
+
+from dependency_injector import containers, providers
+from sqlalchemy import create_engine
+
+import source.controllers.v1
 from source.config.app_config import AppConfig
-from source.repositories.sqlalchemy.tasks.repositories\
-    .create.create_task_sqlalchemy_repository import (
-        CreateTaskSqlalchemyRepository,
-    )
-from source.repositories.sqlalchemy.tasks.repositories\
-    .delete_task_sqlalchemy_repository import (
-        DeleteTaskSqlalchemyRepository,
-    )
-from source.repositories.sqlalchemy.tasks.repositories\
-    .get_all.get_all_tasks_sqlalchemy_repository import (
-        GetAllTasksSqlalchemyRepository,
-    )
-from source.repositories.sqlalchemy.tasks.repositories\
-    .get_task_sqlalchemy_repository import (
-        GetTaskSqlalchemyRepository,
-    )
-from source.repositories.sqlalchemy.tasks.repositories\
-    .update_task_sqlalchemy_repository import (
-        UpdateTaskSqlalchemyRepository,
-    )
+from source.repositories.fake.tasks_fake_repository import TasksFakeRepository
+from source.repositories.fake.users_fake_repository import UsersFakeRepository
+from source.repositories.sqlalchemy.tasks.repositories.create.create_task_sqlalchemy_repository import (
+    CreateTaskSqlalchemyRepository,
+)
+from source.repositories.sqlalchemy.tasks.repositories.delete_task_sqlalchemy_repository import (
+    DeleteTaskSqlalchemyRepository,
+)
+from source.repositories.sqlalchemy.tasks.repositories.get_all.get_all_tasks_sqlalchemy_repository import (
+    GetAllTasksSqlalchemyRepository,
+)
+from source.repositories.sqlalchemy.tasks.repositories.get_task_sqlalchemy_repository import (
+    GetTaskSqlalchemyRepository,
+)
+from source.repositories.sqlalchemy.tasks.repositories.update_task_sqlalchemy_repository import (
+    UpdateTaskSqlalchemyRepository,
+)
 from source.services.create_task_service import CreateTaskService
 from source.services.delete_task_service import DeleteTaskService
 from source.services.get_all_tasks_service import GetAllTasksService
@@ -35,8 +32,6 @@ from source.services.greeting_service import GreetingService
 from source.services.login_user_service import LoginUserService
 from source.services.register_user_service import RegisterUserService
 from source.services.update_task_service import UpdateTaskService
-from source.repositories.fake.tasks_fake_repository import TasksFakeRepository
-from source.repositories.fake.users_fake_repository import FakeUserRepository
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +120,7 @@ class Container(containers.DeclarativeContainer):
         DeleteTaskService, repository=delete_task_repository
     )
 
-    user_repository = providers.Singleton(FakeUserRepository)
+    user_repository = providers.Singleton(UsersFakeRepository)
 
     register_user_service = providers.Singleton(
         RegisterUserService, repository=user_repository

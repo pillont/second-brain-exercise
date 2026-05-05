@@ -7,11 +7,14 @@ on:
       - 'source/**'
       - '.github/workflows/quality-checks.yml'
       - 'requirements.txt'
+
   pull_request:
     branches: [ main, develop ]
     paths:
       - 'source/**'
-
+      - '.github/workflows/quality-checks.yml'
+      - 'requirements.txt'
+      
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -33,76 +36,53 @@ jobs:
         pip install -r requirements.txt
         pip install pytest pytest-cov pytest-mock pytest-asyncio
         pip install mypy flake8 black pylint radon
+        pip install pip-audit isort
         pip install magicmock
 
-    # to enable
-    # - name: Check code formatting with Black
-    #   run: |
-    #     python -m black --check source/
-    #   continue-on-error: false
+    - name: Check code formatting with Black
+      run: |
+        python -m black --check source/
 
     - name: Lint with Flake8 (PEP 8)
       run: |
         python -m flake8 source/ --count --show-source --statistics
-      continue-on-error: false
 
     - name: Type check with MyPy
       run: |
         python -m mypy source/ --explicit-package-bases
-      continue-on-error: false
 
-    - name: Run unit tests
+    # - name: Security analysis with Bandit
+    #   run: |
+    #     python -m bandit -r source/
+
+    - name: Check dependencies vulnerabilities
+      run: |
+        python -m pip_audit --ignore-vuln CVE-2026-3219
+        
+    - name: Check StrEnum usage
+      run: |
+        ! grep -rn "str, Enum\|Enum, str" source/ --include="*.py"
+
+    - name: No inline pylint disables
+      run: |
+        ! grep -rn "# pylint: disable" source/ --include="*.py"
+
+    - name: Run unit tests (min 80% coverage)
       run: |
         python -m pytest source/tests/unit/ -v \
           --tb=short \
           --cov=source \
+          --cov-branch \
           --cov-report=xml \
-          --cov-report=term-missing
-      continue-on-error: false
+          --cov-report=term-missing \
+          --cov-fail-under=80
 
-    - name: Run integration tests
+    - name: Run integration tests (min 80% coverage)
       run: |
         python -m pytest source/tests/integration/ -v \
           --tb=short \
           --cov=source \
-          --cov-append \
+          --cov-branch \
           --cov-report=xml \
-          --cov-report=term-missing
-      continue-on-error: false
-
-    - name: Check code complexity
-      run: |
-        python -m radon cc source/ -a --show-closures
-        python -m radon mi source/ -nb -s
-      continue-on-error: true
-
-    - name: Pylint code analysis
-      run: |
-        python -m pylint source/ \
-          --init-hook='import sys; sys.path.insert(0, ".")' \
-          --extension-pkg-allow-list=dependency_injector \
-          --disable=C0111,C0103,R0903,W0621,R0801 \
-          --exit-zero
-      continue-on-error: false
-
-    - name: Upload coverage reports to Codecov (if configured)
-      uses: codecov/codecov-action@v4
-      with:
-        files: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-      if: matrix.python-version == '3.10'
-      continue-on-error: true
-
-    - name: Report test coverage
-      run: |
-        python -m pytest source/tests/ --cov=source --cov-report=term --cov-report=html:htmlcov
-      continue-on-error: true
-
-    - name: Archive coverage artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-report-${{ matrix.python-version }}
-        path: htmlcov/
-      if: always()
-      continue-on-error: true
+          --cov-report=term-missing \
+          --cov-fail-under=80
