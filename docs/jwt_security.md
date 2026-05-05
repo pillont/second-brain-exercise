@@ -5,7 +5,7 @@
 | Point | Verdict | Detail |
 |---|---|---|
 | **Expiration** | ✅ | 15 minutes — good value for an access token |
-| **IdDTO** | ✅ | `create_access_token(str(user.id))` — standard usage |
+| **IdEntity** | ✅ | `create_access_token(str(user.id))` — standard usage |
 | **Password hashing** | ✅ | `generate_password_hash` / `check_password_hash` (Werkzeug) |
 | **Route protection** | ✅ | `@jwt_required()` on all `/tasks` endpoints |
 | **OpenAPI security scheme** | ✅ | `BearerAuth` correctly declared in `API_SPEC_OPTIONS` |
