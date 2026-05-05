@@ -43,7 +43,7 @@ jobs:
 
     - name: Lint with Flake8 (PEP 8)
       run: |
-        python -m flake8 source/ --count --show-source --statistics --ignore=W291
+        python -m flake8 source/ --count --show-source --statistics
       continue-on-error: false
 
     - name: Type check with MyPy
