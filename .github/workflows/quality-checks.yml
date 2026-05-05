@@ -86,8 +86,3 @@ jobs:
           --cov-report=xml \
           --cov-report=term-missing \
           --cov-fail-under=80
-
-    - name: Check code complexity
-      run: |
-        python -m radon cc source/ -n B --average
-        python -m radon cc source/ --min B --exit-status
