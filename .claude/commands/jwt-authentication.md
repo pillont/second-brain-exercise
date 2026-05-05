@@ -123,7 +123,7 @@ Place `@jwt_required()` immediately after the route decorator and before `@blp.a
 @tasks_blp.arguments(TaskDataSchema)
 @tasks_blp.response(201, TaskSchema)
 @inject
-def create_task(task_data_entity, create_task_service=Provide[...]) -> TaskEntity:
+def create_task(task_data_dto, create_task_service=Provide[...]) -> TaskDTO:
     ...
 ```
 
@@ -133,8 +133,8 @@ Unauthenticated requests to a protected route receive **401**.
 
 | Endpoint | Method | Description | Success | Error |
 |---|---|---|---|---|
-| `/auth/register` | POST | Create a new user | 201 `UserEntity` | 409 duplicate username, 422 bad body |
-| `/auth/login` | POST | Authenticate and get a token | 200 `TokenEntity` | 401 wrong credentials, 422 bad body |
+| `/auth/register` | POST | Create a new user | 201 `UserDTO` | 409 duplicate username, 422 bad body |
+| `/auth/login` | POST | Authenticate and get a token | 200 `TokenDTO` | 401 wrong credentials, 422 bad body |
 
 `auth_controller.py` is the **only** controller that uses `try/except` — it catches domain errors and converts them to HTTP errors via `abort()`:
 
@@ -144,26 +144,26 @@ Unauthenticated requests to a protected route receive **401**.
 @auth_blp.response(409)
 @auth_blp.response(201, UserSchema)
 @inject
-def register(auth_data_entity, register_user_service=Provide[...]) -> UserEntity:
-    user_data = to_auth_data(auth_data_entity)
+def register(auth_data_dto, register_user_service=Provide[...]) -> UserDTO:
+    user_data = to_auth_data(auth_data_dto)
     try:
         user = register_user_service.register_user(user_data)
     except UserAlreadyExistsError:
         abort(409)
-    return to_user_entity(user)
+    return to_user_dto(user)
 
 @auth_blp.route("/login", methods=["POST"])
 @auth_blp.arguments(AuthDataSchema)
 @auth_blp.response(401)
 @auth_blp.response(200, TokenSchema)
 @inject
-def login(auth_data_entity, login_user_service=Provide[...]) -> TokenEntity:
+def login(auth_data_dto, login_user_service=Provide[...]) -> TokenDTO:
     try:
         user = login_user_service.login(
-            auth_data_entity["username"],
-            auth_data_entity["password"],
+            auth_data_dto["username"],
+            auth_data_dto["password"],
         )
-        return to_token_entity(user)
+        return to_token_dto(user)
     except InvalidCredentialsError:
         abort(401)
 ```
@@ -233,9 +233,9 @@ Token creation belongs in `auth_mapper.py` — **never in the controller or serv
 ```python
 from flask_jwt_extended import create_access_token
 
-def to_token_entity(user: User) -> TokenEntity:
+def to_token_dto(user: User) -> TokenDTO:
     token = create_access_token(str(user.id))   # subject = user id as string
-    return TokenEntity(token=token, links=_build_token_links())
+    return TokenDTO(token=token, links=_build_token_links())
 ```
 
 ## Input validation

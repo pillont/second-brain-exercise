@@ -16,9 +16,9 @@ Because `request_logger.py` handles request logging globally, **controllers must
 ```python
 @blueprint.route("/example", methods=["GET"])
 @inject
-def get_example(my_service=Provide[Container.my_service]) -> MyEntity:
+def get_example(my_service=Provide[Container.my_service]) -> MyDTO:
     result = my_service.do_something()
-    return to_my_entity(result)
+    return to_my_dto(result)
 ```
 
 Services and repositories may still raise domain-specific exceptions — the global handler catches anything that bubbles up uncaught.

@@ -13,7 +13,7 @@ source/
 ├── models/        (domain models, StrEnum, error types)
 ├── repositories/  (ABCs + in-memory implementations)
 ├── services/      (one service class per operation)
-├── controllers/   (blueprints, schemas, entities, mappers, utils)
+├── controllers/   (blueprints, schemas, dtos, mappers, utils)
 └── tests/         (unit/ + integration/)
 ```
 
@@ -69,7 +69,7 @@ python -m pylint source/ --disable=C0111
 |---|---|
 | [project-structure](.claude/commands/project-structure.md) | Full annotated file tree |
 | [conventions](.claude/commands/conventions.md) | Inheritance, update ops, filter ordering, pure functions |
-| [hateoas](.claude/commands/hateoas.md) | `_links`, entities, mappers, schemas |
+| [hateoas](.claude/commands/hateoas.md) | `_links`, dtos, mappers, schemas |
 | [serialization](.claude/commands/serialization.md) | flask-smorest, `@blp.response`, Swagger decorators |
 | [config](.claude/commands/config.md) | AppConfig TypedDict, FlaskConfig, bridge function |
 | [jwt-authentication](.claude/commands/jwt-authentication.md) | `@jwt_required()`, decorator order, auth_mapper |

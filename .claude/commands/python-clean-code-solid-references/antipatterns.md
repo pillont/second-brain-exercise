@@ -198,7 +198,7 @@ msg = "User {} logged in at {}".format(name, time)
 
 ## 9. Using `is` for Value Comparison
 
-❌ **Bad**: Checks identity, not equality
+❌ **Bad**: Checks idDTO, not equality
 
 ```python
 if x is 5:  # WRONG! Checks if same object

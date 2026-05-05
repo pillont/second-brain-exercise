@@ -1,0 +1,121 @@
+from dependency_injector.wiring import Provide, inject
+from flask_jwt_extended import jwt_required
+from flask_smorest import Blueprint
+
+from source.container import Container
+from source.controllers.v1.utils.list_dto import ListDTO
+from source.controllers.v1.tasks.task_dto import (
+    TaskDataDTO,
+    TaskDTO,
+    TaskUpdateDataDTO,
+)
+from source.controllers.v1.tasks.tasks_list_argument_dto import (
+    TasksListArgumentDTO,
+)
+from source.controllers.v1.tasks.task_mapper import (
+    map_to_filtered_tasks_list,
+    to_task_cursor,
+    to_task_data,
+    to_task_dto,
+    to_task_filters,
+    to_task_sort,
+    to_task_update_data,
+)
+from source.controllers.v1.tasks.task_data_schema import TaskDataSchema
+from source.controllers.v1.tasks.task_schema import TaskSchema, TasksListSchema
+from source.controllers.v1.tasks.task_update_data_schema import TaskUpdateDataSchema
+from source.controllers.v1.tasks.tasks_list_argument_schema import (
+    TasksListArgumentSchema,
+)
+from source.services.create_task_service import CreateTaskService
+from source.services.delete_task_service import DeleteTaskService
+from source.services.get_all_tasks_service import GetAllTasksService
+from source.services.get_task_service import GetTaskService
+from source.services.update_task_service import UpdateTaskService
+
+v1_tasks_blp = Blueprint(
+    "tasks", __name__, url_prefix="/v1/tasks", description="Task management."
+)
+
+
+@v1_tasks_blp.route("/", methods=["POST"])
+@jwt_required()
+@v1_tasks_blp.doc(summary="Create a task", description="Create a new task.")
+@v1_tasks_blp.arguments(TaskDataSchema)
+@v1_tasks_blp.response(201, TaskSchema)
+@inject
+def create_task(
+    task_data_dto: TaskDataDTO,
+    create_task_service: CreateTaskService = Provide[Container.create_task_service],
+) -> TaskDTO:
+    task = create_task_service.create_task(to_task_data(task_data_dto))
+    return to_task_dto(task)
+
+
+@v1_tasks_blp.route("/", methods=["GET"])
+@jwt_required()
+@v1_tasks_blp.doc(
+    summary="List tasks",
+    description="Retrieve all tasks with optional filters and pagination.",
+)
+@v1_tasks_blp.arguments(TasksListArgumentSchema, location="query")
+@v1_tasks_blp.response(200, TasksListSchema)
+@inject
+def get_all_tasks(
+    args: TasksListArgumentDTO,
+    get_all_tasks_service: GetAllTasksService = Provide[
+        Container.get_all_tasks_service
+    ],
+) -> ListDTO[TaskDTO]:
+    all_tasks = get_all_tasks_service.get_all_tasks(
+        to_task_filters(args),
+        to_task_sort(args),
+        to_task_cursor(args),
+        args.get("page_size", None),
+    )
+
+    return map_to_filtered_tasks_list(all_tasks)
+
+
+@v1_tasks_blp.route("/<int:id>", methods=["GET"])
+@jwt_required()
+@v1_tasks_blp.doc(summary="Get a task", description="Retrieve a single task by its ID.")
+@v1_tasks_blp.response(404)
+@v1_tasks_blp.response(200, TaskSchema)
+@inject
+def get_task(
+    id: int,
+    get_task_service: GetTaskService = Provide[Container.get_task_service],
+) -> TaskDTO:
+    task = get_task_service.get_task(id)
+    return to_task_dto(task)
+
+
+@v1_tasks_blp.route("/<int:id>", methods=["PUT"])
+@jwt_required()
+@v1_tasks_blp.doc(
+    summary="Update a task", description="Update an existing task by its ID."
+)
+@v1_tasks_blp.arguments(TaskUpdateDataSchema)
+@v1_tasks_blp.response(404)
+@v1_tasks_blp.response(204)
+@inject
+def update_task(
+    task_update_data_dto: TaskUpdateDataDTO,
+    id: int,
+    update_task_service: UpdateTaskService = Provide[Container.update_task_service],
+) -> None:
+    update_task_service.update_task(id, to_task_update_data(task_update_data_dto))
+
+
+@v1_tasks_blp.route("/<int:id>", methods=["DELETE"])
+@jwt_required()
+@v1_tasks_blp.doc(summary="Delete a task", description="Delete a task by its ID.")
+@v1_tasks_blp.response(404)
+@v1_tasks_blp.response(204)
+@inject
+def delete_task(
+    id: int,
+    delete_task_service: DeleteTaskService = Provide[Container.delete_task_service],
+) -> None:
+    delete_task_service.delete_task(id)

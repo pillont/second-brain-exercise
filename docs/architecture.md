@@ -10,7 +10,7 @@ source/
 ├── models/        (domain models, StrEnum, error types)
 ├── repositories/  (ABCs + in-memory fakes + SQLAlchemy implementations)
 ├── services/      (one service class per operation)
-├── controllers/   (blueprints, schemas, entities, mappers, utils)
+├── controllers/   (blueprints, schemas, DTO, mappers, utils)
 └── tests/         (unit/ + integration/)
 ```
 
@@ -21,7 +21,7 @@ source/
 1. HTTP POST /tasks/ with JSON body
    ↓
 2. [Controller] create_task()
-   - flask-smorest deserializes body via TaskDataSchema → TaskDataEntity
+   - flask-smorest deserializes body via TaskDataSchema → TaskDataDTO
    - Calls to_task_data() mapper → TaskData domain object
    - Calls CreateTaskService.create_task(task_data)
    ↓
@@ -33,7 +33,7 @@ source/
    - Assigns auto-incremented id, sets status=INCOMPLETE
    - Returns Task
    ↓
-5. [Controller] calls to_task_entity(task) → TaskEntity with _links
+5. [Controller] calls to_task_dto(task) → TaskDTO with _links
    - flask-smorest serializes via TaskSchema → JSON
    - Returns HTTP 201
 ```
@@ -58,5 +58,5 @@ source/
 ## See also
 
 - [project-structure](.claude/commands/project-structure.md) — full annotated file tree
-- [hateoas](.claude/commands/hateoas.md) — entities, mappers, `_links`
+- [hateoas](.claude/commands/hateoas.md) — DTO, mappers, `_links`
 - [dependency-injection](.claude/commands/dependency-injection.md) — container wiring

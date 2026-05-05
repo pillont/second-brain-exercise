@@ -39,10 +39,10 @@ class OrmSession(Generic[T]):
     def __init__(self, engine: Engine, model_class: type[T]) -> None: ...
 
     def add(self, orm_object: Base) -> None: ...          # INSERT + refresh (gets auto-increment id)
-    def get_or_raise(self, entity_id: int) -> T: ...      # SELECT by PK, raises NotFoundError
+    def get_or_raise(self, DTO_id: int) -> T: ...      # SELECT by PK, raises NotFoundError
     def select(self, select_statement: Select) -> List[T]: ...  # execute arbitrary SELECT
-    def update_or_raise(self, entity_id: int, apply_update: Callable[[T], None]) -> None: ...
-    def delete_or_raise(self, entity_id: int) -> None: ...
+    def update_or_raise(self, DTO_id: int, apply_update: Callable[[T], None]) -> None: ...
+    def delete_or_raise(self, DTO_id: int) -> None: ...
 ```
 
 Each repo's `__init__` follows this exact pattern:
@@ -85,7 +85,7 @@ def delete_task(self, id: int) -> None:
 
 ### Keyset cursor pagination
 
-Cursor is an entity `id`. `get_cursor_row` fetches the row, then SQL builds a WHERE that skips everything before it:
+Cursor is an DTO `id`. `get_cursor_row` fetches the row, then SQL builds a WHERE that skips everything before it:
 
 - ID sort: `WHERE id > cursor_id`
 - Other field (e.g. title ASC): `WHERE (LOWER(title) > val) OR (LOWER(title) = val AND id > cursor_id)`

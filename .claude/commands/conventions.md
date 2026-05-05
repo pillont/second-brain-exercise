@@ -2,21 +2,21 @@
 
 ## Inheritance for variants
 
-When creating an Update variant of a model/entity/schema, inherit from the base and only add the extra field — never re-declare shared fields:
+When creating an Update variant of a model/dto/schema, inherit from the base and only add the extra field — never re-declare shared fields:
 
 ```python
 class TaskUpdateData(TaskData):
     status: TaskStatus
 
-class TaskUpdateDataEntity(TaskDataEntity):
+class TaskUpdateDataDTO(TaskDataDTO):
     status: TaskStatus
 
 class TaskUpdateDataSchema(TaskDataSchema):
     status = fields.Enum(TaskStatus, by_value=True, required=True)
 
     @post_load
-    def make_entity(self, data: dict, **kwargs: object) -> TaskUpdateDataEntity:
-        return TaskUpdateDataEntity(**data)
+    def make_dto(self, data: dict, **kwargs: object) -> TaskUpdateDataDTO:
+        return TaskUpdateDataDTO(**data)
 ```
 
 ## Update operations
@@ -31,13 +31,13 @@ Marshmallow 4 loads enums **by name** by default (`INCOMPLETE`, `COMPLETE`). Alw
 status = fields.Enum(TaskStatus, by_value=True, required=False)
 ```
 
-## Generic vs resource-specific schemas and entities
+## Generic vs resource-specific schemas and dtos
 
 Generic components (pagination) stay minimal. Resource-specific fields go in a subclass:
 
 - `ListArgumentSchema(Schema)` → `cursor`, `page_size` only
 - `TasksListArgumentSchema(ListArgumentSchema)` → adds filter fields
-- Same pattern for TypedDict entities: `ListArgumentEntity` → `TasksListArgumentEntity(ListArgumentEntity)`
+- Same pattern for TypedDict dtos: `ListArgumentDTO` → `TasksListArgumentDTO(ListArgumentDTO)`
 - The resource controller uses the resource-specific subclass, never the generic directly
 
 ## Filter parameter ordering in signatures

@@ -26,31 +26,29 @@ class OrmSession(Generic[T]):
             session.commit()
             session.refresh(orm_object)
 
-    def get_or_raise(self, entity_id: int) -> T:
+    def get_or_raise(self, DTO_id: int) -> T:
         with Session(self._engine) as session:
-            return self._get_or_raise_in_session(session, entity_id)
+            return self._get_or_raise_in_session(session, DTO_id)
 
     def select(self, select_statement: Select) -> List[T]:
         with Session(self._engine) as session:
             execusion = session.execute(select_statement).scalars().all()
             return list(execusion)
 
-    def update_or_raise(
-        self, entity_id: int, apply_update: Callable[[T], None]
-    ) -> None:
+    def update_or_raise(self, DTO_id: int, apply_update: Callable[[T], None]) -> None:
         with Session(self._engine) as session:
-            instance = self._get_or_raise_in_session(session, entity_id)
+            instance = self._get_or_raise_in_session(session, DTO_id)
             apply_update(instance)
             session.commit()
 
-    def delete_or_raise(self, entity_id: int) -> None:
+    def delete_or_raise(self, DTO_id: int) -> None:
         with Session(self._engine) as session:
-            instance = self._get_or_raise_in_session(session, entity_id)
+            instance = self._get_or_raise_in_session(session, DTO_id)
             session.delete(instance)
             session.commit()
 
-    def _get_or_raise_in_session(self, session: Session, entity_id: int) -> T:
-        instance = session.get(self._model_class, entity_id)
+    def _get_or_raise_in_session(self, session: Session, DTO_id: int) -> T:
+        instance = session.get(self._model_class, DTO_id)
         if instance is None:
             raise NotFoundError()
         return instance
