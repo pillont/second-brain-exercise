@@ -51,10 +51,6 @@ jobs:
       run: |
         python -m mypy source/ --explicit-package-bases
 
-    # - name: Security analysis with Bandit
-    #   run: |
-    #     python -m bandit -r source/
-
     - name: Check dependencies vulnerabilities
       run: |
         python -m pip_audit --ignore-vuln CVE-2026-3219
@@ -86,3 +82,21 @@ jobs:
           --cov-report=xml \
           --cov-report=term-missing \
           --cov-fail-under=80
+
+    # IMPROVEMENTS :
+    #
+    # - name: Check imports order with isort
+    #   run: |
+    #     python -m isort source/ --check-only
+    #
+    # - name: Pylint code analysis
+    #   run: python -m pylint source/
+    #
+    # - name: Security analysis with Bandit
+    #   run: |
+    #     python -m bandit -r source/
+    #
+    # - name: Check code complexity
+    #   run: |        
+    #     python -m radon cc source/ -n B --average
+    #     python -m radon cc source/ --min B --exit-status
