@@ -7,7 +7,7 @@ from sqlalchemy.sql import Select
 from source.models.not_found_error import NotFoundError
 from source.repositories.sqlalchemy.tasks.task_orm_model import Base
 
-T = TypeVar("T")
+T = TypeVar("T", bound=Base)
 
 
 def initialize_schema(engine: Engine) -> Engine:
@@ -17,34 +17,34 @@ def initialize_schema(engine: Engine) -> Engine:
 
 class OrmSession(Generic[T]):
     def __init__(self, engine: Engine, model_class: type[T]) -> None:
-        self._engine: Final = engine
+        self.engine: Final = engine
         self._model_class: Final = model_class
 
-    def add(self, orm_object: Base) -> None:
-        with Session(self._engine) as session:
+    def add(self, orm_object: T) -> None:
+        with Session(self.engine) as session:
             session.add(orm_object)
             session.commit()
             session.refresh(orm_object)
 
     def get_or_raise(self, entity_id: int) -> T:
-        with Session(self._engine) as session:
+        with Session(self.engine) as session:
             return self._get_or_raise_in_session(session, entity_id)
 
     def select(self, select_statement: Select) -> List[T]:
-        with Session(self._engine) as session:
+        with Session(self.engine) as session:
             execusion = session.execute(select_statement).scalars().all()
             return list(execusion)
 
     def update_or_raise(
         self, entity_id: int, apply_update: Callable[[T], None]
     ) -> None:
-        with Session(self._engine) as session:
+        with Session(self.engine) as session:
             instance = self._get_or_raise_in_session(session, entity_id)
             apply_update(instance)
             session.commit()
 
     def delete_or_raise(self, entity_id: int) -> None:
-        with Session(self._engine) as session:
+        with Session(self.engine) as session:
             instance = self._get_or_raise_in_session(session, entity_id)
             session.delete(instance)
             session.commit()

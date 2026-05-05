@@ -19,6 +19,7 @@ from source.repositories.sqlalchemy.tasks.repositories.get_task_sqlalchemy_repos
     GetTaskSqlalchemyRepository
 from source.repositories.sqlalchemy.tasks.repositories.update_task_sqlalchemy_repository import \
     UpdateTaskSqlalchemyRepository
+from source.repositories.sqlalchemy.users.user_sqlalchemy_repository import UsersSqlalchemyRepository
 from source.services.create_task_service import CreateTaskService
 from source.services.delete_task_service import DeleteTaskService
 from source.services.get_all_tasks_service import GetAllTasksService
@@ -115,8 +116,15 @@ class Container(containers.DeclarativeContainer):
         DeleteTaskService, repository=delete_task_repository
     )
 
-    user_repository = providers.Singleton(UsersFakeRepository)
+    user_fake_repository = providers.Singleton(UsersFakeRepository)
+    user_sqlalchemy_repository = providers.Singleton(UsersSqlalchemyRepository)
 
+    user_repository = providers.Callable(
+        _select_repo,
+        config.provided,
+        user_sqlalchemy_repository.provider,
+        user_fake_repository.provider,
+    )
     register_user_service = providers.Singleton(
         RegisterUserService, repository=user_repository
     )
