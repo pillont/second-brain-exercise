@@ -95,7 +95,7 @@ from source.controllers.entities.greeting_entity import GreetingEntity, Greeting
 from source.models.greeting import Greeting
 
 def _build_links() -> GreetingLinks:
-    return GreetingLinks(self_link=LinkEntity(href="/hello"))
+    return GreetingLinks(self_link=LinkEntity(href="/v1/hello"))
 
 def to_greeting_entity(greeting: Greeting) -> GreetingEntity:
     return GreetingEntity(id=greeting.id, message=greeting.message, links=_build_links())
@@ -124,10 +124,10 @@ Always use the constructor with keyword arguments:
 
 ```python
 return TaskLinks(
-    self_link=LinkEntity(href=f"/tasks/{task.id}"),
-    tasks=LinkEntity(href="/tasks/"),
-    update=LinkEntity(href=f"/tasks/{task.id}", type=HttpMethod.PUT),
-    delete=LinkEntity(href=f"/tasks/{task.id}", type=HttpMethod.DELETE),
+    self_link=LinkEntity(href=f"/v1/tasks/{task.id}"),
+    tasks=LinkEntity(href="/v1/tasks/"),
+    update=LinkEntity(href=f"/v1/tasks/{task.id}", type=HttpMethod.PUT),
+    delete=LinkEntity(href=f"/v1/tasks/{task.id}", type=HttpMethod.DELETE),
 )
 ```
 

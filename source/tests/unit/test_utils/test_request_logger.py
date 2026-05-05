@@ -21,10 +21,10 @@ def test_request_is_logged(client, caplog):
     with caplog.at_level(
         logging.INFO, logger="source.controllers.utils.request_logger"
     ):
-        client.get("/hello")
+        client.get("/v1/hello")
 
     assert any(
-        "GET" in record.message and "/hello" in record.message
+        "GET" in record.message and "/v1/hello" in record.message
         for record in caplog.records
     )
 
@@ -34,10 +34,11 @@ def test_post_request_is_logged(client, caplog):
         logging.INFO, logger="source.controllers.utils.request_logger"
     ):
         client.post(
-            "/tasks/", json={"title": "t", "description": "d", "due_date": "2026-05-01"}
+            "/v1/tasks/", 
+            json={"title": "t", "description": "d", "due_date": "2026-05-01"}
         )
 
     assert any(
-        "POST" in record.message and "/tasks/" in record.message
+        "POST" in record.message and "/v1/tasks/" in record.message
         for record in caplog.records
     )

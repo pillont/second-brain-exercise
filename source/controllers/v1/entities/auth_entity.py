@@ -1,6 +1,6 @@
 from typing import TypedDict
 
-from source.controllers.entities.link import LinkEntity, LinksEntity
+from source.controllers.v1.entities.link import LinkEntity, LinksEntity
 
 
 class UserLinksEntity(LinksEntity):

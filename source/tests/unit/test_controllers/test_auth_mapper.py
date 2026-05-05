@@ -1,9 +1,9 @@
 import pytest
 from source.config.app_config import get_app_config
 from source.config.flask_config import TestingFlaskConfig
-from source.controllers.entities.auth_entity import AuthDataEntity
-from source.controllers.entities.link import HttpMethod
-from source.controllers.mappers.auth_mapper import (
+from source.controllers.v1.entities.auth_entity import AuthDataEntity
+from source.controllers.v1.entities.link import HttpMethod
+from source.controllers.v1.mappers.auth_mapper import (
     to_auth_data,
     to_token_entity,
     to_user_entity,
@@ -43,13 +43,13 @@ def test_to_user_entity_maps_fields() -> None:
 def test_to_user_entity_sets_self_link() -> None:
     result = to_user_entity(_make_user())
 
-    assert result["links"]["self_link"]["href"] == "/auth/register"
+    assert result["links"]["self_link"]["href"] == "/v1/auth/register"
 
 
 def test_to_user_entity_sets_login_link() -> None:
     result = to_user_entity(_make_user())
 
-    assert result["links"]["login"]["href"] == "/auth/login"
+    assert result["links"]["login"]["href"] == "/v1/auth/login"
     assert result["links"]["login"]["type"] == HttpMethod.POST
 
 
@@ -65,14 +65,14 @@ def test_to_token_entity_sets_self_link(app) -> None:
     with app.app_context():
         result = to_token_entity(_make_user())
 
-    assert result["links"]["self_link"]["href"] == "/auth/login"
+    assert result["links"]["self_link"]["href"] == "/v1/auth/login"
 
 
 def test_to_token_entity_sets_register_link(app) -> None:
     with app.app_context():
         result = to_token_entity(_make_user())
 
-    assert result["links"]["register"]["href"] == "/auth/register"
+    assert result["links"]["register"]["href"] == "/v1/auth/register"
     assert result["links"]["register"]["type"] == HttpMethod.POST
 
 
@@ -80,7 +80,7 @@ def test_to_token_entity_sets_get_all_tasks_link(app) -> None:
     with app.app_context():
         result = to_token_entity(_make_user())
 
-    assert result["links"]["get_all_tasks"]["href"] == "/tasks/"
+    assert result["links"]["get_all_tasks"]["href"] == "/v1/tasks/"
     assert "type" not in result["links"]["get_all_tasks"]
 
 
@@ -88,5 +88,5 @@ def test_to_token_entity_sets_create_task_link(app) -> None:
     with app.app_context():
         result = to_token_entity(_make_user())
 
-    assert result["links"]["create_task"]["href"] == "/tasks/"
+    assert result["links"]["create_task"]["href"] == "/v1/tasks/"
     assert result["links"]["create_task"]["type"] == HttpMethod.POST

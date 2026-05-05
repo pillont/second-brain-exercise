@@ -7,7 +7,7 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_smorest import Api, Blueprint
 
-import source.controllers
+import source.controllers.v1
 from source.config.app_config import AppConfig
 from source.config.flask_config import FlaskConfig
 from source.container import setup_container, Container
@@ -43,10 +43,11 @@ def _register_module_blueprints(api: Api, module: object) -> None:
 
 
 def _iter_controller_modules() -> Iterator[pkgutil.ModuleInfo]:
-    return pkgutil.walk_packages(
+    controllers = pkgutil.walk_packages(
         path=source.controllers.__path__,
         prefix="source.controllers.",
     )
+    return controllers
 
 
 def _register_blueprints(app: FlaskApp) -> None:

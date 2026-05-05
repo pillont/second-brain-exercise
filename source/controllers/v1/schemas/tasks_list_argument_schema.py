@@ -1,6 +1,6 @@
 from marshmallow import fields
 
-from source.controllers.schemas.list_argument_schema import ListArgumentSchema
+from source.controllers.v1.schemas.list_argument_schema import ListArgumentSchema
 from source.models.task import TaskStatus
 from source.models.task_sort import SortDirection, SortField
 
